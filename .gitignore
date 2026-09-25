@@ -12,13 +12,6 @@ secrets.yaml
 # Récaps de session
 SESSION_SUMMARY.md
 
-# Fichiers d'outillage locaux
-CLAUDE.md
-.claude/
-
-# Consignes destinées aux assistants de code : restent en local
-CONTRIBUTING.md
-
 # Python
 __pycache__/
 *.pyc
