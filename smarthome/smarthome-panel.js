@@ -15,7 +15,7 @@ import { demarrerHorloge } from './js/clock.js';
 // La clé correspond au premier segment d'URL après le préfixe du panneau.
 const VUES = {
   '':         { titre: 'Tableau de bord', charger: () => import('./views/dashboard/dashboard.js') },
-  budget:     { titre: 'Budget & Factures' },
+  budget:     { titre: 'Budget & Factures', charger: () => import('./views/budget/budget.js') },
   energie:    { titre: 'Énergie & Fluides' },
   calendrier: { titre: 'Calendrier famille' },
   courses:    { titre: 'Liste de courses' },

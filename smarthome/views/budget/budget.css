@@ -1,0 +1,546 @@
+/* =============================================
+   BUDGET.CSS — Vue Budget & Factures
+   Maquette Figma (thème clair) transposée en thème sombre.
+   ============================================= */
+
+.vue-budget {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.budget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+/* === EN-TÊTE === */
+.budget-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.budget-titre {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.budget-sous-titre {
+  margin-top: 6px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.budget-mois {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* === GRILLE (paysage) === */
+.budget-ligne {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap-lg);
+  align-items: start;
+}
+.budget-ligne-factures { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+
+/* === CARTES === */
+.budget-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+.budget-carte-titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* === TEXTES ET MONTANTS === */
+.budget-libelle {
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.budget-montant {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  text-align: right;
+}
+
+.budget-ligne-texte {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.budget-chiffre {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.budget-droite { text-align: right; }
+.budget-gras   { font-weight: 600; }
+
+.budget-texte-emeraude { color: var(--accent-emeraude); }
+.budget-texte-rose     { color: var(--accent-rose); font-weight: 600; }
+.budget-texte-ambre    { color: var(--accent-ambre); }
+
+/* === APERÇU GLOBAL === */
+.budget-donut {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.budget-donut svg { display: block; }
+
+.budget-donut-fond,
+.budget-donut-arc {
+  fill: none;
+  stroke-width: 12;
+}
+.budget-donut-fond { stroke: var(--piste); }
+.budget-donut-arc  { stroke: var(--accent-bleu-vif); stroke-linecap: round; }
+
+.budget-donut-texte {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.budget-donut-texte b    { font-size: var(--fs-xl); line-height: 1.1; }
+.budget-donut-texte span { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+.budget-chiffres {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.budget-chiffres dd { margin-bottom: 10px; }
+.budget-chiffres dd:last-child { margin-bottom: 0; }
+
+/* === ÉVOLUTION MENSUELLE === */
+.budget-courbe-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.budget-courbe-grille { stroke: var(--border); stroke-width: 1; }
+.budget-courbe-ligne  { fill: none; stroke: var(--accent-bleu-vif); stroke-width: 2; stroke-linejoin: round; }
+.budget-courbe-point  { fill: var(--accent-bleu-vif); }
+.budget-courbe-actuel { stroke: var(--bg-card); stroke-width: 2; }
+.budget-courbe-bulle  { fill: var(--bg-main); stroke: var(--border); }
+.budget-courbe-bulle-texte {
+  fill: var(--text-primary);
+  font-size: 12px;   /* unités du viewBox SVG : ≥ 14 px à l'écran une fois le graphique agrandi */
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.budget-courbe-mois {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.budget-mois-actuel { font-weight: 600; color: var(--text-primary); }
+
+/* === CHAMPS DE SAISIE === */
+.budget-champ-bloc {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.budget-champ {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+  transition: var(--transition);
+}
+.budget-champ:focus-within { border-color: var(--border-active); }
+
+.budget-champ-court { width: 160px; flex-shrink: 0; }
+
+.budget-devise {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+.budget-champ input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  text-align: right;
+  outline: none;
+  -moz-appearance: textfield;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.budget-champ input::-webkit-outer-spin-button,
+.budget-champ input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* === JAUGES === */
+.budget-progression {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.budget-progression b { font-size: var(--fs-xs); }
+
+.budget-jauge {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--piste);
+  overflow: hidden;
+}
+
+.budget-jauge-remplie {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.budget-couleur-bleu     { background: var(--accent-bleu-vif); }
+.budget-couleur-rose     { background: var(--accent-rose); }
+.budget-couleur-ambre    { background: var(--accent-ambre); }
+.budget-couleur-emeraude { background: var(--accent-emeraude); }
+
+/* === ÉPARGNE === */
+.budget-repartition {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.budget-repartition b.budget-libelle { font-weight: 600; }
+.budget-repartition .budget-ligne-texte b { font-size: var(--fs-xs); }
+
+/* === AJUSTEMENT DES DÉPENSES === */
+.budget-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.budget-categorie {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.budget-ajuster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.budget-ajuster .budget-libelle { flex: 1; }
+
+.budget-bouton-pas {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.budget-bouton-pas:active { background: var(--bg-card-hover); }
+
+/* === TOTAUX === */
+.budget-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+  font-size: var(--fs-xs);
+}
+.budget-total-valeur { font-size: var(--fs-md); }
+
+/* === SORTIES & IMPRÉVUS === */
+.budget-imprevus {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.budget-imprevu > span:first-child { font-size: var(--fs-sm); font-weight: 500; }
+
+/* === FACTURES À VENIR === */
+.budget-a-venir {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.budget-facture {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+}
+.budget-facture b:first-child  { font-size: var(--fs-xs); }
+.budget-facture-montant        { font-size: var(--fs-md); }
+
+/* === STATUTS === */
+.budget-statut {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.budget-statut-a-payer { background: rgba(245, 158, 11, 0.12); color: var(--accent-ambre); }
+.budget-statut-paye    { background: rgba(16, 185, 129, 0.12); color: var(--accent-emeraude); }
+.budget-statut-retard  { background: rgba(225, 29, 72, 0.12);  color: var(--accent-rose); }
+
+/* === HISTORIQUE === */
+.budget-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--fs-sm);
+}
+
+.budget-table th {
+  padding: 12px;
+  background: var(--bg-input);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-align: left;
+}
+.budget-table th:first-child { border-radius: 6px 0 0 6px; }
+.budget-table th:last-child  { border-radius: 0 6px 6px 0; }
+.budget-table th.budget-droite { text-align: right; }
+
+.budget-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.budget-table tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
+.budget-table td.budget-libelle { font-size: var(--fs-sm); }
+.budget-fournisseur { font-weight: 500; }
+
+/* === ÉTATS DE LA VUE === */
+.vue-budget [hidden] { display: none !important; }
+
+.budget-contenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+.budget-entete-droite {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.budget-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.budget-bouton {
+  min-height: var(--touch-min);
+  padding: 0 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.budget-bouton:active { background: var(--bg-card-hover); }
+.budget-bouton:disabled { opacity: 0.5; cursor: wait; }
+
+.budget-bouton-principal {
+  border-color: transparent;
+  background: var(--accent-bleu-vif);
+  color: #fff;
+}
+.budget-bouton-principal:active { background: var(--accent-blue); }
+
+.budget-erreur {
+  padding: 14px 18px;
+  border: 1px solid var(--accent-rose);
+  border-radius: 12px;
+  background: rgba(225, 29, 72, 0.12);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+}
+
+/* === ÉCRAN DE CODE === */
+.budget-verrou {
+  align-self: center;
+  align-items: center;
+  width: min(100%, 440px);
+  text-align: center;
+}
+
+.budget-verrou-titre {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.budget-code-points {
+  display: flex;
+  gap: 14px;
+  margin: 8px 0;
+}
+
+.budget-code-point {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-secondary);
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.budget-code-point.rempli {
+  border-color: var(--accent-bleu-vif);
+  background-color: var(--accent-bleu-vif);
+}
+
+.budget-code-message {
+  min-height: 1.5em;
+  font-size: var(--fs-sm);
+  color: var(--accent-ambre);
+}
+
+.budget-clavier {
+  display: grid;
+  grid-template-columns: repeat(3, 88px);
+  gap: 14px;
+}
+
+.budget-touche {
+  height: 72px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.budget-touche:active { background: var(--bg-card-hover); }
+.budget-touche:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* === MODE ÉDITION === */
+.budget-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.budget-ligne-edition {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.budget-ligne-edition .budget-champ-texte { flex: 1; }
+.budget-fin { justify-content: flex-end; }
+
+.budget-champ-texte input { text-align: left; font-size: var(--fs-sm); font-weight: 500; }
+.budget-champ-date input { font-size: var(--fs-sm); color-scheme: dark; }
+.budget-champ-date { flex-shrink: 0; }
+
+.budget-champ input[readonly] { cursor: default; }
+.budget-en-edition .budget-champ { border-color: var(--border-active); }
+
+.budget-select {
+  min-height: var(--touch-min);
+  padding: 0 12px;
+  border: 1px solid var(--border-active);
+  border-radius: 10px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  color-scheme: dark;
+}
+
+.budget-depense-libelle { flex: 0 0 auto; margin-left: 12px; }
+
+.budget-ajouter {
+  min-height: var(--touch-min);
+  border: 1px dashed var(--border-active);
+  border-radius: 10px;
+  background: none;
+  color: var(--accent-bleu-vif);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.budget-ajouter:active { background: var(--bg-card-hover); }
+
+.budget-vide {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.budget-table td .budget-champ { min-width: 0; }

@@ -16,6 +16,13 @@ SESSION_SUMMARY.md
 CLAUDE.md
 .claude/
 
+# Consignes destinées aux assistants de code : restent en local
+CONTRIBUTING.md
+
+# Python
+__pycache__/
+*.pyc
+
 # OS / éditeurs
 Thumbs.db
 .DS_Store

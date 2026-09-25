@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Code du budget",
+        "description": "Code à 6 chiffres demandé pour ouvrir la vue Budget. Seule son empreinte est enregistrée : il ne pourra pas être affiché plus tard.",
+        "data": {
+          "code": "Code (6 chiffres)",
+          "confirmation": "Confirmer le code"
+        }
+      }
+    },
+    "error": {
+      "code_invalide": "Le code doit contenir exactement 6 chiffres.",
+      "code_faible": "Code trop facile à deviner (suite, chiffre répété ou motif).",
+      "codes_differents": "Les deux codes ne correspondent pas."
+    },
+    "abort": {
+      "single_instance_allowed": "Déjà configuré. Pour changer le code, utiliser « Configurer »."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Changer le code du budget",
+        "description": "Les sessions ouvertes avec l'ancien code seront fermées.",
+        "data": {
+          "code": "Nouveau code (6 chiffres)",
+          "confirmation": "Confirmer le nouveau code"
+        }
+      }
+    },
+    "error": {
+      "code_invalide": "Le code doit contenir exactement 6 chiffres.",
+      "code_faible": "Code trop facile à deviner (suite, chiffre répété ou motif).",
+      "codes_differents": "Les deux codes ne correspondent pas."
+    }
+  }
+}

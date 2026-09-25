@@ -12,6 +12,9 @@ smarthome/
 ├── js/                  Modules partagés (accès HA, DOM, météo, prières, horloge)
 ├── css/                 Styles (variables, sidebar, cards)
 └── dev/                 Aperçu hors Home Assistant avec un faux `hass`
+
+custom_components/maison/  Intégration HA : budget stocké côté serveur, protégé par un code
+tests/maison/              Tests de l'intégration (python -m unittest discover -s tests/maison)
 ```
 
 ## Configuration
@@ -34,6 +37,8 @@ Depuis la console du navigateur :
 - `mock.basculer('binary_sensor.lave_linge')` : déclenche une alerte ;
 - `mock.definir('sensor.tablette_battery_level', '15')` : simule un niveau de batterie.
 
+Vue Budget en dev : code de démonstration `123456` (le vrai code est défini dans Home Assistant).
+
 ## Déploiement
 
 1. Copier `smarthome/` dans `/config/www/smarthome/` sur Home Assistant, **sans le dossier `dev/`**.
@@ -48,7 +53,11 @@ Depuis la console du navigateur :
        module_url: /local/smarthome/smarthome-panel.js?v=1
    ```
 
-3. Redémarrer Home Assistant. Le panneau apparaît dans le menu sous « Maison ».
+3. Copier `custom_components/maison/` dans `/config/custom_components/maison/`.
+4. Redémarrer Home Assistant. Le panneau apparaît dans le menu sous « Maison ».
+5. Budget : Paramètres → Appareils et services → Ajouter une intégration → **Maison**,
+   puis choisir le code à 6 chiffres (compte administrateur requis).
+   Pour changer le code : Maison → Configurer.
 
 Incrémenter `?v=` à chaque mise à jour pour forcer le navigateur à recharger les fichiers.
 
@@ -56,7 +65,9 @@ Incrémenter `?v=` à chaque mise à jour pour forcer le navigateur à recharger
 
 - Tout ce qui est dans `/config/www` est servi en `/local/` **sans authentification** :
   ni token, ni donnée personnelle (budget, calendrier, courses) dans ces fichiers.
-  Les données personnelles passent par des entités Home Assistant.
+  Les données personnelles passent par Home Assistant.
+- Budget : données stockées par l'intégration `maison` (hors `hass.states`), lisibles uniquement
+  après saisie du code, vérifié côté serveur. Blocage progressif après 5 essais erronés.
 - Les tests de `tests/security/` tournent sur chaque PR : secrets, webhooks en dur, `eval`, `innerHTML`.
 - Construire le DOM avec `el()` (`js/dom.js`) : pas de `innerHTML`, pas d'attribut `on*`.
 
