@@ -12,6 +12,10 @@ secrets.yaml
 # Récaps de session
 SESSION_SUMMARY.md
 
+# Fichiers d'outillage locaux
+CLAUDE.md
+.claude/
+
 # OS / éditeurs
 Thumbs.db
 .DS_Store

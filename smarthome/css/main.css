@@ -1,0 +1,281 @@
+/* =============================================
+   MAIN.CSS — Variables, Reset, Layout global
+   ============================================= */
+
+/* Variables Design System (depuis Figma) */
+:root {
+  /* Couleurs */
+  --bg-main:       #0D0F14;
+  --bg-card:       #161B22;
+  --bg-card-hover: #1C2330;
+  --bg-sidebar:    #0F1318;
+  --bg-input:      #1E2530;
+
+  --accent-blue:   #4A9EFF;
+  --accent-green:  #2ECC71;
+  --accent-orange: #F39C12;
+  --accent-red:    #E74C3C;
+  --accent-purple: #9B59B6;
+  --accent-cyan:   #1ABC9C;
+
+  --text-primary:   #FFFFFF;
+  --text-secondary: #8B9AB0;
+  --text-muted:     #4A5568;
+
+  --border:         rgba(255, 255, 255, 0.07);
+  --border-active:  rgba(74, 158, 255, 0.4);
+
+  /* Rayons */
+  --radius-card:   16px;
+  --radius-btn:    10px;
+  --radius-sm:     8px;
+  --radius-xs:     6px;
+
+  /* Ombres */
+  --shadow-card:   0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-btn:    0 2px 8px rgba(0, 0, 0, 0.3);
+
+  /* Transitions */
+  --transition:    all 0.2s ease;
+
+  /* Sidebar */
+  --sidebar-w:     72px;
+
+  /* Espacement */
+  --gap:           16px;
+  --gap-lg:        24px;
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+/* Import Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Layout principal */
+#app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Zone de contenu (tout sauf sidebar) */
+#main-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Header */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+/* Contenu scrollable */
+#page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--gap-lg);
+}
+
+#page-content::-webkit-scrollbar { width: 4px; }
+#page-content::-webkit-scrollbar-track { background: transparent; }
+#page-content::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 2px; }
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: var(--border-active);
+  background: var(--bg-card-hover);
+}
+
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+/* Boutons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-btn);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: #fff;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-ghost {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { color: var(--text-primary); border-color: var(--border-active); }
+
+/* Chips de statut */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.chip-green  { background: rgba(46, 204, 113, 0.15); color: var(--accent-green); }
+.chip-red    { background: rgba(231, 76, 60, 0.15);  color: var(--accent-red); }
+.chip-blue   { background: rgba(74, 158, 255, 0.15); color: var(--accent-blue); }
+.chip-orange { background: rgba(243, 156, 18, 0.15); color: var(--accent-orange); }
+
+/* Dot de statut */
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot-green  { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+.dot-red    { background: var(--accent-red); }
+.dot-orange { background: var(--accent-orange); }
+
+/* Grille responsive */
+.grid {
+  display: grid;
+  gap: var(--gap);
+}
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Utilitaires */
+.flex        { display: flex; }
+.flex-col    { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm      { gap: 8px; }
+.gap-md      { gap: 16px; }
+.gap-lg      { gap: 24px; }
+.text-secondary { color: var(--text-secondary); }
+.text-sm     { font-size: 12px; }
+.text-lg     { font-size: 18px; }
+.text-xl     { font-size: 24px; }
+.font-semibold { font-weight: 600; }
+.font-bold   { font-weight: 700; }
+.mt-auto     { margin-top: auto; }
+
+/* Badge alerte */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+.badge-red    { background: var(--accent-red); color: #fff; }
+.badge-orange { background: var(--accent-orange); color: #fff; }
+
+/* Loader */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Barre de progression */
+.progress-bar {
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Alertes bottom bar */
+#alert-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  background: rgba(231, 76, 60, 0.08);
+  border-top: 1px solid rgba(231, 76, 60, 0.2);
+  flex-shrink: 0;
+  min-height: 44px;
+}
+
+#alert-bar.hidden { display: none; }
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--accent-orange);
+}
+
+/* Status bar connexion HA */
+#ha-status {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  pointer-events: none;
+}
