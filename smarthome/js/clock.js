@@ -3,11 +3,11 @@
 // =============================================
 
 function salutation(heure) {
-  if (heure >= 5  && heure < 12) return 'Bonne matinée ☀️';
-  if (heure >= 12 && heure < 14) return 'Bon appétit 🍽️';
-  if (heure >= 14 && heure < 18) return 'Bon après-midi 🌤';
-  if (heure >= 18 && heure < 21) return 'Bonne soirée 🌆';
-  return 'Bonne nuit 🌙';
+  if (heure >= 5  && heure < 12) return 'Bonne matinée';
+  if (heure >= 12 && heure < 14) return 'Bon appétit';
+  if (heure >= 14 && heure < 18) return 'Bon après-midi';
+  if (heure >= 18 && heure < 21) return 'Bonne soirée';
+  return 'Bonne nuit';
 }
 
 // Met à jour les éléments d'horloge présents sous `racine`.
@@ -25,7 +25,7 @@ export function demarrerHorloge(racine) {
 
     ecrire('clock-time', `${h}:${m}`);
     ecrire('clock-date', now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
-    ecrire('header-sub', salutation(now.getHours()));
+    ecrire('header-sub', `${salutation(now.getHours())}, ravi de vous revoir.`);
     ecrire('cal-date', `Aujourd'hui, ${now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`);
   };
 

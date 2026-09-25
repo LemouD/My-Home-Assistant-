@@ -192,7 +192,7 @@ class SmarthomePanel extends HTMLElement {
         const present = estPresent(hass, p.id);
         return el('div', { class: present ? 'chip chip-green' : 'chip chip-red' },
           el('span', { class: present ? 'dot dot-green' : 'dot dot-red' }),
-          `${nom(hass, p.id, p.nom)} — ${present ? 'Présent' : 'Absent'}`);
+          `${nom(hass, p.id, p.nom)} — ${present ? 'À la maison' : 'Absent'}`);
       }));
     }
     this.#hassShell = hass;

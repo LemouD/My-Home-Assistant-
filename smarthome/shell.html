@@ -8,48 +8,48 @@
     <!-- Visible sur écran étroit : rouvre le menu de Home Assistant -->
     <button class="menu-ha" data-action="menu-ha" aria-label="Menu Home Assistant">☰</button>
 
-    <div class="sidebar-logo">🏠</div>
+    <!-- Logo : le SVG (64 px) inclut son ombre, il déborde du cadre de 40 px -->
+    <span class="sidebar-logo"><img src="assets/icons/accueil/logo.svg" width="64" height="64" alt=""></span>
 
     <div class="nav-items">
 
       <a class="nav-item" data-vue="" aria-label="Tableau de bord">
-        <span class="nav-icon">📊</span>
+        <span class="nav-icon nav-icon-accueil"></span>
         <span class="nav-label">Accueil</span>
       </a>
 
       <a class="nav-item" data-vue="budget" aria-label="Budget & Factures">
-        <span class="nav-icon">💰</span>
+        <span class="nav-icon nav-icon-budget"></span>
         <span class="nav-label">Budget</span>
       </a>
 
       <a class="nav-item" data-vue="energie" aria-label="Énergie & Fluides">
-        <span class="nav-icon">⚡</span>
+        <span class="nav-icon nav-icon-energie"></span>
         <span class="nav-label">Énergie</span>
       </a>
 
       <a class="nav-item" data-vue="calendrier" aria-label="Calendrier famille">
-        <span class="nav-icon">📅</span>
+        <span class="nav-icon nav-icon-calendrier"></span>
         <span class="nav-label">Agenda</span>
       </a>
 
       <a class="nav-item" data-vue="courses" aria-label="Liste de courses">
-        <span class="nav-icon">🛒</span>
+        <span class="nav-icon nav-icon-courses"></span>
         <span class="nav-label">Courses</span>
-      </a>
-
-      <div class="nav-divider"></div>
-
-      <a class="nav-item desactive" aria-disabled="true" aria-label="Automatisations (à venir)">
-        <span class="nav-icon">🤖</span>
-        <span class="nav-label">Auto</span>
       </a>
 
     </div>
 
     <div class="sidebar-bottom">
-      <div class="ha-indicator" id="ha-indicator" title="Home Assistant"></div>
-      <a class="nav-item desactive" aria-disabled="true" aria-label="Paramètres (à venir)">
-        <span class="nav-icon">⚙️</span>
+      <!-- État de la connexion : libellé visible, pas d'infobulle (écran tactile) -->
+      <div class="ha-etat">
+        <span class="ha-indicator" id="ha-indicator"></span>
+        <span class="ha-etat-texte ha-etat-ok">En ligne</span>
+        <span class="ha-etat-texte ha-etat-ko">Hors ligne</span>
+      </div>
+      <a class="nav-item desactive" aria-disabled="true" aria-label="Réglages (à venir)">
+        <span class="nav-icon nav-icon-configurations"></span>
+        <span class="nav-label">Réglages</span>
       </a>
     </div>
 
@@ -64,17 +64,16 @@
     <header id="header">
 
       <div class="header-left">
-        <div class="header-greeting">Bonjour, <strong id="greeting-name">…</strong> 👋</div>
-        <div class="header-sub" id="header-sub">Chargement...</div>
-      </div>
-
-      <div class="header-center">
-        <div class="presence-chips" id="presence-chips"></div>
+        <div class="header-greeting">Bonjour, <span id="greeting-name">…</span></div>
+        <div class="header-sub" id="header-sub">Chargement…</div>
       </div>
 
       <div class="header-right">
-        <div id="clock-time">--:--</div>
-        <div id="clock-date">--</div>
+        <div class="presence-chips" id="presence-chips"></div>
+        <div class="header-date">
+          <span class="header-date-icone"><img src="assets/icons/accueil/date.svg" width="8.84211" height="8.4" alt=""></span>
+          <span id="clock-date">--</span><span id="clock-time">--:--</span>
+        </div>
       </div>
 
     </header>

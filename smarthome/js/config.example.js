@@ -9,19 +9,24 @@
 // `nom` ne sert que tant que l'entité n'existe pas encore.
 
 export default {
+  // Ville affichée sur la météo et les prières (facultatif)
+  VILLE: 'Paris, FR',
+
   // Méthode de calcul des horaires (12 = Union des Organisations Islamiques de France)
   METHODE_PRIERE: 12,
 
   // Rafraîchissement météo (millisecondes)
   REFRESH_METEO: 900000,
 
+  // icone : ampoule, cuisine, lit, bain, bureau, porte (assets/icons/accueil/piece-*.svg)
+  // teinte quand la lumière est allumée : ambre (défaut), bleu, vert, orange
   LUMIERES: [
-    { id: 'light.salon',         nom: 'Salon',         icone: '🛋️' },
-    { id: 'light.cuisine',       nom: 'Cuisine',       icone: '🍳' },
-    { id: 'light.chambre',       nom: 'Chambre',       icone: '🛏️' },
-    { id: 'light.bureau',        nom: 'Bureau',        icone: '💻' },
-    { id: 'light.entree',        nom: 'Entrée',        icone: '🚪' },
-    { id: 'light.salle_de_bain', nom: 'Salle de bain', icone: '🚿' },
+    { id: 'light.salon',         nom: 'Salon',         icone: 'ampoule', teinte: 'ambre' },
+    { id: 'light.cuisine',       nom: 'Cuisine',       icone: 'cuisine', teinte: 'ambre' },
+    { id: 'light.chambre',       nom: 'Chambre',       icone: 'lit',     teinte: 'ambre' },
+    { id: 'light.salle_de_bain', nom: 'Salle de bain', icone: 'bain',    teinte: 'bleu' },
+    { id: 'light.bureau',        nom: 'Bureau',        icone: 'bureau',  teinte: 'vert' },
+    { id: 'light.entree',        nom: 'Entrée',        icone: 'porte',   teinte: 'orange' },
   ],
 
   PRESENCES: [
@@ -37,7 +42,8 @@ export default {
   },
 
   // Une alerte s'affiche quand l'entité est à "on".
+  // gravite : info (bleu, défaut), attention (ambre), danger (rouge)
   ALERTES: [
-    { id: 'binary_sensor.lave_linge',   libelle: 'Lave-linge terminé',   icone: '🫧' },
+    { id: 'binary_sensor.lave_linge', libelle: 'Lave-linge terminé', gravite: 'info' },
   ],
 };
