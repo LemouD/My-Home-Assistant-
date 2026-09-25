@@ -79,7 +79,7 @@ export async function monter({ config }) {
 
     barre.replaceChildren(
       ...actives.flatMap((a, i) => [
-        i > 0 && el('span', { class: 'alert-sep' }, '|'),
+        ...(i > 0 ? [el('span', { class: 'alert-sep' }, '|')] : []),
         el('span', { class: 'alert-item' },
           el('span', { class: 'alert-icon' }, a.icone),
           el('span', { class: 'alert-label' }, a.libelle ?? nom(hass, a.id)),

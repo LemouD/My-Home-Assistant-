@@ -87,8 +87,15 @@ class SmarthomePanel extends HTMLElement {
       ]);
       this.#config = config;
 
+      // Styles chargés avant d'afficher le cadre, pour éviter un flash sans mise en forme
       const styles = STYLES.map((f) => el('link', { rel: 'stylesheet', href: new URL(f, import.meta.url).href }));
-      this.shadowRoot.replaceChildren(...styles, shell);
+      const stylesCharges = styles.map((lien) => new Promise((ok) => {
+        lien.addEventListener('load', ok, { once: true });
+        lien.addEventListener('error', ok, { once: true });
+      }));
+      this.shadowRoot.replaceChildren(...styles);
+      await Promise.all(stylesCharges);
+      this.shadowRoot.append(shell);
       this.shadowRoot.getElementById('app').classList.toggle('narrow', this.#narrow);
       this.shadowRoot.addEventListener('click', (e) => this.#surClic(e));
 
