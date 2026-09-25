@@ -30,6 +30,12 @@
   --accent-ambre:     #F59E0B;
   --piste:            rgba(255, 255, 255, 0.08);   /* fond des jauges */
 
+  /* Énergie (maquette Figma) */
+  --accent-cyan-vif:  #06B6D4;
+  --accent-bleu-fonce:#2563EB;
+  --accent-violet:    #A855F7;
+  --bg-carte-sombre:  linear-gradient(90deg, #1D2429, #0F141C);
+
   --text-primary:   #FFFFFF;
   --text-secondary: #8B9AB0;
   --text-muted:     #7D8BA1;   /* contraste ≥ 4,5:1 sur les cartes */

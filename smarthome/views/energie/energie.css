@@ -1,0 +1,377 @@
+/* =============================================
+   ENERGIE.CSS — Vue Énergie & Fluides
+   ============================================= */
+
+.vue-energie {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.vue-energie [hidden] { display: none !important; }
+
+.energie {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* === EN-TÊTE === */
+.energie-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.energie-titre {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.energie-sous-titre {
+  margin-top: 6px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.energie-mois {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* === GRILLE (paysage) === */
+.energie-ligne {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap);
+  align-items: stretch;
+}
+.energie-ligne-resume     { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.energie-ligne-principale { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+
+/* === CARTES === */
+.energie-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: var(--shadow-card);
+}
+.energie-carte-electricite {
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--accent-emeraude), var(--accent-cyan-vif));
+}
+.energie-carte-eau {
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--accent-bleu-vif), var(--accent-bleu-fonce));
+}
+.energie-carte-sombre { background: var(--bg-carte-sombre); }
+
+.energie-carte-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.energie-titre-groupe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+}
+.energie-titre-section b { letter-spacing: 1px; }
+
+.energie-icone-fond {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.energie-tendance,
+.energie-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.energie-badge {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent-bleu-vif);
+}
+
+.energie-valeur {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.energie-valeur b    { font-size: var(--fs-xl); font-weight: 800; line-height: 1.1; }
+.energie-valeur span { font-size: var(--fs-sm); color: rgba(255, 255, 255, 0.8); }
+
+.energie-note       { font-size: var(--fs-xs); color: rgba(255, 255, 255, 0.75); }
+.energie-note-forte { font-size: var(--fs-xs); }
+.energie-attenue    { color: var(--text-secondary); }
+.energie-gras       { font-weight: 600; }
+.energie-droite     { text-align: right; }
+
+.energie-ligne-texte {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--fs-xs);
+}
+
+.energie-vide {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* === COURBE ÉLECTRIQUE === */
+.energie-courbe-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.energie-grille       { stroke: rgba(255, 255, 255, 0.15); stroke-width: 1; }
+.energie-courbe-ligne { fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; }
+.energie-courbe-point { fill: #fff; }
+.energie-bulle        { fill: rgba(255, 255, 255, 0.15); stroke: rgba(255, 255, 255, 0.25); }
+.energie-bulle-texte {
+  fill: #fff;
+  font-size: 12px;   /* unités du viewBox SVG, agrandies avec le graphique */
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.energie-courbe-jours {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6px;
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.7);
+}
+.energie-courbe-jours b { color: #fff; }
+
+.energie-hchp {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 16px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+.energie-hchp-separateur { background: rgba(255, 255, 255, 0.2); }
+.energie-hchp .energie-ligne-texte span { color: rgba(255, 255, 255, 0.85); }
+
+/* === EAU === */
+.energie-eau-moyenne {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.energie-eau-moyenne b { font-size: var(--fs-lg); font-weight: 800; }
+
+.energie-barres {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  min-height: 110px;
+  padding-top: 10px;
+}
+
+.energie-barre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.6);
+}
+.energie-barre-colonne {
+  width: 16px;
+  border: 1px solid var(--border);
+  border-radius: 3px 3px 0 0;
+  background: rgba(255, 255, 255, 0.15);
+}
+.energie-barre-courante { color: #fff; font-weight: 700; }
+.energie-barre-courante .energie-barre-colonne { background: #fff; border-color: #fff; }
+
+.energie-bouton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.energie-bouton:active { background: rgba(255, 255, 255, 0.22); }
+.energie-bouton-principal { background: #fff; color: var(--accent-bleu-fonce); }
+
+.energie-saisie {
+  display: flex;
+  gap: 10px;
+}
+
+.energie-champ {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  font-size: var(--fs-sm);
+}
+.energie-champ input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.energie-message {
+  min-height: 1.2em;
+  font-size: var(--fs-xs);
+}
+
+/* === COÛTS === */
+.energie-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  font-size: var(--fs-sm);
+}
+.energie-table th {
+  padding: 10px 12px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: left;
+  background: rgba(255, 255, 255, 0.04);
+}
+.energie-table th:first-child,
+.energie-table td:first-child { border-radius: 6px 0 0 6px; }
+.energie-table th:last-child,
+.energie-table td:last-child  { border-radius: 0 6px 6px 0; }
+.energie-table th.energie-droite { text-align: right; }
+.energie-table td {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.energie-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+.energie-total b {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  color: var(--accent-bleu-vif);
+}
+
+/* === RÉPARTITION === */
+.energie-segments {
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--piste);
+}
+.energie-segments:empty { display: none; }
+
+.energie-postes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.energie-postes .energie-ligne-texte { font-size: var(--fs-sm); }
+
+.energie-poste-nom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.energie-pastille {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.energie-couleur-bleu     { background: var(--accent-bleu-vif); }
+.energie-couleur-cyan     { background: var(--accent-cyan-vif); }
+.energie-couleur-ambre    { background: var(--accent-ambre); }
+.energie-couleur-violet   { background: var(--accent-violet); }
+.energie-couleur-emeraude { background: var(--accent-emeraude); }
+.energie-couleur-rose     { background: var(--accent-rose); }
+.energie-couleur-gris     { background: var(--text-secondary); }
+
+/* === ALERTES ET CONSEILS === */
+.energie-conseils {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.energie-conseil {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.energie-conseil img { margin-top: 3px; flex-shrink: 0; }
+.energie-conseil b   { display: block; font-size: var(--fs-sm); }
+.energie-conseil p   { margin-top: 2px; font-size: var(--fs-xs); color: rgba(255, 255, 255, 0.8); }
+
+.energie-conseil-alerte {
+  border-color: var(--accent-rose);
+  background: rgba(225, 29, 72, 0.12);
+}

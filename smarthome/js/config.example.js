@@ -41,6 +41,30 @@ export default {
     charge: 'sensor.tablette_battery_state',  // charging / discharging / full / not_charging
   },
 
+  // Énergie & Fluides. Chaque capteur est facultatif : sans capteur, la carte
+  // correspondante affiche « non configuré ». Capteurs d'énergie ou d'index
+  // avec state_class: total_increasing (statistiques longue durée de HA).
+  ENERGIE: {
+    electricite: {
+      hc: 'sensor.linky_index_hc',          // kWh, heures creuses
+      hp: 'sensor.linky_index_hp',          // kWh, heures pleines
+      tarifHC: 0.17,                        // € / kWh
+      tarifHP: 0.27,
+    },
+    eau: {
+      index: 'sensor.index_eau',            // m³ (voir README : saisie manuelle de l'index)
+      saisie: 'input_number.index_eau',     // champ modifié par « Saisir nouvel index »
+      prixM3: 4.3,                          // € / m³, assainissement compris
+    },
+    // Appareils suivis par une prise connectée (capteur d'énergie en kWh)
+    postes: [
+      // { nom: 'Lave-linge', capteur: 'sensor.prise_lave_linge_energie', couleur: 'ambre' },
+    ],
+    // Sondes de température intérieure et consigne recommandée
+    temperatures: [],
+    consigne: 19,
+  },
+
   // Une alerte s'affiche quand l'entité est à "on".
   // gravite : info (bleu, défaut), attention (ambre), danger (rouge)
   ALERTES: [
