@@ -7,6 +7,8 @@
 export function el(tag, attributs = {}, ...enfants) {
   const noeud = document.createElement(tag);
   for (const [cle, valeur] of Object.entries(attributs)) {
+    // Gestionnaires d'événements en attribut interdits : utiliser addEventListener
+    if (/^on/i.test(cle)) throw new Error(`Attribut interdit : ${cle}`);
     if (valeur === false || valeur == null) continue;
     if (cle === 'class') noeud.className = valeur;
     else noeud.setAttribute(cle, valeur === true ? '' : valeur);

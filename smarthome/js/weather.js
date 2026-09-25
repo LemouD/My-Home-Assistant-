@@ -33,9 +33,10 @@ export function demarrerMeteo(racine, { latitude, longitude, fuseau }, intervall
 
   const charger = async () => {
     try {
+      // Position arrondie à ~1 km : l'adresse exacte n'est pas envoyée à l'API
       const params = new URLSearchParams({
-        latitude,
-        longitude,
+        latitude: latitude.toFixed(2),
+        longitude: longitude.toFixed(2),
         current: 'temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code',
         daily: 'weather_code,temperature_2m_max,temperature_2m_min',
         timezone: fuseau,

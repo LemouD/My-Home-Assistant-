@@ -31,7 +31,12 @@ export function demarrerPrieres(racine, { latitude, longitude, methode }) {
   let horaires = null;  // [{ ...PRIERES_DEF, heure: 'HH:MM', minutes }]
 
   const charger = async (date) => {
-    const params = new URLSearchParams({ latitude, longitude, method: methode });
+    // Position arrondie à ~1 km : l'adresse exacte n'est pas envoyée à l'API
+    const params = new URLSearchParams({
+      latitude: latitude.toFixed(2),
+      longitude: longitude.toFixed(2),
+      method: methode,
+    });
     const res = await fetch(`https://api.aladhan.com/v1/timings/${date}?${params}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
