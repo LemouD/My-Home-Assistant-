@@ -25,6 +25,11 @@
   --accent-emeraude:  #10B981;
   --accent-bleu-vif:  #3B82F6;
 
+  /* Budget (maquette Figma) */
+  --accent-rose:      #E11D48;
+  --accent-ambre:     #F59E0B;
+  --piste:            rgba(255, 255, 255, 0.08);   /* fond des jauges */
+
   --text-primary:   #FFFFFF;
   --text-secondary: #8B9AB0;
   --text-muted:     #4A5568;
@@ -37,6 +42,7 @@
   --radius-btn:    10px;
   --radius-sm:     8px;
   --radius-xs:     6px;
+  --radius-xl:     24px;
 
   /* Ombres (légères : tablette peu puissante) */
   --shadow-card:   0 2px 8px rgba(0, 0, 0, 0.3);

@@ -1,0 +1,13 @@
+{
+  "domain": "maison",
+  "name": "Maison",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["websocket_api"],
+  "documentation": "https://github.com/LemouD/My-Home-Assistant-",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "1.0.0"
+}

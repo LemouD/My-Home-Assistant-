@@ -12,9 +12,9 @@ secrets.yaml
 # Récaps de session
 SESSION_SUMMARY.md
 
-# Fichiers d'outillage locaux
-CLAUDE.md
-.claude/
+# Python
+__pycache__/
+*.pyc
 
 # OS / éditeurs
 Thumbs.db

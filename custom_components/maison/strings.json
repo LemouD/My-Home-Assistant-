@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Budget code",
+        "description": "6-digit code required to open the Budget view. Only its hash is stored: it cannot be displayed later.",
+        "data": {
+          "code": "Code (6 digits)",
+          "confirmation": "Confirm code"
+        }
+      }
+    },
+    "error": {
+      "code_invalide": "The code must be exactly 6 digits.",
+      "code_faible": "Code too easy to guess (sequence, repeated digit or pattern).",
+      "codes_differents": "The two codes do not match."
+    },
+    "abort": {
+      "single_instance_allowed": "Already configured. Use \"Configure\" to change the code."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Change budget code",
+        "description": "Sessions opened with the previous code will be closed.",
+        "data": {
+          "code": "New code (6 digits)",
+          "confirmation": "Confirm new code"
+        }
+      }
+    },
+    "error": {
+      "code_invalide": "The code must be exactly 6 digits.",
+      "code_faible": "Code too easy to guess (sequence, repeated digit or pattern).",
+      "codes_differents": "The two codes do not match."
+    }
+  }
+}

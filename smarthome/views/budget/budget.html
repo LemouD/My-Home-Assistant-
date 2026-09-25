@@ -1,0 +1,162 @@
+<div id="page-content" class="budget">
+
+  <!-- EN-TÊTE DE LA VUE -->
+  <div class="budget-entete">
+    <div>
+      <h1 class="budget-titre">Budget &amp; Factures</h1>
+      <p class="budget-sous-titre">Suivi en temps réel des dépenses mensuelles du foyer.</p>
+    </div>
+    <div class="budget-entete-droite">
+      <div class="budget-actions" id="budget-actions"></div>
+      <div class="budget-mois">
+        <img src="../../assets/icons/budget/mois.svg" width="14" height="14" alt="">
+        <span id="budget-mois"></span>
+        <img src="../../assets/icons/budget/chevron-bas.svg" width="12" height="12" alt="">
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉCRAN DE CODE : affiché tant que le budget est verrouillé -->
+  <section class="budget-carte budget-verrou" id="budget-verrou">
+    <h2 class="budget-verrou-titre">🔒 Budget protégé</h2>
+    <p class="budget-libelle">Saisissez le code à 6 chiffres</p>
+    <div class="budget-code-points" id="budget-code-points"></div>
+    <p class="budget-code-message" id="budget-code-message" role="status"></p>
+    <div class="budget-clavier" id="budget-clavier"></div>
+  </section>
+
+  <!-- CONTENU : affiché après saisie du code -->
+  <div class="budget-contenu" id="budget-contenu" hidden>
+
+    <p class="budget-erreur" id="budget-erreur" role="alert" hidden></p>
+
+    <!-- LIGNE 1 : Aperçu global + Évolution mensuelle -->
+    <div class="budget-ligne">
+
+      <section class="budget-carte">
+        <h2 class="budget-carte-titre">
+          <img src="../../assets/icons/budget/section-rond.svg" width="14" height="14" alt="">
+          Aperçu global
+        </h2>
+        <div class="budget-donut" id="budget-donut"></div>
+        <dl class="budget-chiffres" id="budget-chiffres"></dl>
+      </section>
+
+      <section class="budget-carte">
+        <h2 class="budget-carte-titre">
+          <img src="../../assets/icons/budget/section-evolution.svg" width="14" height="14" alt="">
+          Évolution mensuelle
+        </h2>
+        <div class="budget-courbe" id="budget-courbe"></div>
+        <div class="budget-courbe-mois" id="budget-courbe-mois"></div>
+      </section>
+
+    </div>
+
+    <!-- LIGNE 2 : Épargne + Ajustement des dépenses -->
+    <div class="budget-ligne">
+
+      <section class="budget-carte">
+        <h2 class="budget-carte-titre">
+          <img src="../../assets/icons/budget/section-rond.svg" width="14" height="14" alt="">
+          Épargne &amp; mise de côté
+        </h2>
+
+        <label class="budget-champ-bloc">
+          <span class="budget-libelle">Objectif épargne mensuel</span>
+          <span class="budget-champ">
+            <span class="budget-devise">€</span>
+            <input type="number" inputmode="decimal" min="0" step="10" id="budget-epargne-objectif" data-chemin="epargne.objectif" data-type="montant">
+          </span>
+        </label>
+
+        <label class="budget-champ-bloc">
+          <span class="budget-libelle">Épargné ce mois</span>
+          <span class="budget-champ">
+            <span class="budget-devise">€</span>
+            <input type="number" inputmode="decimal" min="0" step="10" id="budget-epargne-mois" data-chemin="epargne.ceMois" data-type="montant">
+          </span>
+        </label>
+
+        <div class="budget-progression">
+          <div class="budget-ligne-texte">
+            <span class="budget-libelle">Progression</span>
+            <b id="budget-epargne-pct"></b>
+          </div>
+          <div class="budget-jauge"><div class="budget-jauge-remplie budget-couleur-emeraude" id="budget-epargne-jauge"></div></div>
+        </div>
+
+        <div class="budget-chiffre">
+          <span class="budget-libelle">Épargne totale cumulée</span>
+          <b class="budget-montant" id="budget-epargne-total"></b>
+        </div>
+
+        <div class="budget-repartition">
+          <b class="budget-libelle">Répartition</b>
+          <div class="budget-liste" id="budget-comptes"></div>
+        </div>
+      </section>
+
+      <section class="budget-carte">
+        <h2 class="budget-carte-titre">
+          <img src="../../assets/icons/budget/section-rond.svg" width="14" height="14" alt="">
+          Ajustement des dépenses
+        </h2>
+        <div class="budget-categories" id="budget-categories"></div>
+        <div class="budget-total">
+          <b>Budget ajusté</b>
+          <b class="budget-total-valeur" id="budget-total-ajuste"></b>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- LIGNE 3 : Sorties & imprévus + Factures à venir -->
+    <div class="budget-ligne budget-ligne-factures">
+
+      <section class="budget-carte">
+        <h2 class="budget-carte-titre">
+          <img src="../../assets/icons/budget/section-carre.svg" width="14" height="14" alt="">
+          Sorties &amp; imprévus
+        </h2>
+        <div class="budget-liste" id="budget-imprevus"></div>
+        <div class="budget-total">
+          <b>Total imprévus</b>
+          <b class="budget-total-valeur budget-texte-ambre" id="budget-imprevus-total"></b>
+        </div>
+        <div class="budget-total" id="budget-fonds-urgence"></div>
+      </section>
+
+      <section class="budget-carte">
+        <h2 class="budget-carte-titre">
+          <img src="../../assets/icons/budget/section-carre.svg" width="14" height="14" alt="">
+          Factures à venir
+        </h2>
+        <div class="budget-liste" id="budget-a-venir"></div>
+      </section>
+
+    </div>
+
+    <!-- LIGNE 4 : Factures récentes & historique -->
+    <section class="budget-carte">
+      <h2 class="budget-carte-titre">
+        <img src="../../assets/icons/budget/section-factures.svg" width="14" height="14" alt="">
+        Factures récentes &amp; historique
+      </h2>
+      <table class="budget-table">
+        <thead>
+          <tr>
+            <th>Fournisseur</th>
+            <th>Date d'échéance</th>
+            <th class="budget-droite">Montant</th>
+            <th class="budget-droite">Statut</th>
+          </tr>
+        </thead>
+        <tbody id="budget-factures"></tbody>
+      </table>
+      <div id="budget-factures-ajout"></div>
+    </section>
+
+  </div>
+
+</div>

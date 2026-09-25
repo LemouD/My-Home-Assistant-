@@ -29,3 +29,24 @@ export async function basculer(hass, entityId) {
 export async function commanderLumieres(hass, ids, allumer) {
   await hass.callService('light', allumer ? 'turn_on' : 'turn_off', { entity_id: ids });
 }
+
+// ---- BUDGET ----
+// Données stockées côté serveur par l'intégration « maison » (custom_components/maison).
+// Elles ne sont pas dans hass.states : il faut un jeton, obtenu en saisissant le code.
+// En cas d'erreur, la promesse est rejetée avec { code, message } :
+// non_configure, code_invalide, bloque, session_invalide, donnees_invalides.
+
+export const budgetEtat = (hass) =>
+  hass.callWS({ type: 'maison/budget/etat' });
+
+export const budgetDeverrouiller = (hass, code) =>
+  hass.callWS({ type: 'maison/budget/deverrouiller', code });
+
+export const budgetLire = (hass, jeton) =>
+  hass.callWS({ type: 'maison/budget/lire', jeton });
+
+export const budgetEnregistrer = (hass, jeton, donnees) =>
+  hass.callWS({ type: 'maison/budget/enregistrer', jeton, donnees });
+
+export const budgetVerrouiller = (hass, jeton) =>
+  hass.callWS({ type: 'maison/budget/verrouiller', jeton });
