@@ -1,0 +1,277 @@
+/* =============================================
+   CARDS.CSS — Tous les composants cards
+   ============================================= */
+
+/* === HEADER === */
+.header-left { display: flex; flex-direction: column; gap: 2px; }
+.header-greeting { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.header-sub { font-size: 12px; color: var(--text-secondary); }
+
+.header-center { display: flex; align-items: center; gap: 8px; }
+
+.presence-chips { display: flex; gap: 8px; }
+
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+#clock-time { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+#clock-date { font-size: 12px; color: var(--text-secondary); }
+
+/* === METEO === */
+.meteo-card { }
+
+.meteo-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.meteo-icon { font-size: 56px; line-height: 1; }
+
+.meteo-info { flex: 1; }
+.meteo-temp { font-size: 48px; font-weight: 700; line-height: 1; }
+.meteo-temp span { font-size: 24px; color: var(--text-secondary); }
+.meteo-desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.meteo-ville { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.meteo-details {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.meteo-detail-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+
+.meteo-previsions {
+  display: flex;
+  gap: 8px;
+}
+
+.prev-jour {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  font-size: 11px;
+}
+.prev-jour .jour-nom  { color: var(--text-muted); }
+.prev-jour .jour-icon { font-size: 18px; }
+.prev-jour .jour-temp { font-weight: 600; color: var(--text-primary); }
+.prev-jour.today { background: rgba(74, 158, 255, 0.12); border: 1px solid var(--border-active); }
+
+/* === DOUAS === */
+.douas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.doua-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.doua-card:hover { border-color: var(--border-active); }
+
+.doua-header { display: flex; align-items: center; gap: 8px; }
+.doua-icon { font-size: 22px; }
+.doua-titre { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.doua-sous-titre { font-size: 10px; color: var(--text-secondary); }
+
+.doua-texte {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.doua-arabique {
+  font-size: 18px;
+  text-align: right;
+  color: var(--accent-blue);
+  direction: rtl;
+  line-height: 1.8;
+}
+
+.doua-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--accent-blue);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* === LUMIERES === */
+.lumieres-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.lumiere-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.lumiere-btn:hover { border-color: var(--border-active); }
+
+.lumiere-btn.on {
+  background: rgba(243, 156, 18, 0.1);
+  border-color: rgba(243, 156, 18, 0.35);
+  color: var(--accent-orange);
+}
+
+.lumiere-btn.on .lumiere-icon { filter: drop-shadow(0 0 8px rgba(243,156,18,0.6)); }
+
+.lumiere-icon { font-size: 24px; transition: var(--transition); }
+.lumiere-nom  { line-height: 1.3; }
+
+.lumiere-all {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.lumiere-all button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.lumiere-all button:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+/* === PRIERES === */
+.prieres-list { display: flex; flex-direction: column; gap: 6px; }
+
+.priere-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  transition: var(--transition);
+}
+
+.priere-item.active {
+  background: rgba(74, 158, 255, 0.1);
+  border-color: rgba(74, 158, 255, 0.35);
+}
+
+.priere-item.active .priere-nom,
+.priere-item.active .priere-heure { color: var(--accent-blue); }
+
+.priere-gauche { display: flex; align-items: center; gap: 10px; }
+.priere-icon   { font-size: 16px; }
+.priere-nom    { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.priere-heure  { font-size: 13px; font-weight: 600; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+.priere-badge-next {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: var(--accent-blue);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* === BATTERIE === */
+.batterie-card { }
+
+.batterie-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.batterie-pct    { font-size: 42px; font-weight: 700; color: var(--accent-green); }
+.batterie-pct span { font-size: 18px; color: var(--text-secondary); }
+.batterie-status { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.batterie-icon-big { font-size: 40px; }
+
+.batterie-bar { margin-bottom: 12px; }
+.batterie-bar .progress-fill { background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); }
+
+.batterie-details { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+.batterie-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.batterie-stat {
+  background: var(--bg-input);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.batterie-stat .stat-val { font-size: 16px; font-weight: 600; }
+.batterie-stat .stat-lbl { font-size: 10px; color: var(--text-muted); }
+.batterie-stat.production .stat-val { color: var(--accent-green); }
+.batterie-stat.consommation .stat-val { color: var(--accent-orange); }
+
+/* === CALENDRIER === */
+.calendrier-today { }
+
+.cal-today-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cal-today-date   { font-size: 16px; font-weight: 600; }
+.cal-today-sub    { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+.cal-events { display: flex; flex-direction: column; gap: 8px; }
+.cal-event  { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-input); border-left: 3px solid var(--accent-blue); }
+
+.cal-event.vert   { border-color: var(--accent-green); }
+.cal-event.orange { border-color: var(--accent-orange); }
+.cal-event.violet { border-color: var(--accent-purple); }
+
+.cal-event-time  { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: 1px; }
+.cal-event-titre { font-size: 13px; font-weight: 500; }
+.cal-event-desc  { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+.cal-empty { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 12px; }
+
+/* === ALERTES BAR === */
+.alert-icon { font-size: 16px; }
+.alert-label { font-size: 12px; }
+.alert-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-red); }
+.alert-sep { color: var(--text-muted); }

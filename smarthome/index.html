@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maison Diop — Tableau de bord</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/sidebar.css" />
+  <link rel="stylesheet" href="css/cards.css" />
+
+  <!-- Préchargement font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============================
+       SIDEBAR NAVIGATION
+  ============================= -->
+  <nav id="sidebar">
+
+    <div class="sidebar-logo">🏠</div>
+
+    <div class="nav-items">
+
+      <a class="nav-item active" href="index.html" data-tooltip="Tableau de bord">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Accueil</span>
+      </a>
+
+      <a class="nav-item" href="budget.html" data-tooltip="Budget & Factures">
+        <span class="nav-icon">💰</span>
+        <span class="nav-label">Budget</span>
+      </a>
+
+      <a class="nav-item" href="energie.html" data-tooltip="Énergie & Fluides">
+        <span class="nav-icon">⚡</span>
+        <span class="nav-label">Énergie</span>
+      </a>
+
+      <a class="nav-item" href="calendrier.html" data-tooltip="Calendrier famille">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Agenda</span>
+      </a>
+
+      <a class="nav-item" href="courses.html" data-tooltip="Liste de courses">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">Courses</span>
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <a class="nav-item" href="#" data-tooltip="Automatisations" onclick="return false">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">Auto</span>
+      </a>
+
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="ha-indicator" id="ha-indicator" title="Home Assistant"></div>
+      <a class="nav-item" href="#" data-tooltip="Paramètres" onclick="return false">
+        <span class="nav-icon">⚙️</span>
+      </a>
+    </div>
+
+  </nav>
+
+  <!-- ============================
+       ZONE PRINCIPALE
+  ============================= -->
+  <div id="main-area">
+
+    <!-- HEADER -->
+    <header id="header">
+
+      <div class="header-left">
+        <div class="header-greeting">Bonjour, <strong id="greeting-name">LES DIOP</strong> 👋</div>
+        <div class="header-sub" id="header-sub">Chargement...</div>
+      </div>
+
+      <div class="header-center">
+        <div class="presence-chips" id="presence-chips">
+          <!-- Généré par JS -->
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div id="clock-time">--:--</div>
+        <div id="clock-date">--</div>
+      </div>
+
+    </header>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div id="page-content">
+
+      <!--
+        Layout grille :
+        [Météo         ] [Douas                      ]
+        [Lumières      ] [Prières  ] [Batterie        ]
+        [Calendrier aujourd'hui                       ]
+      -->
+
+      <!-- LIGNE 1 : Météo + Douas -->
+      <div class="grid" style="grid-template-columns: 1fr 1.2fr; gap: 16px; margin-bottom: 16px;">
+
+        <!-- MÉTÉO -->
+        <div class="card meteo-card">
+          <div class="card-title">🌤 Météo — Paris</div>
+
+          <div class="meteo-main">
+            <div class="meteo-icon" id="meteo-icon">⏳</div>
+            <div class="meteo-info">
+              <div class="meteo-temp">
+                <span id="meteo-temp">--</span><span>°C</span>
+              </div>
+              <div class="meteo-desc" id="meteo-desc">Chargement...</div>
+              <div class="meteo-ville">📍 Paris, France</div>
+            </div>
+          </div>
+
+          <div class="meteo-details">
+            <div class="meteo-detail-item">💧 <span id="meteo-humidite">--%</span></div>
+            <div class="meteo-detail-item">💨 <span id="meteo-vent">-- km/h</span></div>
+            <div class="meteo-detail-item">🌡 <span id="meteo-ressenti">--°C</span></div>
+          </div>
+
+          <div class="meteo-previsions" id="meteo-previsions">
+            <!-- 5 jours générés par JS -->
+          </div>
+        </div>
+
+        <!-- DOUAS DU FOYER -->
+        <div class="card">
+          <div class="card-title">🤲 Douas du foyer</div>
+          <div class="douas-grid">
+
+            <div class="doua-card">
+              <div class="doua-header">
+                <span class="doua-icon">🚪</span>
+                <div>
+                  <div class="doua-titre">En sortant</div>
+                  <div class="doua-sous-titre">Doua de sortie</div>
+                </div>
+              </div>
+              <div class="doua-arabique">بِسْمِ اللهِ، تَوَكَّلْتُ عَلَى اللهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ</div>
+              <div class="doua-texte">« Au nom d'Allah, je me remets à Allah, et il n'y a ni force ni puissance si ce n'est par Allah. »</div>
+              <button class="doua-btn">🔊 Écouter</button>
+            </div>
+
+            <div class="doua-card">
+              <div class="doua-header">
+                <span class="doua-icon">🏠</span>
+                <div>
+                  <div class="doua-titre">En rentrant</div>
+                  <div class="doua-sous-titre">Doua d'entrée</div>
+                </div>
+              </div>
+              <div class="doua-arabique">اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلِجِ وَخَيْرَ الْمَخْرَجِ</div>
+              <div class="doua-texte">« Ô Allah, je Te demande la bonté de l'entrée et la bonté de la sortie. »</div>
+              <button class="doua-btn">🔊 Écouter</button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- LIGNE 2 : Lumières + Prières + Batterie -->
+      <div class="grid" style="grid-template-columns: 1.2fr 1fr 0.9fr; gap: 16px; margin-bottom: 16px;">
+
+        <!-- CONTRÔLE LUMIÈRES -->
+        <div class="card">
+          <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+            💡 Éclairage
+            <span id="lumieres-count" style="font-size:10px; background:rgba(243,156,18,0.15); color:var(--accent-orange); padding:2px 8px; border-radius:10px;">0 allumée(s)</span>
+          </div>
+
+          <div class="lumieres-grid" id="lumieres-grid">
+            <!-- Généré par JS -->
+          </div>
+
+          <div class="lumiere-all" style="margin-top: 12px;">
+            <button onclick="toutAllumer()">☀️ Tout allumer</button>
+            <button onclick="toutEteindre()">🌙 Tout éteindre</button>
+          </div>
+        </div>
+
+        <!-- HORAIRES PRIÈRES -->
+        <div class="card">
+          <div class="card-title">🕌 Horaires de prière</div>
+          <div class="prieres-list" id="prieres-list">
+            <!-- Généré par JS -->
+          </div>
+        </div>
+
+        <!-- BATTERIE MAISON -->
+        <div class="card batterie-card">
+          <div class="card-title">🔋 Énergie maison</div>
+          <div class="batterie-header">
+            <div>
+              <div class="batterie-pct"><span id="batterie-pct">78</span><span>%</span></div>
+              <div class="batterie-status" id="batterie-status">⚡ En charge</div>
+            </div>
+            <div class="batterie-icon-big">🔋</div>
+          </div>
+          <div class="batterie-bar progress-bar">
+            <div class="progress-fill" id="batterie-fill" style="width: 78%; background: linear-gradient(90deg, #2ECC71, #1ABC9C);"></div>
+          </div>
+          <div class="batterie-details">
+            <span>0%</span>
+            <span id="batterie-label">78% — Bon</span>
+            <span>100%</span>
+          </div>
+          <div class="batterie-grid">
+            <div class="batterie-stat production">
+              <div class="stat-val" id="prod-val">2.4 kW</div>
+              <div class="stat-lbl">⬆ Production</div>
+            </div>
+            <div class="batterie-stat consommation">
+              <div class="stat-val" id="conso-val">1.1 kW</div>
+              <div class="stat-lbl">⬇ Consommation</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- LIGNE 3 : Calendrier aujourd'hui -->
+      <div class="card calendrier-today">
+        <div class="cal-today-header">
+          <div>
+            <div class="cal-today-date" id="cal-date">Aujourd'hui</div>
+            <div class="cal-today-sub">Agenda de la famille</div>
+          </div>
+          <a href="calendrier.html" class="btn btn-ghost" style="font-size:11px; padding:6px 12px;">Voir tout →</a>
+        </div>
+
+        <div class="cal-events" id="cal-events">
+          <!-- Généré par JS — pour l'instant placeholder -->
+          <div class="cal-event vert">
+            <div class="cal-event-time">09:00</div>
+            <div>
+              <div class="cal-event-titre">Réunion école — Yasmine</div>
+              <div class="cal-event-desc">École primaire Victor Hugo</div>
+            </div>
+          </div>
+          <div class="cal-event orange">
+            <div class="cal-event-time">14:30</div>
+            <div>
+              <div class="cal-event-titre">Livraison Amazon</div>
+              <div class="cal-event-desc">Créneau 14h–18h</div>
+            </div>
+          </div>
+          <div class="cal-event violet">
+            <div class="cal-event-time">19:00</div>
+            <div>
+              <div class="cal-event-titre">Dîner en famille</div>
+              <div class="cal-event-desc">Cuisine ensemble</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+
+    <!-- BARRE ALERTES -->
+    <div id="alert-bar">
+      <span class="alert-item">
+        <span class="alert-icon">🚗</span>
+        <span class="alert-label">Porte garage ouverte</span>
+        <span class="alert-dot"></span>
+      </span>
+      <span class="alert-sep">|</span>
+      <span class="alert-item">
+        <span class="alert-icon">🫧</span>
+        <span class="alert-label">Lave-linge terminé</span>
+        <span class="alert-dot"></span>
+      </span>
+      <span class="alert-sep">|</span>
+      <span class="alert-item">
+        <span class="alert-icon">📦</span>
+        <span class="alert-label">Livraison prévue cet après-midi</span>
+      </span>
+      <span style="margin-left:auto; font-size:11px; color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('alert-bar').classList.add('hidden')">✕ Fermer</span>
+    </div>
+
+  </div><!-- /main-area -->
+
+</div><!-- /app -->
+
+<!-- Scripts -->
+<script src="js/config.js"></script>
+<script src="js/ha-api.js"></script>
+<script src="js/clock.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/prayer.js"></script>
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>
