@@ -8,7 +8,7 @@
 // Le jeton de session reste en mémoire (jamais dans le stockage du navigateur) et la vue
 // se reverrouille quand on la quitte ou après INACTIVITE_MS sans interaction.
 
-import { ajouterStyle, chargerGabarit, el, svg } from '../../js/dom.js';
+import { ajouterStyle, chargerGabarit, el, remplacer, svg } from '../../js/dom.js';
 import {
   budgetDeverrouiller, budgetEnregistrer, budgetEtat, budgetLire, budgetVerrouiller,
 } from '../../js/ha.js';
@@ -80,7 +80,7 @@ export async function monter() {
 
   function construireClavier() {
     const touches = ['1', '2', '3', '4', '5', '6', '7', '8', '9', null, '0', 'effacer'];
-    $('budget-clavier').replaceChildren(...touches.map((t) => {
+    remplacer($('budget-clavier'), ...touches.map((t) => {
       if (t === null) return el('span');
       return t === 'effacer'
         ? el('button', { class: 'budget-touche', 'data-action': 'effacer', 'aria-label': 'Effacer' }, '⌫')
@@ -89,7 +89,7 @@ export async function monter() {
   }
 
   function rendrePoints() {
-    $('budget-code-points').replaceChildren(...Array.from({ length: LONGUEUR_CODE }, (_, i) =>
+    remplacer($('budget-code-points'), ...Array.from({ length: LONGUEUR_CODE }, (_, i) =>
       el('span', { class: i < code.length ? 'budget-code-point rempli' : 'budget-code-point' })));
   }
 
@@ -212,7 +212,7 @@ export async function monter() {
     let boutons = [];
     if (jeton && enEdition()) boutons = [bouton('annuler', 'Annuler'), bouton('enregistrer', 'Enregistrer', true)];
     else if (jeton) boutons = [bouton('modifier', '✏️ Modifier le mois', true), bouton('verrouiller', '🔒 Verrouiller')];
-    $('budget-actions').replaceChildren(...boutons);
+    remplacer($('budget-actions'), ...boutons);
   }
 
   // ---- Champs (non modifiables hors édition) ----
@@ -257,7 +257,7 @@ export async function monter() {
   function rendreApercu() {
     const d = courant();
     const lignes = [['Revenus', 'revenus'], ['Dépenses fixes', 'depensesFixes'], ['Dépenses variables', 'depensesVariables']];
-    $('budget-chiffres').replaceChildren(
+    remplacer($('budget-chiffres'), 
       ...lignes.flatMap(([libelle, cle]) => [
         el('dt', { class: 'budget-libelle' }, libelle),
         el('dd', { class: 'budget-montant' }, enEdition() ? champMontant(d[cle], cle, false) : euros.format(d[cle])),
@@ -273,7 +273,7 @@ export async function monter() {
       $(id).value = epargne[cle];
       $(id).readOnly = !enEdition();
     }
-    $('budget-comptes').replaceChildren(
+    remplacer($('budget-comptes'), 
       ...epargne.comptes.map((c, i) => (enEdition()
         ? el('div', { class: 'budget-ligne-edition' },
           champTexte(c.nom, `epargne.comptes.${i}.nom`, 'Nom du compte'),
@@ -288,7 +288,7 @@ export async function monter() {
   }
 
   function rendreCategories() {
-    $('budget-categories').replaceChildren(...courant().categories.map((c, i) =>
+    remplacer($('budget-categories'), ...courant().categories.map((c, i) =>
       el('div', { class: 'budget-categorie' },
         el('div', { class: 'budget-ligne-texte' },
           el('span', { class: c.alerte ? 'budget-libelle budget-texte-rose' : 'budget-libelle' }, c.nom),
@@ -308,7 +308,7 @@ export async function monter() {
 
   function rendreImprevus() {
     const d = courant();
-    $('budget-imprevus').replaceChildren(
+    remplacer($('budget-imprevus'), 
       ...d.imprevus.map((x, i) => (enEdition()
         ? el('div', { class: 'budget-ligne-edition' },
           champTexte(x.libelle, `imprevus.${i}.libelle`, 'Libellé'),
@@ -320,7 +320,7 @@ export async function monter() {
       !d.imprevus.length && !enEdition() && vide('Aucun imprévu ce mois-ci.'),
       boutonAjouter('imprevus', 'Ajouter un imprévu'),
     );
-    $('budget-fonds-urgence').replaceChildren(
+    remplacer($('budget-fonds-urgence'), 
       el('b', {}, 'Fonds d\'urgence'),
       enEdition()
         ? champMontant(d.fondsUrgence, 'fondsUrgence')
@@ -331,7 +331,7 @@ export async function monter() {
   function rendreFactures() {
     const d = courant();
 
-    $('budget-a-venir').replaceChildren(
+    remplacer($('budget-a-venir'), 
       ...d.facturesAVenir.map((f, i) => (enEdition()
         ? el('div', { class: 'budget-facture' },
           champTexte(f.fournisseur, `facturesAVenir.${i}.fournisseur`, 'Fournisseur'),
@@ -350,7 +350,7 @@ export async function monter() {
       boutonAjouter('facturesAVenir', 'Ajouter une facture'),
     );
 
-    $('budget-factures').replaceChildren(...d.factures.map((f, i) => (enEdition()
+    remplacer($('budget-factures'), ...d.factures.map((f, i) => (enEdition()
       ? el('tr', {},
         el('td', {}, champTexte(f.fournisseur, `factures.${i}.fournisseur`, 'Fournisseur')),
         el('td', {}, champDate(f.echeance, `factures.${i}.echeance`)),
@@ -364,7 +364,7 @@ export async function monter() {
         el('td', { class: 'budget-libelle' }, dateLongue.format(dateDe(f.echeance))),
         el('td', { class: 'budget-droite budget-gras' }, eurosCentimes.format(f.montant)),
         el('td', { class: 'budget-droite' }, badge(f.statut))))));
-    $('budget-factures-ajout').replaceChildren(
+    remplacer($('budget-factures-ajout'), 
       !d.factures.length && !enEdition() && vide('Aucune facture enregistrée.'),
       boutonAjouter('factures', 'Ajouter une facture'),
     );
@@ -381,7 +381,7 @@ export async function monter() {
 
     const rayon = 52;
     const circonference = 2 * Math.PI * rayon;
-    $('budget-donut').replaceChildren(
+    remplacer($('budget-donut'), 
       svg('svg', { viewBox: '0 0 120 120', width: 120, height: 120, 'aria-hidden': 'true' },
         svg('circle', { cx: 60, cy: 60, r: rayon, class: 'budget-donut-fond' }),
         utilise > 0 && svg('circle', {
@@ -423,7 +423,7 @@ export async function monter() {
     const y = (v) => 20 + ((max - v) / (max - min || 1)) * (H - 40);
     const bulleX = Math.max(0, Math.min(x(dernier) - 30, L - 62));
 
-    $('budget-courbe').replaceChildren(
+    remplacer($('budget-courbe'), 
       svg('svg', { viewBox: `0 0 ${L} ${H}`, class: 'budget-courbe-svg', 'aria-hidden': 'true' },
         ...[0, 30, 60, 90].map((ligne) => svg('line', { x1: 0, x2: L, y1: ligne + 0.5, y2: ligne + 0.5, class: 'budget-courbe-grille' })),
         dernier > 0 && svg('polyline', { points: valeurs.map((v, i) => `${x(i)},${y(v)}`).join(' '), class: 'budget-courbe-ligne' }),
@@ -436,7 +436,7 @@ export async function monter() {
       ),
     );
 
-    $('budget-courbe-mois').replaceChildren(...points.map((p, i) => (i === dernier
+    remplacer($('budget-courbe-mois'), ...points.map((p, i) => (i === dernier
       ? el('span', { class: 'budget-mois-actuel' }, `${majuscule(nomDuMois(p.mois, 'short'))} (Auj)`)
       : el('span', {}, majuscule(nomDuMois(p.mois, 'long').split(' ')[0])))));
   }

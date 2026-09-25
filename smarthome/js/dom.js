@@ -13,6 +13,14 @@ export function svg(tag, attributs = {}, ...enfants) {
   return remplir(document.createElementNS('http://www.w3.org/2000/svg', tag), attributs, enfants);
 }
 
+// Remplace le contenu d'un nœud. Contrairement à replaceChildren natif,
+// ignore false / null / undefined (enfants conditionnels : `cond && el(...)`).
+export function remplacer(noeud, ...enfants) {
+  noeud.replaceChildren(...filtrerEnfants(enfants));
+}
+
+const filtrerEnfants = (enfants) => enfants.flat().filter((e) => e != null && e !== false);
+
 function remplir(noeud, attributs, enfants) {
   for (const [cle, valeur] of Object.entries(attributs)) {
     // Gestionnaires d'événements en attribut interdits : utiliser addEventListener
@@ -21,7 +29,7 @@ function remplir(noeud, attributs, enfants) {
     if (cle === 'class') noeud.setAttribute('class', valeur);
     else noeud.setAttribute(cle, valeur === true ? '' : valeur);
   }
-  noeud.append(...enfants.flat().filter((e) => e != null && e !== false));
+  noeud.append(...filtrerEnfants(enfants));
   return noeud;
 }
 
