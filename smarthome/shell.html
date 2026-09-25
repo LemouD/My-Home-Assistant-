@@ -1,0 +1,87 @@
+<div id="app">
+
+  <!-- ============================
+       SIDEBAR NAVIGATION
+  ============================= -->
+  <nav id="sidebar">
+
+    <!-- Visible sur écran étroit : rouvre le menu de Home Assistant -->
+    <button class="menu-ha" data-action="menu-ha" aria-label="Menu Home Assistant">☰</button>
+
+    <div class="sidebar-logo">🏠</div>
+
+    <div class="nav-items">
+
+      <a class="nav-item" data-vue="" data-tooltip="Tableau de bord">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Accueil</span>
+      </a>
+
+      <a class="nav-item" data-vue="budget" data-tooltip="Budget & Factures">
+        <span class="nav-icon">💰</span>
+        <span class="nav-label">Budget</span>
+      </a>
+
+      <a class="nav-item" data-vue="energie" data-tooltip="Énergie & Fluides">
+        <span class="nav-icon">⚡</span>
+        <span class="nav-label">Énergie</span>
+      </a>
+
+      <a class="nav-item" data-vue="calendrier" data-tooltip="Calendrier famille">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Agenda</span>
+      </a>
+
+      <a class="nav-item" data-vue="courses" data-tooltip="Liste de courses">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">Courses</span>
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <a class="nav-item desactive" aria-disabled="true" data-tooltip="Automatisations (à venir)">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">Auto</span>
+      </a>
+
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="ha-indicator" id="ha-indicator" title="Home Assistant"></div>
+      <a class="nav-item desactive" aria-disabled="true" data-tooltip="Paramètres (à venir)">
+        <span class="nav-icon">⚙️</span>
+      </a>
+    </div>
+
+  </nav>
+
+  <!-- ============================
+       ZONE PRINCIPALE
+  ============================= -->
+  <div id="main-area">
+
+    <!-- HEADER -->
+    <header id="header">
+
+      <div class="header-left">
+        <div class="header-greeting">Bonjour, <strong id="greeting-name">…</strong> 👋</div>
+        <div class="header-sub" id="header-sub">Chargement...</div>
+      </div>
+
+      <div class="header-center">
+        <div class="presence-chips" id="presence-chips"></div>
+      </div>
+
+      <div class="header-right">
+        <div id="clock-time">--:--</div>
+        <div id="clock-date">--</div>
+      </div>
+
+    </header>
+
+    <!-- Vue courante, injectée par le panneau -->
+    <main id="vue"></main>
+
+  </div>
+
+</div>

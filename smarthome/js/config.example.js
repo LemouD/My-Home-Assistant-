@@ -1,36 +1,26 @@
 // =============================================
 // CONFIG — Smarthome Dashboard
 // =============================================
-// Copier ce fichier en config.js puis renseigner les valeurs.
-// config.js est ignoré par git : ne jamais y committer de token.
+// Copier ce fichier en config.js puis adapter les entités.
+// config.js est ignoré par git.
+//
+// Aucun token ici : l'authentification est fournie par Home Assistant.
+// Les noms affichés viennent de Home Assistant (friendly_name) ;
+// `nom` ne sert que tant que l'entité n'existe pas encore.
 
-const CONFIG = {
-  HA_URL: 'http://homeassistant.local:8123',
-  HA_TOKEN: 'VOTRE_TOKEN_ICI',
+export default {
+  // Méthode de calcul des horaires (12 = Union des Organisations Islamiques de France)
+  METHODE_PRIERE: 12,
 
-  // Famille
-  FAMILLE: 'Ma famille',
-  MEMBRES: ['Membre 1', 'Membre 2'],
+  // Rafraîchissement météo (millisecondes)
+  REFRESH_METEO: 900000,
 
-  // Localisation (pour météo + prières)
-  VILLE: 'Paris',
-  LATITUDE: 48.8566,
-  LONGITUDE: 2.3522,
-  PAYS: 'FR',
-  METHODE_PRIERE: 12, // 12 = Union des Organisations Islamiques de France
-
-  // Rafraîchissement (millisecondes)
-  REFRESH_STATES: 30000,   // états HA toutes les 30s
-  REFRESH_METEO: 900000,   // météo toutes les 15min
-  REFRESH_PRIERE: 3600000, // prières toutes les heures
-
-  // Entités Home Assistant (à adapter selon vos vrais appareils)
   LUMIERES: [
-    { id: 'light.salon',    nom: 'Salon',    icone: '🛋️' },
-    { id: 'light.cuisine',  nom: 'Cuisine',  icone: '🍳' },
-    { id: 'light.chambre',  nom: 'Chambre',  icone: '🛏️' },
-    { id: 'light.bureau',   nom: 'Bureau',   icone: '💻' },
-    { id: 'light.entree',   nom: 'Entrée',   icone: '🚪' },
+    { id: 'light.salon',         nom: 'Salon',         icone: '🛋️' },
+    { id: 'light.cuisine',       nom: 'Cuisine',       icone: '🍳' },
+    { id: 'light.chambre',       nom: 'Chambre',       icone: '🛏️' },
+    { id: 'light.bureau',        nom: 'Bureau',        icone: '💻' },
+    { id: 'light.entree',        nom: 'Entrée',        icone: '🚪' },
     { id: 'light.salle_de_bain', nom: 'Salle de bain', icone: '🚿' },
   ],
 
@@ -39,8 +29,9 @@ const CONFIG = {
     { id: 'person.membre_2', nom: 'Membre 2' },
   ],
 
+  // Une alerte s'affiche quand l'entité est à "on".
   ALERTES: [
-    { id: 'binary_sensor.porte_garage', nom: 'Porte garage', icone: '🚗', type: 'door' },
-    { id: 'binary_sensor.lave_linge',   nom: 'Lave-linge',   icone: '🫧', type: 'machine' },
+    { id: 'binary_sensor.porte_garage', libelle: 'Porte garage ouverte', icone: '🚗' },
+    { id: 'binary_sensor.lave_linge',   libelle: 'Lave-linge terminé',   icone: '🫧' },
   ],
 };

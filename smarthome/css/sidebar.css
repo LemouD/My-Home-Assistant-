@@ -15,6 +15,22 @@
   z-index: 100;
 }
 
+/* Bouton menu Home Assistant : visible uniquement en mode étroit */
+.menu-ha {
+  display: none;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 8px;
+  font-size: 20px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.menu-ha:hover { background: var(--bg-card); color: var(--text-primary); }
+.narrow .menu-ha { display: block; }
+
 /* Logo / icône maison */
 .sidebar-logo {
   width: 40px;
@@ -65,6 +81,12 @@
   background: var(--bg-card);
   color: var(--text-secondary);
 }
+
+.nav-item.desactive {
+  opacity: 0.4;
+  cursor: default;
+}
+.nav-item.desactive:hover { background: none; color: var(--text-muted); }
 
 .nav-item.active {
   background: rgba(74, 158, 255, 0.12);
