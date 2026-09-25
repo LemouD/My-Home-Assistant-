@@ -1,0 +1,166 @@
+<div id="page-content">
+
+  <!--
+    Layout grille :
+    [Météo         ] [Douas                      ]
+    [Lumières      ] [Prières  ] [Batterie        ]
+    [Calendrier aujourd'hui                       ]
+  -->
+
+  <!-- LIGNE 1 : Météo + Douas -->
+  <div class="grid" style="grid-template-columns: 1fr 1.2fr; gap: 16px; margin-bottom: 16px;">
+
+    <!-- MÉTÉO -->
+    <div class="card meteo-card">
+      <div class="card-title">🌤 Météo</div>
+
+      <div class="meteo-main">
+        <div class="meteo-icon" id="meteo-icon">⏳</div>
+        <div class="meteo-info">
+          <div class="meteo-temp">
+            <span id="meteo-temp">--</span><span>°C</span>
+          </div>
+          <div class="meteo-desc" id="meteo-desc">Chargement...</div>
+        </div>
+      </div>
+
+      <div class="meteo-details">
+        <div class="meteo-detail-item">💧 <span id="meteo-humidite">--%</span></div>
+        <div class="meteo-detail-item">💨 <span id="meteo-vent">-- km/h</span></div>
+        <div class="meteo-detail-item">🌡 <span id="meteo-ressenti">--°C</span></div>
+      </div>
+
+      <div class="meteo-previsions" id="meteo-previsions"></div>
+    </div>
+
+    <!-- DOUAS DU FOYER -->
+    <div class="card">
+      <div class="card-title">🤲 Douas du foyer</div>
+      <div class="douas-grid">
+
+        <div class="doua-card">
+          <div class="doua-header">
+            <span class="doua-icon">🚪</span>
+            <div>
+              <div class="doua-titre">En sortant</div>
+              <div class="doua-sous-titre">Doua de sortie</div>
+            </div>
+          </div>
+          <div class="doua-arabique">بِسْمِ اللهِ، تَوَكَّلْتُ عَلَى اللهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ</div>
+          <div class="doua-texte">« Au nom d'Allah, je me remets à Allah, et il n'y a ni force ni puissance si ce n'est par Allah. »</div>
+          <button class="doua-btn">🔊 Écouter</button>
+        </div>
+
+        <div class="doua-card">
+          <div class="doua-header">
+            <span class="doua-icon">🏠</span>
+            <div>
+              <div class="doua-titre">En rentrant</div>
+              <div class="doua-sous-titre">Doua d'entrée</div>
+            </div>
+          </div>
+          <div class="doua-arabique">اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلِجِ وَخَيْرَ الْمَخْرَجِ</div>
+          <div class="doua-texte">« Ô Allah, je Te demande la bonté de l'entrée et la bonté de la sortie. »</div>
+          <button class="doua-btn">🔊 Écouter</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIGNE 2 : Lumières + Prières + Batterie -->
+  <div class="grid" style="grid-template-columns: 1.2fr 1fr 0.9fr; gap: 16px; margin-bottom: 16px;">
+
+    <!-- CONTRÔLE LUMIÈRES -->
+    <div class="card">
+      <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+        💡 Éclairage
+        <span id="lumieres-count" style="font-size:10px; background:rgba(243,156,18,0.15); color:var(--accent-orange); padding:2px 8px; border-radius:10px;">0 allumée(s)</span>
+      </div>
+
+      <div class="lumieres-grid" id="lumieres-grid"></div>
+
+      <div class="lumiere-all" style="margin-top: 12px;">
+        <button data-action="tout-allumer">☀️ Tout allumer</button>
+        <button data-action="tout-eteindre">🌙 Tout éteindre</button>
+      </div>
+    </div>
+
+    <!-- HORAIRES PRIÈRES -->
+    <div class="card">
+      <div class="card-title">🕌 Horaires de prière</div>
+      <div class="prieres-list" id="prieres-list"></div>
+    </div>
+
+    <!-- BATTERIE MAISON (valeurs fictives en attendant les capteurs) -->
+    <div class="card batterie-card">
+      <div class="card-title">🔋 Énergie maison</div>
+      <div class="batterie-header">
+        <div>
+          <div class="batterie-pct"><span id="batterie-pct">78</span><span>%</span></div>
+          <div class="batterie-status" id="batterie-status">⚡ En charge</div>
+        </div>
+        <div class="batterie-icon-big">🔋</div>
+      </div>
+      <div class="batterie-bar progress-bar">
+        <div class="progress-fill" id="batterie-fill" style="width: 78%;"></div>
+      </div>
+      <div class="batterie-details">
+        <span>0%</span>
+        <span id="batterie-label">78% — Bon</span>
+        <span>100%</span>
+      </div>
+      <div class="batterie-grid">
+        <div class="batterie-stat production">
+          <div class="stat-val" id="prod-val">2.4 kW</div>
+          <div class="stat-lbl">⬆ Production</div>
+        </div>
+        <div class="batterie-stat consommation">
+          <div class="stat-val" id="conso-val">1.1 kW</div>
+          <div class="stat-lbl">⬇ Consommation</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIGNE 3 : Calendrier aujourd'hui (événements fictifs en attendant l'intégration) -->
+  <div class="card calendrier-today">
+    <div class="cal-today-header">
+      <div>
+        <div class="cal-today-date" id="cal-date">Aujourd'hui</div>
+        <div class="cal-today-sub">Agenda de la famille</div>
+      </div>
+      <a data-vue="calendrier" class="btn btn-ghost" style="font-size:11px; padding:6px 12px;">Voir tout →</a>
+    </div>
+
+    <div class="cal-events" id="cal-events">
+      <div class="cal-event vert">
+        <div class="cal-event-time">09:00</div>
+        <div>
+          <div class="cal-event-titre">Réunion école — Yasmine</div>
+          <div class="cal-event-desc">École primaire Victor Hugo</div>
+        </div>
+      </div>
+      <div class="cal-event orange">
+        <div class="cal-event-time">14:30</div>
+        <div>
+          <div class="cal-event-titre">Livraison Amazon</div>
+          <div class="cal-event-desc">Créneau 14h–18h</div>
+        </div>
+      </div>
+      <div class="cal-event violet">
+        <div class="cal-event-time">19:00</div>
+        <div>
+          <div class="cal-event-titre">Dîner en famille</div>
+          <div class="cal-event-desc">Cuisine ensemble</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BARRE ALERTES : remplie par dashboard.js, masquée s'il n'y a aucune alerte -->
+<div id="alert-bar" class="hidden"></div>

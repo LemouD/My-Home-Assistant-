@@ -2,8 +2,9 @@
    MAIN.CSS — Variables, Reset, Layout global
    ============================================= */
 
-/* Variables Design System (depuis Figma) */
-:root {
+/* Variables Design System (depuis Figma)
+   :host et non :root : le panneau vit dans un Shadow DOM */
+:host {
   /* Couleurs */
   --bg-main:       #0D0F14;
   --bg-card:       #161B22;
@@ -49,8 +50,10 @@
 /* Reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
-  height: 100%;
+/* Hôte du panneau (remplace html, body) */
+:host {
+  display: block;
+  height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-main);
   color: var(--text-primary);
@@ -59,14 +62,11 @@ html, body {
   overflow: hidden;
 }
 
-/* Import Inter */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 /* Layout principal */
 #app {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -259,6 +259,31 @@ html, body {
 }
 
 #alert-bar.hidden { display: none; }
+
+.alert-fermer {
+  margin-left: auto;
+  font: inherit;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.alert-fermer:hover { color: var(--text-primary); }
+
+/* Vue courante : occupe l'espace sous le header */
+#vue {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.vue-dashboard {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 
 .alert-item {
   display: flex;

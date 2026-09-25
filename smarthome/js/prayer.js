@@ -2,6 +2,8 @@
 // PRAYER.JS — Horaires de prière (Aladhan API)
 // =============================================
 
+import { el } from './dom.js';
+
 const PRIERES_DEF = [
   { key: 'Fajr',    nom: 'Fajr',    icone: '🌙' },
   { key: 'Dhuhr',   nom: 'Dhuhr',   icone: '☀️' },
@@ -10,74 +12,81 @@ const PRIERES_DEF = [
   { key: 'Isha',    nom: 'Isha',    icone: '⭐' },
 ];
 
-async function chargerPrieres() {
-  const container = document.getElementById('prieres-list');
-  if (!container) return;
+const dateApi = (d) =>
+  `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
 
-  try {
-    const now = new Date();
-    const day   = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year  = now.getFullYear();
+const enMinutes = (hhmm) => {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+};
 
-    const url = `https://api.aladhan.com/v1/timingsByCity/${day}-${month}-${year}`
-      + `?city=${encodeURIComponent(CONFIG.VILLE)}&country=${CONFIG.PAYS}&method=${CONFIG.METHODE_PRIERE}`;
+// Les horaires ne changent qu'une fois par jour : un seul appel à l'API par jour,
+// le calcul de la prochaine prière se fait localement chaque minute.
+// Renvoie une fonction qui arrête la mise à jour.
+export function demarrerPrieres(racine, { latitude, longitude, methode }) {
+  const liste = racine.querySelector('#prieres-list');
+  if (!liste) return () => {};
 
-    const res  = await fetch(url);
+  let jour = null;      // date des horaires en cache (JJ-MM-AAAA)
+  let horaires = null;  // [{ ...PRIERES_DEF, heure: 'HH:MM', minutes }]
+
+  const charger = async (date) => {
+    // Position arrondie à ~1 km : l'adresse exacte n'est pas envoyée à l'API
+    const params = new URLSearchParams({
+      latitude: latitude.toFixed(2),
+      longitude: longitude.toFixed(2),
+      method: methode,
+    });
+    const res = await fetch(`https://api.aladhan.com/v1/timings/${date}?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-
     if (data.code !== 200) throw new Error('API Aladhan erreur');
 
-    const timings = data.data.timings;
-
-    // Trouver la prochaine prière
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    let nextIndex = -1;
-
-    const priereMinutes = PRIERES_DEF.map(p => {
-      const [h, m] = timings[p.key].split(':').map(Number);
-      return h * 60 + m;
+    return PRIERES_DEF.map((p) => {
+      const heure = data.data.timings[p.key].substring(0, 5); // HH:MM
+      return { ...p, heure, minutes: enMinutes(heure) };
     });
+  };
 
-    for (let i = 0; i < priereMinutes.length; i++) {
-      if (priereMinutes[i] > currentMinutes) {
-        nextIndex = i;
-        break;
+  const afficher = (now) => {
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    // Après Isha, la prochaine prière est Fajr du lendemain
+    const prochaine = horaires.find((p) => p.minutes > minutes) ?? horaires[0];
+
+    liste.replaceChildren(...horaires.map((p) => {
+      const estProchaine = p === prochaine;
+      return el('div', { class: estProchaine ? 'priere-item active' : 'priere-item' },
+        el('div', { class: 'priere-gauche' },
+          el('span', { class: 'priere-icon' }, p.icone),
+          el('span', { class: 'priere-nom' }, p.nom),
+          estProchaine && el('span', { class: 'priere-badge-next' },
+            p.minutes > minutes ? 'Prochaine' : 'Demain'),
+        ),
+        el('span', { class: 'priere-heure' }, p.heure),
+      );
+    }));
+  };
+
+  const maj = async () => {
+    const now = new Date();
+    const date = dateApi(now);
+    try {
+      if (date !== jour) {
+        horaires = await charger(date);
+        jour = date;
+      }
+      afficher(now);
+    } catch (e) {
+      console.warn('Prières indisponibles :', e.message);
+      // En cas d'échec, `jour` n'est pas mis à jour : nouvel essai à la minute suivante
+      if (!horaires) {
+        liste.replaceChildren(el('div', { class: 'cal-empty' },
+          'Horaires indisponibles', el('br'), 'Vérifiez la connexion internet'));
       }
     }
+  };
 
-    // Rendu
-    container.innerHTML = '';
-    PRIERES_DEF.forEach((p, i) => {
-      const heure = timings[p.key].substring(0, 5); // HH:MM
-      const isNext = i === nextIndex;
-
-      container.innerHTML += `
-        <div class="priere-item ${isNext ? 'active' : ''}">
-          <div class="priere-gauche">
-            <span class="priere-icon">${p.icone}</span>
-            <span class="priere-nom">${p.nom}</span>
-            ${isNext ? '<span class="priere-badge-next">Prochaine</span>' : ''}
-          </div>
-          <span class="priere-heure">${heure}</span>
-        </div>`;
-    });
-
-  } catch (e) {
-    console.warn('Prières indisponibles:', e.message);
-    if (container) {
-      container.innerHTML = `
-        <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">
-          Horaires indisponibles<br>Vérifiez la connexion internet
-        </div>`;
-    }
-  }
+  maj();
+  const timer = setInterval(maj, 60000);
+  return () => clearInterval(timer);
 }
-
-// Mise à jour à chaque heure pleine
-document.addEventListener('DOMContentLoaded', () => {
-  chargerPrieres();
-  setInterval(chargerPrieres, CONFIG.REFRESH_PRIERE);
-  // Aussi recalculer quelle est la "prochaine" chaque minute
-  setInterval(() => chargerPrieres(), 60000);
-});

@@ -144,6 +144,8 @@
 }
 
 .lumiere-btn:hover { border-color: var(--border-active); }
+.lumiere-btn:disabled { opacity: 0.5; cursor: wait; }
+.lumiere-btn.erreur { border-color: var(--accent-red); }
 
 .lumiere-btn.on {
   background: rgba(243, 156, 18, 0.1);

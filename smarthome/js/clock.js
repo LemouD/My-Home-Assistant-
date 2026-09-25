@@ -2,44 +2,34 @@
 // CLOCK.JS — Horloge temps réel
 // =============================================
 
-function initClock() {
-  const updateClock = () => {
-    const now = new Date();
-
-    // Heure
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    const clockEl = document.getElementById('clock-time');
-    if (clockEl) clockEl.textContent = `${h}:${m}`;
-
-    // Date en français
-    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    const dateStr = now.toLocaleDateString('fr-FR', options);
-    const dateEl = document.getElementById('clock-date');
-    if (dateEl) dateEl.textContent = dateStr;
-
-    // Sous-titre header (salutation selon heure)
-    const heure = now.getHours();
-    let salut = 'Bienvenue chez vous';
-    if (heure >= 5  && heure < 12) salut = 'Bonne matinée ☀️';
-    if (heure >= 12 && heure < 14) salut = 'Bon appétit 🍽️';
-    if (heure >= 14 && heure < 18) salut = 'Bon après-midi 🌤';
-    if (heure >= 18 && heure < 21) salut = 'Bonne soirée 🌆';
-    if (heure >= 21 || heure < 5)  salut = 'Bonne nuit 🌙';
-
-    const subEl = document.getElementById('header-sub');
-    if (subEl) subEl.textContent = salut;
-
-    // Date calendrier
-    const calDateEl = document.getElementById('cal-date');
-    if (calDateEl) {
-      const calOpts = { weekday: 'long', day: 'numeric', month: 'long' };
-      calDateEl.textContent = 'Aujourd\'hui, ' + now.toLocaleDateString('fr-FR', calOpts);
-    }
-  };
-
-  updateClock();
-  setInterval(updateClock, 1000);
+function salutation(heure) {
+  if (heure >= 5  && heure < 12) return 'Bonne matinée ☀️';
+  if (heure >= 12 && heure < 14) return 'Bon appétit 🍽️';
+  if (heure >= 14 && heure < 18) return 'Bon après-midi 🌤';
+  if (heure >= 18 && heure < 21) return 'Bonne soirée 🌆';
+  return 'Bonne nuit 🌙';
 }
 
-document.addEventListener('DOMContentLoaded', initClock);
+// Met à jour les éléments d'horloge présents sous `racine`.
+// Renvoie une fonction qui arrête l'horloge.
+export function demarrerHorloge(racine) {
+  const ecrire = (id, texte) => {
+    const noeud = racine.getElementById(id);
+    if (noeud) noeud.textContent = texte;
+  };
+
+  const maj = () => {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+
+    ecrire('clock-time', `${h}:${m}`);
+    ecrire('clock-date', now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+    ecrire('header-sub', salutation(now.getHours()));
+    ecrire('cal-date', `Aujourd'hui, ${now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`);
+  };
+
+  maj();
+  const timer = setInterval(maj, 1000);
+  return () => clearInterval(timer);
+}

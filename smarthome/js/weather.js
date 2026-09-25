@@ -2,6 +2,8 @@
 // WEATHER.JS — Météo via Open-Meteo (gratuit)
 // =============================================
 
+import { el } from './dom.js';
+
 const METEO_ICONES = {
   0:  { icone: '☀️',  desc: 'Ciel dégagé' },
   1:  { icone: '🌤',  desc: 'Principalement dégagé' },
@@ -21,61 +23,54 @@ const METEO_ICONES = {
   95: { icone: '⛈️',  desc: 'Orage' },
 };
 
+const INCONNU = { icone: '🌡', desc: 'Inconnu' };
 const JOURS_COURT = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
-async function chargerMeteo() {
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.LATITUDE}&longitude=${CONFIG.LONGITUDE}`
-      + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code`
-      + `&daily=weather_code,temperature_2m_max,temperature_2m_min`
-      + `&timezone=Europe/Paris&forecast_days=5`;
+// Charge la météo pour la position de la maison (hass.config) et l'affiche sous `racine`.
+// Renvoie une fonction qui arrête le rafraîchissement.
+export function demarrerMeteo(racine, { latitude, longitude, fuseau }, intervalle) {
+  const $ = (id) => racine.querySelector(`#${id}`);
 
-    const res  = await fetch(url);
-    const data = await res.json();
+  const charger = async () => {
+    try {
+      // Position arrondie à ~1 km : l'adresse exacte n'est pas envoyée à l'API
+      const params = new URLSearchParams({
+        latitude: latitude.toFixed(2),
+        longitude: longitude.toFixed(2),
+        current: 'temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code',
+        daily: 'weather_code,temperature_2m_max,temperature_2m_min',
+        timezone: fuseau,
+        forecast_days: 5,
+      });
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { current: curr, daily } = await res.json();
 
-    const curr = data.current;
-    const daily = data.daily;
+      // Météo actuelle
+      const info = METEO_ICONES[curr.weather_code] ?? INCONNU;
+      $('meteo-icon').textContent     = info.icone;
+      $('meteo-temp').textContent     = Math.round(curr.temperature_2m);
+      $('meteo-desc').textContent     = info.desc;
+      $('meteo-humidite').textContent = `${curr.relative_humidity_2m}%`;
+      $('meteo-vent').textContent     = `${Math.round(curr.wind_speed_10m)} km/h`;
+      $('meteo-ressenti').textContent = `${Math.round(curr.apparent_temperature)}°C`;
 
-    // Météo actuelle
-    const wCode = curr.weather_code;
-    const info  = METEO_ICONES[wCode] || { icone: '🌡', desc: 'Inconnu' };
-
-    document.getElementById('meteo-icon').textContent     = info.icone;
-    document.getElementById('meteo-temp').textContent     = Math.round(curr.temperature_2m);
-    document.getElementById('meteo-desc').textContent     = info.desc;
-    document.getElementById('meteo-humidite').textContent = `${curr.relative_humidity_2m}%`;
-    document.getElementById('meteo-vent').textContent     = `${Math.round(curr.wind_speed_10m)} km/h`;
-    document.getElementById('meteo-ressenti').textContent = `${Math.round(curr.apparent_temperature)}°C`;
-
-    // Prévisions 5 jours
-    const prevEl = document.getElementById('meteo-previsions');
-    prevEl.innerHTML = '';
-    const today = new Date().getDay();
-
-    for (let i = 0; i < 5; i++) {
-      const code  = daily.weather_code[i];
-      const inf   = METEO_ICONES[code] || { icone: '🌡', desc: '' };
-      const dayIdx = (today + i) % 7;
-      const label = i === 0 ? 'Auj.' : JOURS_COURT[dayIdx];
-      const max   = Math.round(daily.temperature_2m_max[i]);
-
-      prevEl.innerHTML += `
-        <div class="prev-jour ${i === 0 ? 'today' : ''}">
-          <span class="jour-nom">${label}</span>
-          <span class="jour-icon">${inf.icone}</span>
-          <span class="jour-temp">${max}°</span>
-        </div>`;
+      // Prévisions 5 jours
+      const aujourdhui = new Date().getDay();
+      $('meteo-previsions').replaceChildren(...daily.weather_code.slice(0, 5).map((code, i) =>
+        el('div', { class: i === 0 ? 'prev-jour today' : 'prev-jour' },
+          el('span', { class: 'jour-nom' }, i === 0 ? 'Auj.' : JOURS_COURT[(aujourdhui + i) % 7]),
+          el('span', { class: 'jour-icon' }, (METEO_ICONES[code] ?? INCONNU).icone),
+          el('span', { class: 'jour-temp' }, `${Math.round(daily.temperature_2m_max[i])}°`),
+        )));
+    } catch (e) {
+      console.warn('Météo indisponible :', e.message);
+      $('meteo-desc').textContent = 'Météo indisponible';
+      $('meteo-icon').textContent = '❓';
     }
+  };
 
-  } catch (e) {
-    console.warn('Météo indisponible:', e.message);
-    document.getElementById('meteo-desc').textContent = 'Météo indisponible';
-    document.getElementById('meteo-icon').textContent = '❓';
-  }
+  charger();
+  const timer = setInterval(charger, intervalle);
+  return () => clearInterval(timer);
 }
-
-// Charger au démarrage puis toutes les 15 min
-document.addEventListener('DOMContentLoaded', () => {
-  chargerMeteo();
-  setInterval(chargerMeteo, CONFIG.REFRESH_METEO);
-});
