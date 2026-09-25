@@ -1,0 +1,19 @@
+# Secrets
+js/config.js
+smarthome/js/config.js
+**/config.local.js
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.yaml
+
+# Récaps de session
+SESSION_SUMMARY.md
+
+# OS / éditeurs
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
