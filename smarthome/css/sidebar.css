@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  padding: 24px 0 16px;
   gap: 4px;
   flex-shrink: 0;
   z-index: 100;
@@ -30,29 +30,25 @@
 }
 .narrow .menu-ha { display: block; }
 
-/* Logo / icône maison */
+/* Logo (maquette Figma) */
 .sidebar-logo {
-  width: 56px;
-  height: 56px;
-  background: var(--accent-blue);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--fs-xl);
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(74, 158, 255, 0.3);
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 28px;
 }
+.sidebar-logo img { position: absolute; top: -8px; left: -12px; }
 
 /* Items de navigation */
 .nav-items {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
   width: 100%;
-  padding: 0 10px;
+  padding: 0 12px;
 }
 
 /* Libellé toujours visible : pas d'infobulle au survol sur écran tactile */
@@ -63,9 +59,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   padding: 10px 6px;
-  border-radius: 14px;
+  border-radius: 12px;
   cursor: pointer;
   transition: var(--transition);
   text-decoration: none;
@@ -76,24 +72,35 @@
   text-align: center;
 }
 
-.nav-item:active { background: var(--bg-card-hover); }
+.nav-item:active { background: var(--surface-verre-on); }
 
 .nav-item.active {
-  background: rgba(74, 158, 255, 0.12);
-  color: var(--accent-blue);
-  border-color: rgba(74, 158, 255, 0.25);
+  background: var(--surface-verre-on);
+  color: var(--text-primary);
+  border-color: var(--border);
+  font-weight: 600;
 }
 
 .nav-item.desactive {
-  opacity: 0.4;
+  opacity: 0.45;
   cursor: default;
 }
 .nav-item.desactive:active { background: none; }
 
-.nav-item .nav-icon {
-  font-size: var(--fs-xl);
-  line-height: 1;
+/* Icônes SVG de la maquette, teintées par la couleur du lien (currentColor) */
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  background-color: currentColor;
+  -webkit-mask: var(--icone) center / contain no-repeat;
+  mask: var(--icone) center / contain no-repeat;
 }
+.nav-icon-accueil        { --icone: url(../assets/icons/accueil/nav-accueil.svg); }
+.nav-icon-budget         { --icone: url(../assets/icons/accueil/nav-budget.svg); }
+.nav-icon-energie        { --icone: url(../assets/icons/accueil/nav-energie.svg); }
+.nav-icon-calendrier     { --icone: url(../assets/icons/accueil/nav-calendrier.svg); }
+.nav-icon-courses        { --icone: url(../assets/icons/accueil/nav-courses.svg); }
+.nav-icon-configurations { --icone: url(../assets/icons/accueil/nav-configurations.svg); }
 
 .nav-item .nav-label {
   line-height: 1.2;
@@ -101,19 +108,11 @@
 }
 
 @media (hover: hover) {
-  .menu-ha:hover { background: var(--bg-card); color: var(--text-primary); }
-  .nav-item:not(.desactive):hover { background: var(--bg-card); color: var(--text-primary); }
+  .menu-ha:hover { background: var(--surface-verre-on); color: var(--text-primary); }
+  .nav-item:not(.desactive):hover { background: var(--surface-verre); color: var(--text-primary); }
 }
 
-/* Divider */
-.nav-divider {
-  width: 48px;
-  height: 1px;
-  background: var(--border);
-  margin: 8px 0;
-}
-
-/* Bas de la sidebar : indicateur HA + paramètres */
+/* Bas de la sidebar : état de Home Assistant + réglages */
 .sidebar-bottom {
   display: flex;
   flex-direction: column;
@@ -121,20 +120,32 @@
   gap: 8px;
   border-top: 1px solid var(--border);
   width: 100%;
-  padding: 12px 10px 0;
+  padding: 12px 12px 0;
 }
 
-/* Indicateur connexion HA */
+.ha-etat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
 .ha-indicator {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--accent-green);
-  box-shadow: 0 0 8px var(--accent-green);
+  background: var(--accent-emeraude);
+  box-shadow: 0 0 6px var(--accent-emeraude);
   transition: var(--transition);
 }
-
 .ha-indicator.offline {
   background: var(--accent-red);
-  box-shadow: 0 0 8px var(--accent-red);
+  box-shadow: 0 0 6px var(--accent-red);
 }
+
+/* Le libellé suit l'état porté par l'indicateur (classe .offline posée par le panneau) */
+.ha-etat-ko { display: none; color: var(--accent-red); font-weight: 600; }
+.ha-indicator.offline ~ .ha-etat-ok { display: none; }
+.ha-indicator.offline ~ .ha-etat-ko { display: inline; }

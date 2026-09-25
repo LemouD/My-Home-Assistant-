@@ -1,54 +1,68 @@
-<div id="page-content">
+<div id="page-content" class="dash">
 
   <!--
-    Layout grille :
-    [Météo         ] [Douas                      ]
-    [Lumières      ] [Prières  ] [Batterie        ]
-    [Calendrier aujourd'hui                       ]
+    Layout grille (maquette Figma home-dashboard-v2) :
+    [Météo                 ] [Douas                       ]
+    [Lumières     ] [Prières + Batterie ] [Calendrier     ]
+    [Barre d'alertes                                       ]
   -->
 
   <!-- LIGNE 1 : Météo + Douas -->
   <div class="dash-ligne dash-ligne-haut">
 
     <!-- MÉTÉO -->
-    <div class="card meteo-card">
-      <div class="card-title">🌤 Météo</div>
+    <section class="dash-carte meteo-carte">
+      <img class="meteo-fond" src="../../assets/images/skyline.webp" alt="">
 
-      <div class="meteo-main">
-        <div class="meteo-icon" id="meteo-icon">⏳</div>
-        <div class="meteo-info">
-          <div class="meteo-temp">
-            <span id="meteo-temp">--</span><span>°C</span>
-          </div>
-          <div class="meteo-desc" id="meteo-desc">Chargement...</div>
+      <div class="meteo-entete">
+        <span class="meteo-lieu">
+          <img src="../../assets/icons/accueil/lieu.svg" width="16" height="16" alt="">
+          <span id="meteo-ville"></span>
+        </span>
+        <span>Météo du jour</span>
+      </div>
+
+      <div class="meteo-principal">
+        <span class="meteo-icone"><img id="meteo-icon" src="../../assets/icons/accueil/meteo-nuage.svg" width="44.7989" height="32" alt="" data-cale></span>
+        <div>
+          <div class="meteo-temp"><span id="meteo-temp">--</span><span class="meteo-unite">°C</span></div>
+          <div class="meteo-desc" id="meteo-desc">Chargement…</div>
         </div>
       </div>
 
-      <div class="meteo-details">
-        <div class="meteo-detail-item">💧 <span id="meteo-humidite">--%</span></div>
-        <div class="meteo-detail-item">💨 <span id="meteo-vent">-- km/h</span></div>
-        <div class="meteo-detail-item">🌡 <span id="meteo-ressenti">--°C</span></div>
+      <div class="meteo-stats">
+        <span class="meteo-stat">
+          <img src="../../assets/icons/accueil/humidite.svg" width="14" height="14" alt="">
+          Humidité : <span id="meteo-humidite">--%</span>
+        </span>
+        <span class="meteo-stat">
+          <img src="../../assets/icons/accueil/vent.svg" width="14" height="14" alt="">
+          Vent : <span id="meteo-vent">-- km/h</span>
+        </span>
       </div>
+
+      <div class="meteo-separateur"></div>
 
       <div class="meteo-previsions" id="meteo-previsions"></div>
-    </div>
+    </section>
 
     <!-- DOUAS DU FOYER -->
-    <div class="card-douas">
+    <section class="dash-carte card-douas">
+      <img class="douas-fond" src="../../assets/images/mecque.webp" alt="">
       <div class="douas-voile"></div>
 
-      <div class="douas-titre">
-        <span class="douas-icone">🤲</span>
-        <b>Douas du foyer</b>
-      </div>
+      <h2 class="douas-titre">
+        <img src="../../assets/icons/accueil/douas.svg" width="18" height="18" alt="">
+        Douas du foyer
+      </h2>
 
       <div class="doua">
         <div class="doua-moment">
           <span class="doua-point doua-point-sortie"></span>
-          <b>En sortant de la maison</b>
+          En sortant de la maison
         </div>
-        <div class="doua-phonetique">Bismillahi tawakkaltu 'ala Allah, wa la hawla wa la quwwata illa billah</div>
-        <div class="doua-traduction">Au nom d'Allah, je place ma confiance en Allah. Il n'y a de force ni de puissance qu'en Allah.</div>
+        <p class="doua-phonetique">Bismillahi tawakkaltu 'ala Allah, wa la hawla wa la quwwata illa billah</p>
+        <p class="doua-traduction">Au nom d'Allah, je place ma confiance en Allah. Il n'y a de force ni de puissance qu'en Allah.</p>
       </div>
 
       <div class="douas-separateur"></div>
@@ -56,96 +70,102 @@
       <div class="doua">
         <div class="doua-moment">
           <span class="doua-point doua-point-entree"></span>
-          <b>En rentrant à la maison</b>
+          En rentrant à la maison
         </div>
-        <div class="doua-phonetique">Bismillahi walajna, wa bismillahi kharajna, wa 'ala Rabbina tawakkalna</div>
-        <div class="doua-traduction">Au nom d'Allah nous entrons, au nom d'Allah nous sortons et en notre Seigneur nous plaçons notre confiance.</div>
+        <p class="doua-phonetique">Bismillahi walajna, wa bismillahi kharajna, wa 'ala Rabbina tawakkalna</p>
+        <p class="doua-traduction">Au nom d'Allah nous entrons, au nom d'Allah nous sortons et en notre Seigneur nous plaçons notre confiance.</p>
       </div>
-    </div>
+    </section>
   </div>
 
-  <!-- LIGNE 2 : Lumières + Prières + Batterie -->
-  <div class="dash-ligne dash-ligne-milieu">
+  <!-- LIGNE 2 : Lumières + (Prières, Batterie) + Calendrier -->
+  <div class="dash-ligne dash-ligne-bas">
 
     <!-- CONTRÔLE LUMIÈRES -->
-    <div class="card">
-      <div class="card-title card-title-ligne">
-        💡 Éclairage
-        <span id="lumieres-count" class="lumieres-compteur">0 allumée(s)</span>
+    <section class="dash-carte lumieres-carte">
+      <div class="dash-carte-entete">
+        <h2 class="dash-carte-titre">
+          <img src="../../assets/icons/accueil/lumieres.svg" width="18" height="18" alt="">
+          Contrôle lumières
+        </h2>
+        <span id="lumieres-count" class="lumieres-compteur"></span>
       </div>
 
       <div class="lumieres-grid" id="lumieres-grid"></div>
 
       <div class="lumiere-all">
-        <button data-action="tout-allumer">☀️ Tout allumer</button>
-        <button data-action="tout-eteindre">🌙 Tout éteindre</button>
+        <button data-action="tout-allumer">Tout allumer</button>
+        <button data-action="tout-eteindre">Tout éteindre</button>
       </div>
-    </div>
+    </section>
 
-    <!-- HORAIRES PRIÈRES -->
-    <div class="card">
-      <div class="card-title">🕌 Horaires de prière</div>
-      <div class="prieres-list" id="prieres-list"></div>
-    </div>
+    <div class="dash-pile">
 
-    <!-- BATTERIE DE LA TABLETTE (entités publiées par l'app Home Assistant de la tablette) -->
-    <div class="card batterie-card" id="batterie-card">
-      <div class="card-title">🔋 Batterie tablette</div>
-      <div class="batterie-header">
-        <div>
-          <div class="batterie-pct"><span id="batterie-pct">--</span><span>%</span></div>
-          <div class="batterie-status" id="batterie-status">Chargement...</div>
+      <!-- HORAIRES PRIÈRES -->
+      <section class="dash-carte prieres-carte">
+        <h2 class="prieres-titre">
+          <span class="prieres-icone"><img src="../../assets/icons/accueil/prieres.svg" width="16" height="16" alt=""></span>
+          Horaires de prières
+        </h2>
+        <div class="prieres-separateur"></div>
+        <div class="prieres-list" id="prieres-list"></div>
+        <p class="prieres-pied" id="prieres-pied"></p>
+      </section>
+
+      <!-- BATTERIE DE LA TABLETTE (entités publiées par l'app Home Assistant de la tablette) -->
+      <section class="dash-carte batterie-carte" id="batterie-card">
+        <div class="dash-carte-entete">
+          <h2 class="batterie-titre">
+            <img src="../../assets/icons/accueil/batterie.svg" width="18" height="18" alt="">
+            Batterie tablette
+          </h2>
+          <span class="batterie-statut" id="batterie-status">Chargement…</span>
         </div>
-        <div class="batterie-icon-big">🔋</div>
-      </div>
-      <div class="batterie-bar progress-bar">
-        <div class="progress-fill" id="batterie-fill"></div>
-      </div>
-      <div class="batterie-details">
-        <span>0%</span>
-        <span id="batterie-label">—</span>
-        <span>100%</span>
-      </div>
+        <div class="batterie-jauge"><div class="batterie-remplie" id="batterie-fill"></div></div>
+        <div class="batterie-pct"><span id="batterie-pct">--</span> %</div>
+      </section>
+
     </div>
+
+    <!-- CALENDRIER DU JOUR (événements fictifs en attendant l'intégration) -->
+    <section class="dash-carte calendrier-carte">
+      <h2 class="dash-carte-titre">
+        <span class="cal-icone"><img src="../../assets/icons/accueil/calendrier.svg" width="18" height="16.2" alt=""></span>
+        Calendrier famille — aujourd'hui
+      </h2>
+
+      <div class="cal-events">
+        <div class="cal-event">
+          <span class="cal-event-heure">08h00</span>
+          <span class="cal-event-ligne cal-bleu"></span>
+          <span class="cal-event-titre">Déposer les enfants à l'école</span>
+        </div>
+        <div class="cal-event">
+          <span class="cal-event-heure">10h00</span>
+          <span class="cal-event-ligne cal-ambre"></span>
+          <span class="cal-event-titre">Livraison (salon)</span>
+        </div>
+        <div class="cal-event">
+          <span class="cal-event-heure">14h30</span>
+          <span class="cal-event-ligne cal-orange"></span>
+          <span class="cal-event-titre">Appel plombier</span>
+        </div>
+        <div class="cal-event">
+          <span class="cal-event-heure">17h00</span>
+          <span class="cal-event-ligne cal-bleu"></span>
+          <span class="cal-event-titre">Récupérer les enfants</span>
+        </div>
+        <div class="cal-event">
+          <span class="cal-event-heure">19h30</span>
+          <span class="cal-event-ligne cal-vert"></span>
+          <span class="cal-event-titre">Dîner en famille</span>
+        </div>
+      </div>
+    </section>
 
   </div>
 
-  <!-- LIGNE 3 : Calendrier aujourd'hui (événements fictifs en attendant l'intégration) -->
-  <div class="card calendrier-today">
-    <div class="cal-today-header">
-      <div>
-        <div class="cal-today-date" id="cal-date">Aujourd'hui</div>
-        <div class="cal-today-sub">Agenda de la famille</div>
-      </div>
-      <a data-vue="calendrier" class="btn btn-ghost">Voir tout →</a>
-    </div>
-
-    <div class="cal-events" id="cal-events">
-      <div class="cal-event vert">
-        <div class="cal-event-time">09:00</div>
-        <div>
-          <div class="cal-event-titre">Réunion école — Yasmine</div>
-          <div class="cal-event-desc">École primaire Victor Hugo</div>
-        </div>
-      </div>
-      <div class="cal-event orange">
-        <div class="cal-event-time">14:30</div>
-        <div>
-          <div class="cal-event-titre">Livraison Amazon</div>
-          <div class="cal-event-desc">Créneau 14h–18h</div>
-        </div>
-      </div>
-      <div class="cal-event violet">
-        <div class="cal-event-time">19:00</div>
-        <div>
-          <div class="cal-event-titre">Dîner en famille</div>
-          <div class="cal-event-desc">Cuisine ensemble</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- BARRE ALERTES : remplie par dashboard.js, masquée s'il n'y a aucune alerte -->
+  <div id="alert-bar" class="hidden"></div>
 
 </div>
-
-<!-- BARRE ALERTES : remplie par dashboard.js, masquée s'il n'y a aucune alerte -->
-<div id="alert-bar" class="hidden"></div>

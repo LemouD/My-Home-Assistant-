@@ -2,7 +2,7 @@
 // DASHBOARD.JS — Vue page d'accueil
 // =============================================
 
-import { chargerGabarit, el } from '../../js/dom.js';
+import { chargerGabarit, el, remplacer } from '../../js/dom.js';
 import { aChange, basculer, commanderLumieres, estActif, etat, nom } from '../../js/ha.js';
 import { demarrerMeteo } from '../../js/weather.js';
 import { demarrerPrieres } from '../../js/prayer.js';
@@ -26,27 +26,37 @@ export async function monter({ config }) {
 
   // ---- LUMIÈRES ----
 
+  // Icônes de pièce disponibles (assets/icons/accueil/piece-*.svg) et teintes de la maquette
+  const ICONES = ['ampoule', 'cuisine', 'lit', 'bain', 'bureau', 'porte'];
+  const TEINTES = ['ambre', 'bleu', 'vert', 'orange'];
+
   function rendreLumieres() {
     let allumees = 0;
-    $('lumieres-grid').replaceChildren(...config.LUMIERES.map((l) => {
+    remplacer($('lumieres-grid'), ...config.LUMIERES.map((l) => {
       const isOn = estActif(hass, l.id);
       if (isOn) allumees++;
-      const classes = ['lumiere-btn', isOn && 'on', enErreur.has(l.id) && 'erreur'].filter(Boolean).join(' ');
+      const icone = ICONES.includes(l.icone) ? l.icone : 'ampoule';
+      const teinte = TEINTES.includes(l.teinte) ? l.teinte : 'ambre';
+      const classes = ['lumiere-btn', `teinte-${teinte}`, isOn && 'on', enErreur.has(l.id) && 'erreur']
+        .filter(Boolean).join(' ');
+      const nomPiece = nom(hass, l.id, l.nom);
       return el('button', {
         class: classes,
         'data-action': 'basculer',
         'data-entity': l.id,
         disabled: enCours.has(l.id),
-        title: isOn ? 'Allumée — cliquer pour éteindre' : 'Éteinte — cliquer pour allumer',
+        'aria-pressed': isOn ? 'true' : 'false',
+        'aria-label': `${nomPiece} : ${isOn ? 'allumée' : 'éteinte'}`,
       },
-        el('span', { class: 'lumiere-icon' }, isOn ? '💡' : '🔦'),
-        el('span', { class: 'lumiere-nom' }, nom(hass, l.id, l.nom)),
+        el('span', { class: 'lumiere-cercle' }, el('span', { class: `lumiere-icone icone-${icone}` })),
+        el('span', { class: 'lumiere-texte' },
+          el('span', { class: 'lumiere-nom' }, nomPiece),
+          el('span', { class: 'lumiere-etat' }, isOn ? 'Allumée' : 'Éteinte'),
+        ),
       );
     }));
 
-    const compteur = $('lumieres-count');
-    compteur.textContent = `${allumees} allumée(s)`;
-    compteur.style.display = allumees > 0 ? '' : 'none';
+    $('lumieres-count').textContent = allumees > 0 ? `${allumees} / ${config.LUMIERES.length} allumées` : '';
   }
 
   // Pas de mise à jour optimiste : le bouton change quand HA confirme le nouvel état,
@@ -69,10 +79,10 @@ export async function monter({ config }) {
   // ---- BATTERIE TABLETTE ----
 
   const STATUTS_CHARGE = {
-    charging: '⚡ En charge',
-    full: '🔌 Branchée, pleine',
-    discharging: '🔋 Sur batterie',
-    not_charging: '🔌 Branchée, pas en charge',
+    charging: 'En charge',
+    full: 'Branchée, pleine',
+    discharging: 'Sur batterie',
+    not_charging: 'Branchée, pas en charge',
   };
 
   function rendreBatterie() {
@@ -86,22 +96,22 @@ export async function monter({ config }) {
       $('batterie-pct').textContent = '--';
       $('batterie-status').textContent = capteur ? 'Tablette hors ligne' : 'Capteur de batterie introuvable';
       $('batterie-fill').style.width = '0%';
-      $('batterie-label').textContent = '—';
       return;
     }
 
     const pct = Math.round(valeur);
-    const [niveau, libelle] = pct >= 50 ? ['bon', 'Bon'] : pct >= 20 ? ['moyen', 'Moyen'] : ['faible', 'Faible'];
+    const niveau = pct >= 50 ? 'bon' : pct >= 20 ? 'moyen' : 'faible';
     const statut = etat(hass, batterie.charge)?.state;
 
     carte.dataset.niveau = niveau;
     $('batterie-pct').textContent = pct;
     $('batterie-status').textContent = STATUTS_CHARGE[statut] ?? '';
     $('batterie-fill').style.width = `${pct}%`;
-    $('batterie-label').textContent = `${pct}% — ${libelle}`;
   }
 
   // ---- ALERTES ----
+
+  const GRAVITES = ['info', 'attention', 'danger'];
 
   function rendreAlertes() {
     const barre = $('alert-bar');
@@ -114,16 +124,13 @@ export async function monter({ config }) {
       return;
     }
 
-    barre.replaceChildren(
-      ...actives.flatMap((a, i) => [
-        ...(i > 0 ? [el('span', { class: 'alert-sep' }, '|')] : []),
-        el('span', { class: 'alert-item' },
-          el('span', { class: 'alert-icon' }, a.icone),
-          el('span', { class: 'alert-label' }, a.libelle ?? nom(hass, a.id)),
-          el('span', { class: 'alert-dot' }),
-        ),
-      ]),
-      el('button', { class: 'alert-fermer', 'data-action': 'fermer-alertes' }, '✕ Fermer'),
+    // Gravité (config ALERTES → gravite) : info (bleu, par défaut), attention (ambre), danger (rouge)
+    remplacer(barre,
+      ...actives.map((a) => el('span', { class: `alert-item alert-${GRAVITES.includes(a.gravite) ? a.gravite : 'info'}` },
+        el('span', { class: 'alert-dot' }),
+        a.libelle ?? nom(hass, a.id),
+      )),
+      el('button', { class: 'alert-fermer', 'data-action': 'fermer-alertes' }, 'Masquer'),
     );
     barre.dataset.signature = signature;
     barre.classList.remove('hidden');
@@ -166,7 +173,8 @@ export async function monter({ config }) {
       if (!precedent) {
         const { latitude, longitude, time_zone: fuseau } = hass.config;
         arrets.push(demarrerMeteo(racine, { latitude, longitude, fuseau }, config.REFRESH_METEO));
-        arrets.push(demarrerPrieres(racine, { latitude, longitude, methode: config.METHODE_PRIERE }));
+        arrets.push(demarrerPrieres(racine, { latitude, longitude, methode: config.METHODE_PRIERE, ville: config.VILLE }));
+        $('meteo-ville').textContent = config.VILLE ?? '';
       }
 
       if (aChange(precedent, hass, idsLumieres)) rendreLumieres();

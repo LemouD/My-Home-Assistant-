@@ -1,97 +1,212 @@
 /* =============================================
-   CARDS.CSS — Tous les composants cards
+   CARDS.CSS — En-tête et cartes du tableau de bord
+   Maquette Figma « home-dashboard-v2 » adaptée à la tablette :
+   textes à 14 px minimum, pas de flou d'arrière-plan, ombres ≤ 8 px.
    ============================================= */
 
+/* Fond en dégradé de la maquette */
+#app { background: var(--bg-degrade); }
+#header, #page-content { background: none; }
+
 /* === HEADER === */
-.header-left { display: flex; flex-direction: column; gap: 2px; }
-.header-greeting { font-size: var(--fs-lg); font-weight: 700; color: var(--text-primary); }
+#header {
+  padding: 24px 32px 8px;
+  border-bottom: none;
+}
+
+.header-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.header-greeting { font-size: var(--fs-xl); font-weight: 800; line-height: 1.2; color: var(--text-primary); }
 .header-sub { font-size: var(--fs-xs); color: var(--text-secondary); }
 
-.header-center { display: flex; align-items: center; gap: 8px; }
+.header-right { display: flex; align-items: center; gap: 16px; }
 
 .presence-chips { display: flex; gap: 8px; }
 
-.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-#clock-time { font-size: var(--fs-2xl); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary); }
-#clock-date { font-size: var(--fs-xs); color: var(--text-secondary); }
-
-/* === METEO === */
-.meteo-card { }
-
-.meteo-main {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.meteo-icon { font-size: var(--fs-hero); line-height: 1; }
-
-.meteo-info { flex: 1; }
-.meteo-temp { font-size: var(--fs-display); font-weight: 700; line-height: 1; }
-.meteo-temp span { font-size: var(--fs-xl); color: var(--text-secondary); }
-.meteo-desc { font-size: var(--fs-sm); color: var(--text-secondary); margin-top: 4px; }
-.meteo-ville { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
-
-.meteo-details {
-  display: flex;
-  gap: 16px;
-  padding: 12px 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 14px;
-}
-
-.meteo-detail-item { display: flex; align-items: center; gap: 5px; font-size: var(--fs-xs); color: var(--text-secondary); }
-
-.meteo-previsions {
-  display: flex;
+/* Pastilles de présence : fond neutre, seul le point indique l'état.
+   Une absence est un état normal, pas une alerte : point gris, pas rouge. */
+.presence-chips .chip {
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--surface-verre);
+  color: var(--text-primary);
+  font-weight: 600;
   gap: 8px;
 }
+.presence-chips .dot { width: 6px; height: 6px; box-shadow: none; }
+.presence-chips .dot-green { background: var(--accent-emeraude); }
+.presence-chips .dot-red   { background: var(--text-muted); }
 
-.prev-jour {
-  flex: 1;
+.header-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-verre);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.header-date-icone { position: relative; width: 14px; height: 14px; flex-shrink: 0; }
+.header-date-icone img { position: absolute; top: 40%; left: 36.84%; }
+#clock-date::first-letter { text-transform: uppercase; }
+#clock-date::after { content: ','; }
+#clock-time { font-variant-numeric: tabular-nums; }
+
+/* === GRILLE (paysage uniquement) === */
+#page-content.dash {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 4px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-input);
-  font-size: var(--fs-xs);
+  gap: var(--gap-lg);
+  padding: 16px 32px 24px;
 }
-.prev-jour .jour-nom  { color: var(--text-muted); }
-.prev-jour .jour-icon { font-size: var(--fs-lg); }
-.prev-jour .jour-temp { font-weight: 600; color: var(--text-primary); }
-.prev-jour.today { background: rgba(74, 158, 255, 0.12); border: 1px solid var(--border-active); }
 
-/* === DOUAS (maquette Figma "card-douas") === */
-.card-douas {
+.dash-ligne {
+  display: grid;
+  gap: var(--gap-lg);
+}
+.dash-ligne-haut { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dash-ligne-bas  {
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+/* Colonne du milieu : prières au-dessus de la batterie */
+.dash-pile {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* === CARTE COMMUNE === */
+.dash-carte {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 24px;
-  border-radius: 24px;
+  gap: 16px;
+  padding: 20px;
   border: 1px solid var(--border);
-  background-color: rgba(255, 255, 255, 0.04);
-  box-shadow: var(--shadow-card);
-  color: var(--text-doua);
-  font-size: var(--fs-sm);
+  border-radius: var(--radius-xl);
+  background: var(--surface-verre);
 }
 
-/* Teinte verte ; accueillera l'image de fond (Mecque) quand l'asset sera fourni */
+.dash-carte-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dash-carte-titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+/* === MÉTÉO === */
+.meteo-carte {
+  gap: 14px;
+  border: none;
+  background: var(--meteo-degrade);
+  box-shadow: var(--meteo-ombre);
+  color: var(--text-primary);
+}
+
+/* Photo de Paris fondue dans le dégradé */
+.meteo-fond {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  opacity: 0.45;
+}
+
+.meteo-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.meteo-lieu { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+
+.meteo-principal { display: flex; align-items: center; gap: 16px; }
+/* Cadre de 64 px : le nuage de la maquette est calé en bas à gauche, les autres icônes centrées */
+.meteo-icone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+}
+.meteo-icone img[data-cale] { position: absolute; left: 0; bottom: 0; }
+.meteo-temp { font-size: var(--fs-2xl); font-weight: 800; line-height: 1.1; }
+.meteo-desc { font-size: var(--fs-sm); font-weight: 600; }
+
+.meteo-stats { display: flex; gap: 20px; font-size: var(--fs-xs); }
+.meteo-stat  { display: flex; align-items: center; gap: 8px; }
+
+.meteo-separateur { height: 1px; background: rgba(255, 255, 255, 0.2); }
+
+.meteo-previsions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.prev-jour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.prev-jour .jour-temp { font-weight: 700; }
+
+/* === DOUAS === */
+.card-douas {
+  gap: 12px;
+  color: var(--text-doua);
+  font-size: var(--fs-xs);
+}
+
+.douas-fond {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+}
+
 .douas-voile {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, #0e3f3b, #072023);
+  background: var(--douas-voile);
   opacity: 0.35;
 }
 
-.card-douas b,
+.douas-titre,
+.doua-moment,
 .doua-phonetique,
 .doua-traduction {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
@@ -100,226 +215,385 @@
 .douas-titre {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: var(--fs-md);
+  gap: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
   color: var(--text-primary);
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
-.doua {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.doua { display: flex; flex-direction: column; gap: 4px; }
 
 .doua-moment {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: var(--fs-xs);
+  gap: 8px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .doua-point {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 .doua-point-sortie { background-color: var(--accent-emeraude); }
 .doua-point-entree { background-color: var(--accent-bleu-vif); }
 
-.doua-phonetique {
-  font-size: var(--fs-md);
-  font-style: italic;
-  color: var(--accent-lavande);
+.doua-phonetique { color: var(--accent-lavande); }
+.doua-traduction { line-height: 1.4; }
+
+.douas-separateur { border-top: 1px solid var(--border); }
+
+/* === LUMIÈRES === */
+.lumieres-compteur {
+  padding: 4px 12px;
+  border: 1px solid var(--accent-ambre);
+  border-radius: 100px;
+  background: rgba(245, 158, 11, 0.13);
+  color: var(--accent-ambre);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
 }
+.lumieres-compteur:empty { display: none; }
 
-.doua-traduction { line-height: 1.5; }
-
-.douas-separateur {
-  border-top: 1px solid var(--border);
-}
-
-/* === LUMIERES === */
 .lumieres-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(72px, auto);
   gap: 12px;
 }
 
+/* Chaque pièce a sa teinte (config LUMIERES → teinte), utilisée quand elle est allumée */
 .lumiere-btn {
+  --teinte: var(--accent-ambre);
+  --teinte-fond: rgba(245, 158, 11, 0.15);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 104px;
-  padding: 16px 8px;
-  border-radius: 14px;
+  gap: 12px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
-  background: var(--bg-input);
+  border-radius: 16px;
+  background: var(--surface-verre);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
   cursor: pointer;
   transition: var(--transition);
-  color: var(--text-secondary);
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  text-align: center;
 }
+.lumiere-btn.teinte-bleu   { --teinte: var(--accent-bleu-vif);      --teinte-fond: rgba(59, 130, 246, 0.15); }
+.lumiere-btn.teinte-vert   { --teinte: var(--accent-emeraude);      --teinte-fond: rgba(16, 185, 129, 0.15); }
+.lumiere-btn.teinte-orange { --teinte: var(--accent-orange-fonce);  --teinte-fond: rgba(217, 119, 6, 0.15); }
 
-@media (hover: hover) {
-  .lumiere-btn:hover { border-color: var(--border-active); }
-}
+.lumiere-btn.on { background: var(--surface-verre-on); }
 .lumiere-btn:active { background: var(--bg-card-hover); }
 .lumiere-btn:disabled { opacity: 0.5; cursor: wait; }
 .lumiere-btn.erreur { border-color: var(--accent-red); }
-
-.lumiere-btn.on {
-  background: rgba(243, 156, 18, 0.1);
-  border-color: rgba(243, 156, 18, 0.35);
-  color: var(--accent-orange);
+@media (hover: hover) {
+  .lumiere-btn:hover { border-color: var(--border-active); }
 }
 
-.lumiere-btn.on .lumiere-icon { filter: drop-shadow(0 0 8px rgba(243,156,18,0.6)); }
+/* Même icône allumée ou éteinte : seule la couleur change */
+.lumiere-cercle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+.lumiere-btn.on .lumiere-cercle {
+  border-color: var(--teinte);
+  background: var(--teinte-fond);
+  color: var(--teinte);
+}
 
-.lumiere-icon { font-size: var(--fs-xl); transition: var(--transition); }
-.lumiere-nom  { line-height: 1.3; }
+.lumiere-icone {
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  -webkit-mask: var(--icone) center / contain no-repeat;
+  mask: var(--icone) center / contain no-repeat;
+}
+.icone-ampoule { --icone: url(../assets/icons/accueil/piece-ampoule.svg); }
+.icone-cuisine { --icone: url(../assets/icons/accueil/piece-cuisine.svg); }
+.icone-lit     { --icone: url(../assets/icons/accueil/piece-lit.svg); }
+.icone-bain    { --icone: url(../assets/icons/accueil/piece-bain.svg); }
+.icone-bureau  { --icone: url(../assets/icons/accueil/piece-bureau.svg); }
+.icone-porte   { --icone: url(../assets/icons/accueil/piece-porte.svg); }
+
+.lumiere-texte { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lumiere-nom   { font-size: var(--fs-xs); font-weight: 600; line-height: 1.3; }
+.lumiere-etat  { font-size: var(--fs-xs); font-weight: 500; color: var(--text-muted); }
+.lumiere-btn.on .lumiere-etat { color: var(--teinte); }
 
 .lumiere-all {
-  grid-column: 1 / -1;
   display: flex;
   gap: 12px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
+  margin-top: auto;
 }
 
 .lumiere-all button {
   flex: 1;
   min-height: var(--touch-min);
   padding: 8px;
-  border-radius: 8px;
   border: 1px solid var(--border);
-  background: var(--bg-input);
+  border-radius: 12px;
+  background: var(--surface-verre);
   color: var(--text-secondary);
+  font: inherit;
   font-size: var(--fs-xs);
+  font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
 }
+.lumiere-all button:active { background: var(--bg-card-hover); }
 @media (hover: hover) {
-  .lumiere-all button:active { background: var(--bg-card-hover); }
-  .lumiere-all button:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+  .lumiere-all button:hover { color: var(--text-primary); border-color: var(--border-active); }
 }
 
-/* === PRIERES === */
-.prieres-list { display: flex; flex-direction: column; gap: 6px; }
+/* === PRIÈRES === */
+.prieres-carte {
+  gap: 12px;
+  border-color: rgba(124, 58, 237, 0.19);
+}
+
+.prieres-titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--violet-clair);
+}
+.prieres-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.19);
+}
+
+.prieres-separateur { height: 1px; background: rgba(124, 58, 237, 0.15); }
+
+.prieres-list { display: flex; flex-direction: column; gap: 4px; }
 
 .priere-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 12px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  transition: var(--transition);
+  background: rgba(255, 255, 255, 0.02);
 }
 
+.priere-ligne { display: flex; align-items: center; gap: 10px; }
+
+.priere-point {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.priere-fajr    .priere-point { background: var(--accent-ambre); }
+.priere-dhuhr   .priere-point { background: var(--accent-jaune); }
+.priere-asr     .priere-point { background: var(--accent-orange-clair); }
+.priere-maghrib .priere-point { background: var(--accent-rouge-clair); }
+.priere-isha    .priere-point { background: var(--accent-bleu-vif); }
+
+.priere-nom   { flex: 1; font-size: var(--fs-xs); font-weight: 600; color: var(--text-clair); }
+.priere-heure { font-size: var(--fs-xs); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Prochaine prière : liseré violet + compte à rebours */
 .priere-item.active {
-  background: rgba(74, 158, 255, 0.1);
-  border-color: rgba(74, 158, 255, 0.35);
+  padding-left: 9px;
+  border-left: 3px solid var(--accent-violet);
+  background: rgba(124, 58, 237, 0.13);
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.25);
 }
-
-.priere-item.active .priere-nom,
-.priere-item.active .priere-heure { color: var(--accent-blue); }
-
-.priere-gauche { display: flex; align-items: center; gap: 10px; }
-.priere-icon   { font-size: var(--fs-md); }
-.priere-nom    { font-size: var(--fs-sm); font-weight: 500; color: var(--text-primary); }
-.priere-heure  { font-size: var(--fs-sm); font-weight: 600; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.priere-item.active .priere-nom { color: var(--text-primary); font-weight: 700; }
 
 .priere-badge-next {
-  font-size: var(--fs-xs);
   padding: 2px 8px;
-  border-radius: 8px;
-  background: var(--accent-blue);
-  color: #fff;
-  font-weight: 600;
+  border-radius: 100px;
+  background: rgba(124, 58, 237, 0.31);
+  color: var(--violet-pale);
+  font-size: var(--fs-xs);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-/* === BATTERIE === */
-.batterie-card { }
+.priere-compte {
+  padding-left: 17px;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--violet-clair);
+}
 
-.batterie-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.batterie-pct    { font-size: var(--fs-display); font-weight: 700; color: var(--accent-green); }
-.batterie-pct span { font-size: var(--fs-lg); color: var(--text-secondary); }
-.batterie-status { font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 2px; }
+.prieres-pied {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
 
-.batterie-icon-big { font-size: var(--fs-display); }
+/* === BATTERIE TABLETTE === */
+.batterie-carte {
+  gap: 12px;
+  padding: 16px;
+  border-color: rgba(16, 185, 129, 0.19);
+}
 
-.batterie-bar { margin-bottom: 12px; }
-.batterie-bar .progress-fill { width: 0; background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); }
+.batterie-titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-doua);
+}
 
-.batterie-details { display: flex; justify-content: space-between; font-size: var(--fs-xs); color: var(--text-muted); margin-top: 8px; }
+.batterie-statut {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--vert-pale);
+  white-space: nowrap;
+}
+.batterie-statut::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.batterie-jauge {
+  height: 8px;
+  border-radius: 100px;
+  background: var(--border);
+  overflow: hidden;
+}
+.batterie-remplie {
+  width: 0;
+  height: 100%;
+  border-radius: 100px;
+  background: var(--accent-emeraude);
+  transition: width 0.5s ease;
+}
+
+.batterie-pct { font-size: var(--fs-sm); font-weight: 700; }
 
 /* Couleur selon le niveau : bon (≥ 50 %), moyen (≥ 20 %), faible */
-.batterie-card[data-niveau="moyen"]  .batterie-pct { color: var(--accent-orange); }
-.batterie-card[data-niveau="faible"] .batterie-pct { color: var(--accent-red); }
-.batterie-card[data-niveau="moyen"]  .batterie-bar .progress-fill { background: var(--accent-orange); }
-.batterie-card[data-niveau="faible"] .batterie-bar .progress-fill { background: var(--accent-red); }
-.batterie-card[data-niveau="inconnu"] .batterie-pct { color: var(--text-muted); }
+.batterie-carte[data-niveau="moyen"]  .batterie-remplie { background: var(--accent-ambre); }
+.batterie-carte[data-niveau="faible"] .batterie-remplie { background: var(--accent-red); }
+.batterie-carte[data-niveau="moyen"]  .batterie-pct { color: var(--accent-ambre); }
+.batterie-carte[data-niveau="faible"] .batterie-pct { color: var(--accent-red); }
+.batterie-carte[data-niveau="inconnu"] .batterie-statut { color: var(--text-muted); }
 
 /* === CALENDRIER === */
-.calendrier-today { }
+.cal-icone { display: flex; width: 18px; height: 18px; padding-top: 1.8px; flex-shrink: 0; }
 
-.cal-today-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.cal-today-date   { font-size: var(--fs-md); font-weight: 600; }
-.cal-today-sub    { font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 2px; }
+.cal-events { display: flex; flex-direction: column; gap: 10px; }
 
-.cal-events { display: flex; flex-direction: column; gap: 8px; }
-.cal-event  { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-input); border-left: 3px solid var(--accent-blue); }
+.cal-event {
+  display: grid;
+  grid-template-columns: 56px minmax(24px, 1fr) minmax(0, 1.4fr);
+  align-items: center;
+  gap: 16px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-verre);
+}
 
-.cal-event.vert   { border-color: var(--accent-green); }
-.cal-event.orange { border-color: var(--accent-orange); }
-.cal-event.violet { border-color: var(--accent-purple); }
+.cal-event-heure { font-size: var(--fs-xs); font-weight: 700; font-variant-numeric: tabular-nums; }
+.cal-event-titre { font-size: var(--fs-xs); font-weight: 500; line-height: 1.3; }
 
-.cal-event-time  { font-size: var(--fs-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: 1px; }
-.cal-event-titre { font-size: var(--fs-sm); font-weight: 500; }
-.cal-event-desc  { font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 2px; }
+.cal-event-ligne { height: 3px; border-radius: 2px; }
+.cal-bleu   { background: var(--accent-bleu-vif); }
+.cal-ambre  { background: var(--accent-ambre); }
+.cal-orange { background: var(--accent-orange-fonce); }
+.cal-vert   { background: var(--accent-emeraude); }
 
 .cal-empty { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: var(--fs-xs); }
 
-/* === ALERTES BAR === */
-.alert-icon { font-size: var(--fs-md); }
-.alert-label { font-size: var(--fs-xs); }
-.alert-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-red); }
-.alert-sep { color: var(--text-muted); }
-
-/* === GRILLE DU TABLEAU DE BORD (paysage uniquement) === */
-.dash-ligne {
-  display: grid;
-  gap: var(--gap);
-  margin-bottom: var(--gap);
-}
-.dash-ligne-haut   { grid-template-columns: 1fr 1.2fr; }
-.dash-ligne-milieu { grid-template-columns: 1.2fr 1fr 0.9fr; }
-
-.lumieres-compteur {
-  font-size: var(--fs-xs);
-  background: rgba(243, 156, 18, 0.15);
-  color: var(--accent-orange);
-  padding: 2px 10px;
-  border-radius: 10px;
-  text-transform: none;
-  letter-spacing: 0;
+/* === BARRE D'ALERTES : pastilles, une couleur par gravité === */
+.dash #alert-bar {
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(17, 22, 27, 0.75);
 }
 
-.card-title-ligne {
+.alert-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-verre);
+  color: var(--text-primary);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.alert-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-bleu-vif); }
+.alert-attention .alert-dot { background: var(--accent-ambre); }
+.alert-danger    .alert-dot { background: var(--accent-red); }
+
+/* === ÉCRANS BAS (tablette 1280 × 800) : espacements resserrés, textes inchangés === */
+@media (max-height: 860px) {
+  #header { padding: 16px 32px 4px; }
+  .header-greeting { font-size: var(--fs-lg); }
+  .header-sub { display: none; }
+
+  #page-content.dash { gap: 12px; padding: 8px 32px 12px; }
+  .dash-ligne { gap: var(--gap); }
+  .dash-pile { gap: 10px; }
+  .dash-carte { gap: 10px; padding: 16px; }
+
+  .meteo-carte { gap: 8px; }
+  .meteo-principal { gap: 12px; }
+  .meteo-temp { font-size: var(--fs-xl); }
+  .meteo-previsions .prev-jour { gap: 2px; }
+
+  .card-douas { gap: 8px; }
+  .doua { gap: 2px; }
+
+  .lumieres-grid { grid-auto-rows: minmax(56px, auto); gap: 8px; }
+  .lumiere-btn { padding: 8px 12px; }
+
+  .prieres-carte { gap: 8px; }
+  .prieres-list { gap: 2px; }
+  .priere-item { padding-top: 4px; padding-bottom: 4px; }
+
+  .batterie-carte { gap: 8px; padding: 12px 16px; }
+
+  .cal-events { gap: 8px; }
+  .cal-event { min-height: 44px; padding: 2px 12px; }
+  .prieres-pied { display: none; }
+
+  .dash #alert-bar { padding: 6px 8px; }
+  .alert-item { min-height: 36px; padding: 6px 14px; }
 }

@@ -38,7 +38,7 @@
 
   --text-primary:   #FFFFFF;
   --text-secondary: #8B9AB0;
-  --text-muted:     #4A5568;
+  --text-muted:     #7D8BA1;   /* contraste ≥ 4,5:1 sur les cartes */
 
   --border:         rgba(255, 255, 255, 0.07);
   --border-active:  rgba(74, 158, 255, 0.4);
@@ -77,6 +77,23 @@
   /* Espacement */
   --gap:           16px;
   --gap-lg:        24px;
+
+  /* Accueil (maquette Figma home-dashboard-v2) */
+  --bg-degrade:       linear-gradient(90deg, #0A0F14, #12161C 50%, #070A0E);
+  --surface-verre:    rgba(255, 255, 255, 0.04);
+  --surface-verre-on: rgba(255, 255, 255, 0.08);
+  --meteo-degrade:    linear-gradient(90deg, #FF7A50, #FF4E64);
+  --meteo-ombre:      0 4px 8px rgba(255, 78, 100, 0.2);
+  --douas-voile:      linear-gradient(90deg, #0E3F3B, #072023);
+  --text-clair:       #CBD5E1;
+  --accent-orange-fonce: #D97706;
+  --accent-jaune:     #FCD34D;
+  --accent-orange-clair: #FB923C;
+  --accent-rouge-clair:  #F87171;
+  --accent-violet:    #7C3AED;
+  --violet-clair:     #A78BFA;
+  --violet-pale:      #C4B5FD;
+  --vert-pale:        #A7F3D0;
 }
 
 /* Reset */
