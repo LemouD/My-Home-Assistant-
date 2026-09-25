@@ -16,7 +16,7 @@ import { demarrerHorloge } from './js/clock.js';
 const VUES = {
   '':         { titre: 'Tableau de bord', charger: () => import('./views/dashboard/dashboard.js') },
   budget:     { titre: 'Budget & Factures', charger: () => import('./views/budget/budget.js') },
-  energie:    { titre: 'Énergie & Fluides' },
+  energie:    { titre: 'Énergie & Fluides', charger: () => import('./views/energie/energie.js') },
   calendrier: { titre: 'Calendrier famille' },
   courses:    { titre: 'Liste de courses' },
 };
