@@ -29,9 +29,15 @@ export default {
     { id: 'person.membre_2', nom: 'Membre 2' },
   ],
 
+  // Batterie de la tablette murale, publiée par l'application Home Assistant (Companion)
+  // installée sur la tablette. Remplacer "tablette" par le nom de l'appareil dans HA.
+  BATTERIE_TABLETTE: {
+    niveau: 'sensor.tablette_battery_level',  // pourcentage
+    charge: 'sensor.tablette_battery_state',  // charging / discharging / full / not_charging
+  },
+
   // Une alerte s'affiche quand l'entité est à "on".
   ALERTES: [
-    { id: 'binary_sensor.porte_garage', libelle: 'Porte garage ouverte', icone: '🚗' },
     { id: 'binary_sensor.lave_linge',   libelle: 'Lave-linge terminé',   icone: '🫧' },
   ],
 };

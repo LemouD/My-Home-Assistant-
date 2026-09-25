@@ -4,16 +4,16 @@
 
 /* === HEADER === */
 .header-left { display: flex; flex-direction: column; gap: 2px; }
-.header-greeting { font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.header-sub { font-size: 12px; color: var(--text-secondary); }
+.header-greeting { font-size: var(--fs-lg); font-weight: 700; color: var(--text-primary); }
+.header-sub { font-size: var(--fs-xs); color: var(--text-secondary); }
 
 .header-center { display: flex; align-items: center; gap: 8px; }
 
 .presence-chips { display: flex; gap: 8px; }
 
 .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-#clock-time { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary); }
-#clock-date { font-size: 12px; color: var(--text-secondary); }
+#clock-time { font-size: var(--fs-2xl); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+#clock-date { font-size: var(--fs-xs); color: var(--text-secondary); }
 
 /* === METEO === */
 .meteo-card { }
@@ -25,13 +25,13 @@
   margin-bottom: 16px;
 }
 
-.meteo-icon { font-size: 56px; line-height: 1; }
+.meteo-icon { font-size: var(--fs-hero); line-height: 1; }
 
 .meteo-info { flex: 1; }
-.meteo-temp { font-size: 48px; font-weight: 700; line-height: 1; }
-.meteo-temp span { font-size: 24px; color: var(--text-secondary); }
-.meteo-desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-.meteo-ville { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.meteo-temp { font-size: var(--fs-display); font-weight: 700; line-height: 1; }
+.meteo-temp span { font-size: var(--fs-xl); color: var(--text-secondary); }
+.meteo-desc { font-size: var(--fs-sm); color: var(--text-secondary); margin-top: 4px; }
+.meteo-ville { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
 
 .meteo-details {
   display: flex;
@@ -42,7 +42,7 @@
   margin-bottom: 14px;
 }
 
-.meteo-detail-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+.meteo-detail-item { display: flex; align-items: center; gap: 5px; font-size: var(--fs-xs); color: var(--text-secondary); }
 
 .meteo-previsions {
   display: flex;
@@ -58,71 +58,96 @@
   padding: 8px 4px;
   border-radius: var(--radius-sm);
   background: var(--bg-input);
-  font-size: 11px;
+  font-size: var(--fs-xs);
 }
 .prev-jour .jour-nom  { color: var(--text-muted); }
-.prev-jour .jour-icon { font-size: 18px; }
+.prev-jour .jour-icon { font-size: var(--fs-lg); }
 .prev-jour .jour-temp { font-weight: 600; color: var(--text-primary); }
 .prev-jour.today { background: rgba(74, 158, 255, 0.12); border: 1px solid var(--border-active); }
 
-/* === DOUAS === */
-.douas-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.doua-card {
+/* === DOUAS (maquette Figma "card-douas") === */
+.card-douas {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border-radius: 12px;
-  background: var(--bg-input);
+  gap: 14px;
+  padding: 24px;
+  border-radius: 24px;
   border: 1px solid var(--border);
-  transition: var(--transition);
-  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-card);
+  color: var(--text-doua);
+  font-size: var(--fs-sm);
 }
 
-.doua-card:hover { border-color: var(--border-active); }
-
-.doua-header { display: flex; align-items: center; gap: 8px; }
-.doua-icon { font-size: 22px; }
-.doua-titre { font-size: 12px; font-weight: 600; color: var(--text-primary); }
-.doua-sous-titre { font-size: 10px; color: var(--text-secondary); }
-
-.doua-texte {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  font-style: italic;
+/* Teinte verte ; accueillera l'image de fond (Mecque) quand l'asset sera fourni */
+.douas-voile {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, #0e3f3b, #072023);
+  opacity: 0.35;
 }
 
-.doua-arabique {
-  font-size: 18px;
-  text-align: right;
-  color: var(--accent-blue);
-  direction: rtl;
-  line-height: 1.8;
+.card-douas b,
+.doua-phonetique,
+.doua-traduction {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
-.doua-btn {
+.douas-titre {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--accent-blue);
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
+  gap: 10px;
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.doua {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.doua-moment {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.doua-point {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.doua-point-sortie { background-color: var(--accent-emeraude); }
+.doua-point-entree { background-color: var(--accent-bleu-vif); }
+
+.doua-phonetique {
+  font-size: var(--fs-md);
+  font-style: italic;
+  color: var(--accent-lavande);
+}
+
+.doua-traduction { line-height: 1.5; }
+
+.douas-separateur {
+  border-top: 1px solid var(--border);
 }
 
 /* === LUMIERES === */
 .lumieres-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 
 .lumiere-btn {
@@ -131,19 +156,23 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  min-height: 104px;
   padding: 16px 8px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--bg-input);
   cursor: pointer;
   transition: var(--transition);
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 500;
   text-align: center;
 }
 
-.lumiere-btn:hover { border-color: var(--border-active); }
+@media (hover: hover) {
+  .lumiere-btn:hover { border-color: var(--border-active); }
+}
+.lumiere-btn:active { background: var(--bg-card-hover); }
 .lumiere-btn:disabled { opacity: 0.5; cursor: wait; }
 .lumiere-btn.erreur { border-color: var(--accent-red); }
 
@@ -155,29 +184,34 @@
 
 .lumiere-btn.on .lumiere-icon { filter: drop-shadow(0 0 8px rgba(243,156,18,0.6)); }
 
-.lumiere-icon { font-size: 24px; transition: var(--transition); }
+.lumiere-icon { font-size: var(--fs-xl); transition: var(--transition); }
 .lumiere-nom  { line-height: 1.3; }
 
 .lumiere-all {
   grid-column: 1 / -1;
   display: flex;
-  gap: 8px;
-  padding-top: 4px;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
 .lumiere-all button {
   flex: 1;
+  min-height: var(--touch-min);
   padding: 8px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg-input);
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: var(--fs-xs);
   cursor: pointer;
   transition: var(--transition);
 }
-.lumiere-all button:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+@media (hover: hover) {
+  .lumiere-all button:active { background: var(--bg-card-hover); }
+  .lumiere-all button:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+}
 
 /* === PRIERES === */
 .prieres-list { display: flex; flex-direction: column; gap: 6px; }
@@ -202,13 +236,13 @@
 .priere-item.active .priere-heure { color: var(--accent-blue); }
 
 .priere-gauche { display: flex; align-items: center; gap: 10px; }
-.priere-icon   { font-size: 16px; }
-.priere-nom    { font-size: 13px; font-weight: 500; color: var(--text-primary); }
-.priere-heure  { font-size: 13px; font-weight: 600; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.priere-icon   { font-size: var(--fs-md); }
+.priere-nom    { font-size: var(--fs-sm); font-weight: 500; color: var(--text-primary); }
+.priere-heure  { font-size: var(--fs-sm); font-weight: 600; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 
 .priere-badge-next {
-  font-size: 9px;
-  padding: 2px 6px;
+  font-size: var(--fs-xs);
+  padding: 2px 8px;
   border-radius: 8px;
   background: var(--accent-blue);
   color: #fff;
@@ -221,43 +255,30 @@
 .batterie-card { }
 
 .batterie-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.batterie-pct    { font-size: 42px; font-weight: 700; color: var(--accent-green); }
-.batterie-pct span { font-size: 18px; color: var(--text-secondary); }
-.batterie-status { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.batterie-pct    { font-size: var(--fs-display); font-weight: 700; color: var(--accent-green); }
+.batterie-pct span { font-size: var(--fs-lg); color: var(--text-secondary); }
+.batterie-status { font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 2px; }
 
-.batterie-icon-big { font-size: 40px; }
+.batterie-icon-big { font-size: var(--fs-display); }
 
 .batterie-bar { margin-bottom: 12px; }
-.batterie-bar .progress-fill { background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); }
+.batterie-bar .progress-fill { width: 0; background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); }
 
-.batterie-details { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+.batterie-details { display: flex; justify-content: space-between; font-size: var(--fs-xs); color: var(--text-muted); margin-top: 8px; }
 
-.batterie-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.batterie-stat {
-  background: var(--bg-input);
-  border-radius: 8px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.batterie-stat .stat-val { font-size: 16px; font-weight: 600; }
-.batterie-stat .stat-lbl { font-size: 10px; color: var(--text-muted); }
-.batterie-stat.production .stat-val { color: var(--accent-green); }
-.batterie-stat.consommation .stat-val { color: var(--accent-orange); }
+/* Couleur selon le niveau : bon (≥ 50 %), moyen (≥ 20 %), faible */
+.batterie-card[data-niveau="moyen"]  .batterie-pct { color: var(--accent-orange); }
+.batterie-card[data-niveau="faible"] .batterie-pct { color: var(--accent-red); }
+.batterie-card[data-niveau="moyen"]  .batterie-bar .progress-fill { background: var(--accent-orange); }
+.batterie-card[data-niveau="faible"] .batterie-bar .progress-fill { background: var(--accent-red); }
+.batterie-card[data-niveau="inconnu"] .batterie-pct { color: var(--text-muted); }
 
 /* === CALENDRIER === */
 .calendrier-today { }
 
 .cal-today-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.cal-today-date   { font-size: 16px; font-weight: 600; }
-.cal-today-sub    { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.cal-today-date   { font-size: var(--fs-md); font-weight: 600; }
+.cal-today-sub    { font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 2px; }
 
 .cal-events { display: flex; flex-direction: column; gap: 8px; }
 .cal-event  { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-input); border-left: 3px solid var(--accent-blue); }
@@ -266,14 +287,39 @@
 .cal-event.orange { border-color: var(--accent-orange); }
 .cal-event.violet { border-color: var(--accent-purple); }
 
-.cal-event-time  { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: 1px; }
-.cal-event-titre { font-size: 13px; font-weight: 500; }
-.cal-event-desc  { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.cal-event-time  { font-size: var(--fs-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: 1px; }
+.cal-event-titre { font-size: var(--fs-sm); font-weight: 500; }
+.cal-event-desc  { font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 2px; }
 
-.cal-empty { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 12px; }
+.cal-empty { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: var(--fs-xs); }
 
 /* === ALERTES BAR === */
-.alert-icon { font-size: 16px; }
-.alert-label { font-size: 12px; }
+.alert-icon { font-size: var(--fs-md); }
+.alert-label { font-size: var(--fs-xs); }
 .alert-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-red); }
 .alert-sep { color: var(--text-muted); }
+
+/* === GRILLE DU TABLEAU DE BORD (paysage uniquement) === */
+.dash-ligne {
+  display: grid;
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+}
+.dash-ligne-haut   { grid-template-columns: 1fr 1.2fr; }
+.dash-ligne-milieu { grid-template-columns: 1.2fr 1fr 0.9fr; }
+
+.lumieres-compteur {
+  font-size: var(--fs-xs);
+  background: rgba(243, 156, 18, 0.15);
+  color: var(--accent-orange);
+  padding: 2px 10px;
+  border-radius: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.card-title-ligne {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

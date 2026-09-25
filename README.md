@@ -24,10 +24,15 @@ Aucun token : le panneau reçoit l'objet `hass` de Home Assistant, avec la sessi
 ## Développement
 
 ```
-npx serve smarthome
+python smarthome/dev/serveur.py
 ```
 
-Puis ouvrir `http://localhost:3000/dev/`. Les états sont simulés par `dev/mock-hass.js`.
+Puis ouvrir `http://localhost:8765/dev/`. Les états sont simulés par `dev/mock-hass.js`.
+Ce serveur désactive le cache : un simple rechargement prend toujours la dernière version des modules JS.
+
+Depuis la console du navigateur :
+- `mock.basculer('binary_sensor.lave_linge')` : déclenche une alerte ;
+- `mock.definir('sensor.tablette_battery_level', '15')` : simule un niveau de batterie.
 
 ## Déploiement
 

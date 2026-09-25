@@ -3,7 +3,7 @@
 // =============================================
 
 import { chargerGabarit, el } from '../../js/dom.js';
-import { aChange, basculer, commanderLumieres, estActif, nom } from '../../js/ha.js';
+import { aChange, basculer, commanderLumieres, estActif, etat, nom } from '../../js/ha.js';
 import { demarrerMeteo } from '../../js/weather.js';
 import { demarrerPrieres } from '../../js/prayer.js';
 
@@ -14,6 +14,8 @@ export async function monter({ config }) {
 
   const idsLumieres = config.LUMIERES.map((l) => l.id);
   const idsAlertes = config.ALERTES.map((a) => a.id);
+  const batterie = config.BATTERIE_TABLETTE ?? {};
+  const idsBatterie = [batterie.niveau, batterie.charge].filter(Boolean);
 
   let hass = null;
   let precedent = null;
@@ -62,6 +64,41 @@ export async function monter({ config }) {
       ids.forEach((id) => enCours.delete(id));
       rendreLumieres();
     }
+  }
+
+  // ---- BATTERIE TABLETTE ----
+
+  const STATUTS_CHARGE = {
+    charging: '⚡ En charge',
+    full: '🔌 Branchée, pleine',
+    discharging: '🔋 Sur batterie',
+    not_charging: '🔌 Branchée, pas en charge',
+  };
+
+  function rendreBatterie() {
+    const capteur = etat(hass, batterie.niveau);
+    const valeur = Number.parseFloat(capteur?.state);
+    const carte = $('batterie-card');
+
+    // Capteur absent de HA, ou présent mais "unavailable" (tablette hors ligne)
+    if (!Number.isFinite(valeur)) {
+      carte.dataset.niveau = 'inconnu';
+      $('batterie-pct').textContent = '--';
+      $('batterie-status').textContent = capteur ? 'Tablette hors ligne' : 'Capteur de batterie introuvable';
+      $('batterie-fill').style.width = '0%';
+      $('batterie-label').textContent = '—';
+      return;
+    }
+
+    const pct = Math.round(valeur);
+    const [niveau, libelle] = pct >= 50 ? ['bon', 'Bon'] : pct >= 20 ? ['moyen', 'Moyen'] : ['faible', 'Faible'];
+    const statut = etat(hass, batterie.charge)?.state;
+
+    carte.dataset.niveau = niveau;
+    $('batterie-pct').textContent = pct;
+    $('batterie-status').textContent = STATUTS_CHARGE[statut] ?? '';
+    $('batterie-fill').style.width = `${pct}%`;
+    $('batterie-label').textContent = `${pct}% — ${libelle}`;
   }
 
   // ---- ALERTES ----
@@ -134,6 +171,7 @@ export async function monter({ config }) {
 
       if (aChange(precedent, hass, idsLumieres)) rendreLumieres();
       if (aChange(precedent, hass, idsAlertes)) rendreAlertes();
+      if (aChange(precedent, hass, idsBatterie)) rendreBatterie();
       precedent = hass;
     },
 

@@ -18,31 +18,30 @@
 /* Bouton menu Home Assistant : visible uniquement en mode étroit */
 .menu-ha {
   display: none;
-  width: 40px;
-  height: 40px;
+  width: var(--touch-min);
+  height: var(--touch-min);
   margin-bottom: 8px;
-  font-size: 20px;
+  font-size: var(--fs-lg);
   color: var(--text-secondary);
   background: none;
   border: none;
   border-radius: 12px;
   cursor: pointer;
 }
-.menu-ha:hover { background: var(--bg-card); color: var(--text-primary); }
 .narrow .menu-ha { display: block; }
 
 /* Logo / icône maison */
 .sidebar-logo {
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   background: var(--accent-blue);
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: var(--fs-xl);
   margin-bottom: 24px;
-  box-shadow: 0 4px 16px rgba(74, 158, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(74, 158, 255, 0.3);
 }
 
 /* Items de navigation */
@@ -50,43 +49,34 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   flex: 1;
   width: 100%;
-  padding: 0 8px;
+  padding: 0 10px;
 }
 
+/* Libellé toujours visible : pas d'infobulle au survol sur écran tactile */
 .nav-item {
-  position: relative;
   width: 100%;
+  min-height: 72px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 10px 8px;
-  border-radius: 12px;
+  gap: 6px;
+  padding: 10px 6px;
+  border-radius: 14px;
   cursor: pointer;
   transition: var(--transition);
   text-decoration: none;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   border: 1px solid transparent;
-  font-size: 9px;
+  font-size: var(--fs-xs);
   font-weight: 500;
   text-align: center;
-  letter-spacing: 0.02em;
 }
 
-.nav-item:hover {
-  background: var(--bg-card);
-  color: var(--text-secondary);
-}
-
-.nav-item.desactive {
-  opacity: 0.4;
-  cursor: default;
-}
-.nav-item.desactive:hover { background: none; color: var(--text-muted); }
+.nav-item:active { background: var(--bg-card-hover); }
 
 .nav-item.active {
   background: rgba(74, 158, 255, 0.12);
@@ -94,8 +84,14 @@
   border-color: rgba(74, 158, 255, 0.25);
 }
 
+.nav-item.desactive {
+  opacity: 0.4;
+  cursor: default;
+}
+.nav-item.desactive:active { background: none; }
+
 .nav-item .nav-icon {
-  font-size: 20px;
+  font-size: var(--fs-xl);
   line-height: 1;
 }
 
@@ -104,56 +100,34 @@
   white-space: nowrap;
 }
 
-/* Tooltip au hover */
-.nav-item::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-  z-index: 200;
-  box-shadow: var(--shadow-card);
-}
-
-.nav-item:hover::after {
-  opacity: 1;
+@media (hover: hover) {
+  .menu-ha:hover { background: var(--bg-card); color: var(--text-primary); }
+  .nav-item:not(.desactive):hover { background: var(--bg-card); color: var(--text-primary); }
 }
 
 /* Divider */
 .nav-divider {
-  width: 32px;
+  width: 48px;
   height: 1px;
   background: var(--border);
   margin: 8px 0;
 }
 
-/* Bouton settings en bas */
+/* Bas de la sidebar : indicateur HA + paramètres */
 .sidebar-bottom {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding-top: 12px;
   border-top: 1px solid var(--border);
   width: 100%;
-  padding: 12px 8px 0;
+  padding: 12px 10px 0;
 }
 
 /* Indicateur connexion HA */
 .ha-indicator {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--accent-green);
   box-shadow: 0 0 8px var(--accent-green);
