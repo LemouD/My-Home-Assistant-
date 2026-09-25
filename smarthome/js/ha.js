@@ -50,3 +50,32 @@ export const budgetEnregistrer = (hass, jeton, donnees) =>
 
 export const budgetVerrouiller = (hass, jeton) =>
   hass.callWS({ type: 'maison/budget/verrouiller', jeton });
+
+// ---- STATISTIQUES (énergie, eau) ----
+// Statistiques longue durée du recorder de HA : consommation par jour ou par mois
+// pour les capteurs à state_class total_increasing (compteur Linky, index d'eau…).
+// Renvoie { entity_id: [{ debut: Date, variation: nombre }] }.
+
+export async function statistiques(hass, ids, debut, fin, periode) {
+  const reponse = await hass.callWS({
+    type: 'recorder/statistics_during_period',
+    start_time: debut.toISOString(),
+    end_time: fin.toISOString(),
+    statistic_ids: ids,
+    period: periode,          // 'day' | 'month'
+    types: ['change'],
+  });
+  return Object.fromEntries(ids.map((id) => [id, (reponse[id] ?? []).map((p) => ({
+    debut: new Date(p.start),
+    variation: p.change ?? 0,
+  }))]));
+}
+
+export const valeurNumerique = (hass, id) => {
+  const valeur = Number.parseFloat(etat(hass, id)?.state);
+  return Number.isFinite(valeur) ? valeur : null;
+};
+
+export async function definirNombre(hass, entityId, valeur) {
+  await hass.callService('input_number', 'set_value', { entity_id: entityId, value: valeur });
+}

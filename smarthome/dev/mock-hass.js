@@ -24,10 +24,23 @@ const { niveau: batterieNiveau, charge: batterieCharge } = config.BATTERIE_TABLE
 if (batterieNiveau) definir(batterieNiveau, '78', 'Tablette Niveau de batterie');
 if (batterieCharge) definir(batterieCharge, 'charging', 'Tablette État de la batterie');
 
+const energie = config.ENERGIE ?? {};
+if (energie.eau?.index) definir(energie.eau.index, '1247.318', 'Index eau');
+if (energie.eau?.saisie) definir(energie.eau.saisie, '1247.318', 'Saisie index eau');
+(energie.temperatures ?? []).forEach((id, i) => definir(id, String(20.4 + i * 0.8), `Température ${i + 1}`));
+
 const panneau = document.querySelector('smarthome-panel');
 
-async function callService(domaine, service, { entity_id: cibles }) {
+async function callService(domaine, service, donnees) {
   await new Promise((r) => setTimeout(r, LATENCE_MS));
+  const { entity_id: cibles } = donnees;
+  if (domaine === 'input_number' && service === 'set_value') {
+    definir(cibles, String(donnees.value), states[cibles]?.attributes.friendly_name);
+    // Le capteur d'index suit l'input_number, comme le template sensor décrit dans le README
+    if (cibles === energie.eau?.saisie && energie.eau.index) definir(energie.eau.index, String(donnees.value), 'Index eau');
+    publier();
+    return;
+  }
   for (const id of [].concat(cibles)) {
     const actuel = states[id];
     if (!actuel) throw new Error(`Entité inconnue : ${id}`);
@@ -54,9 +67,54 @@ const verifierJeton = (jeton) => {
   if (!budget.jetons.has(jeton)) throw erreurWS('session_invalide', 'Session invalide');
 };
 
+// ---- Statistiques longue durée simulées (recorder/statistics_during_period) ----
+// Valeurs pseudo-aléatoires mais stables : même jour ou même mois = même valeur.
+const bruit = (graine) => {
+  const x = Math.sin(graine * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+};
+const PAR_JOUR = {                                  // valeur moyenne par jour et par capteur
+  [energie.electricite?.hc]: 3.6,
+  [energie.electricite?.hp]: 5.4,
+  [energie.eau?.index]: 0.41,
+};
+
+function variationJour(id, jour) {
+  const base = PAR_JOUR[id] ?? 1.2;                 // prises connectées : ~1,2 kWh/jour
+  const graine = jour.getFullYear() * 400 + jour.getMonth() * 31 + jour.getDate() + id.length;
+  return base * (0.7 + 0.6 * bruit(graine));
+}
+
+function statistiquesSimulees({ statistic_ids: ids, start_time: debut, end_time: fin, period }) {
+  const maintenant = new Date(fin);
+  const resultat = {};
+  for (const id of ids) {
+    const points = [];
+    let curseur = new Date(debut);
+    while (curseur < maintenant) {
+      const suivant = period === 'month'
+        ? new Date(curseur.getFullYear(), curseur.getMonth() + 1, 1)
+        : new Date(curseur.getFullYear(), curseur.getMonth(), curseur.getDate() + 1);
+      let change = 0;
+      for (let j = new Date(curseur); j < suivant && j < maintenant; j.setDate(j.getDate() + 1)) {
+        // Journée en cours : proportion écoulée
+        const fraction = j.toDateString() === maintenant.toDateString()
+          ? (maintenant.getHours() * 60 + maintenant.getMinutes()) / 1440 : 1;
+        change += variationJour(id, j) * fraction;
+      }
+      points.push({ start: curseur.getTime(), end: suivant.getTime(), change });
+      curseur = suivant;
+    }
+    resultat[id] = points;
+  }
+  return resultat;
+}
+
 async function callWS(message) {
   await new Promise((r) => setTimeout(r, LATENCE_MS));
   switch (message.type) {
+    case 'recorder/statistics_during_period':
+      return statistiquesSimulees(message);
     case 'maison/budget/etat':
       return { configure: true, attente: attenteBudget(), essaisRestants: 5 - budget.echecs };
     case 'maison/budget/deverrouiller': {

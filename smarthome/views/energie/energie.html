@@ -1,0 +1,169 @@
+<div id="page-content" class="energie">
+
+  <!-- EN-TÊTE DE LA VUE -->
+  <div class="energie-entete">
+    <div>
+      <h1 class="energie-titre">Énergie &amp; Fluides</h1>
+      <p class="energie-sous-titre">Suivi en temps réel et optimisation des ressources du foyer.</p>
+    </div>
+    <div class="energie-mois">
+      <img src="../../assets/icons/energie/calendrier.svg" width="14" height="14" alt="">
+      <span id="energie-mois"></span>
+    </div>
+  </div>
+
+  <!-- RÉSUMÉ : électricité, eau, coût du mois -->
+  <div class="energie-ligne energie-ligne-resume">
+
+    <section class="energie-carte energie-carte-electricite">
+      <div class="energie-carte-entete">
+        <div class="energie-titre-groupe">
+          <span class="energie-icone-fond"><img src="../../assets/icons/energie/eclair.svg" width="18" height="18" alt=""></span>
+          <b>Électricité</b>
+        </div>
+        <span class="energie-tendance" id="energie-elec-tendance" hidden></span>
+      </div>
+      <div class="energie-valeur">
+        <b id="energie-elec-jour">--</b>
+        <span>kWh aujourd'hui</span>
+      </div>
+    </section>
+
+    <section class="energie-carte">
+      <div class="energie-carte-entete">
+        <div class="energie-titre-groupe">
+          <span class="energie-icone-fond"><img src="../../assets/icons/energie/goutte.svg" width="18" height="18" alt=""></span>
+          <b>Eau</b>
+        </div>
+        <span class="energie-tendance" id="energie-eau-tendance" hidden></span>
+      </div>
+      <div class="energie-valeur">
+        <b id="energie-eau-index">--</b>
+        <span>m³ (index global)</span>
+      </div>
+    </section>
+
+    <section class="energie-carte">
+      <div class="energie-carte-entete">
+        <div class="energie-titre-groupe">
+          <span class="energie-icone-fond"><img src="../../assets/icons/energie/carte-bancaire.svg" width="14" height="14" alt=""></span>
+          <b>Coût estimé</b>
+        </div>
+      </div>
+      <div class="energie-valeur">
+        <b id="energie-cout-mois">--</b>
+        <span>depuis le début du mois</span>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- LIGNE 1 : Consommation électrique + Consommation eau -->
+  <div class="energie-ligne energie-ligne-principale">
+
+    <section class="energie-carte energie-carte-electricite">
+      <div class="energie-carte-entete">
+        <div class="energie-titre-groupe energie-titre-section">
+          <img src="../../assets/icons/energie/eclair-titre.svg" width="14" height="14" alt="">
+          <b>Consommation électrique</b>
+        </div>
+        <span class="energie-note" id="energie-elec-moyenne"></span>
+      </div>
+      <div class="energie-courbe" id="energie-elec-courbe"></div>
+      <div class="energie-courbe-jours" id="energie-elec-jours"></div>
+      <div class="energie-hchp">
+        <div>
+          <div class="energie-ligne-texte"><span>Heures creuses (HC)</span><b id="energie-hc">--</b></div>
+          <span class="energie-note" id="energie-tarif-hc"></span>
+        </div>
+        <div class="energie-hchp-separateur"></div>
+        <div>
+          <div class="energie-ligne-texte"><span>Heures pleines (HP)</span><b id="energie-hp">--</b></div>
+          <span class="energie-note" id="energie-tarif-hp"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="energie-carte energie-carte-eau">
+      <div class="energie-carte-entete">
+        <div class="energie-titre-groupe energie-titre-section">
+          <img src="../../assets/icons/energie/goutte-titre.svg" width="14" height="14" alt="">
+          <b>Consommation eau</b>
+        </div>
+      </div>
+      <div class="energie-eau-moyenne">
+        <span class="energie-note">Moyenne quotidienne</span>
+        <b id="energie-eau-jour">--</b>
+      </div>
+      <div class="energie-barres" id="energie-eau-barres"></div>
+      <button class="energie-bouton" data-action="saisir-index" id="energie-saisir">
+        <img src="../../assets/icons/energie/crayon.svg" width="12" height="12" alt="">
+        Saisir nouvel index
+      </button>
+      <form class="energie-saisie" id="energie-saisie" hidden>
+        <label class="energie-champ">
+          <input type="number" inputmode="decimal" min="0" step="0.001" id="energie-saisie-valeur" aria-label="Nouvel index en m³">
+          <span>m³</span>
+        </label>
+        <button type="button" class="energie-bouton" data-action="annuler-index">Annuler</button>
+        <button type="submit" class="energie-bouton energie-bouton-principal">Valider</button>
+      </form>
+      <p class="energie-message" id="energie-saisie-message" role="status"></p>
+    </section>
+
+  </div>
+
+  <!-- LIGNE 2 : Coûts du mois -->
+  <section class="energie-carte energie-carte-sombre">
+    <div class="energie-carte-entete">
+      <div class="energie-titre-groupe energie-titre-section">
+        <img src="../../assets/icons/energie/carte-bancaire.svg" width="14" height="14" alt="">
+        <b>Coûts énergie</b>
+      </div>
+      <b class="energie-note-forte">Mois en cours</b>
+    </div>
+    <table class="energie-table">
+      <thead>
+        <tr>
+          <th>Poste</th>
+          <th>Consommation</th>
+          <th>Tarif</th>
+          <th class="energie-droite">Montant estimé</th>
+        </tr>
+      </thead>
+      <tbody id="energie-couts"></tbody>
+    </table>
+    <div class="energie-total">
+      <span>Total mensuel estimé :</span>
+      <b id="energie-cout-total">--</b>
+    </div>
+  </section>
+
+  <!-- LIGNE 3 : Répartition par poste + Alertes et conseils -->
+  <div class="energie-ligne">
+
+    <section class="energie-carte energie-carte-sombre">
+      <div class="energie-carte-entete">
+        <div class="energie-titre-groupe energie-titre-section">
+          <img src="../../assets/icons/energie/camembert.svg" width="14" height="14" alt="">
+          <b>Répartition par poste</b>
+        </div>
+      </div>
+      <div class="energie-segments" id="energie-segments"></div>
+      <div class="energie-postes" id="energie-postes"></div>
+    </section>
+
+    <section class="energie-carte energie-carte-sombre">
+      <div class="energie-carte-entete">
+        <div class="energie-titre-groupe energie-titre-section">
+          <img src="../../assets/icons/energie/aide.svg" width="14" height="14" alt="">
+          <b>Alertes et conseils</b>
+        </div>
+        <span class="energie-badge" id="energie-nb-conseils"></span>
+      </div>
+      <div class="energie-conseils" id="energie-conseils"></div>
+    </section>
+
+  </div>
+
+</div>
