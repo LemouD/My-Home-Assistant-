@@ -19,6 +19,12 @@
   --accent-purple: #9B59B6;
   --accent-cyan:   #1ABC9C;
 
+  /* Carte douas (maquette Figma) */
+  --text-doua:        #D9E5EB;
+  --accent-lavande:   #C7B8F2;
+  --accent-emeraude:  #10B981;
+  --accent-bleu-vif:  #3B82F6;
+
   --text-primary:   #FFFFFF;
   --text-secondary: #8B9AB0;
   --text-muted:     #4A5568;
@@ -32,15 +38,29 @@
   --radius-sm:     8px;
   --radius-xs:     6px;
 
-  /* Ombres */
-  --shadow-card:   0 4px 24px rgba(0, 0, 0, 0.4);
+  /* Ombres (légères : tablette peu puissante) */
+  --shadow-card:   0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-btn:    0 2px 8px rgba(0, 0, 0, 0.3);
 
-  /* Transitions */
-  --transition:    all 0.2s ease;
+  /* Transitions : propriétés ciblées, jamais `all` (coût de rendu sur tablette) */
+  --transition:    background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
 
   /* Sidebar */
-  --sidebar-w:     72px;
+  --sidebar-w:     104px;
+
+  /* Typographie — tablette murale 15-16" lue à 1-2 m.
+     Ne pas utiliser de taille en px ailleurs que dans cette échelle. */
+  --fs-xs:      14px;   /* libellés secondaires, minimum absolu */
+  --fs-sm:      16px;   /* texte courant */
+  --fs-md:      18px;
+  --fs-lg:      22px;
+  --fs-xl:      28px;   /* icônes, titres de section */
+  --fs-2xl:     40px;   /* horloge */
+  --fs-display: 56px;   /* valeurs principales (température, batterie) */
+  --fs-hero:    72px;
+
+  /* Tactile : taille minimale d'une zone cliquable */
+  --touch-min:  48px;
 
   /* Espacement */
   --gap:           16px;
@@ -57,9 +77,15 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-main);
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--fs-sm);
   line-height: 1.5;
   overflow: hidden;
+
+  /* Tablette : pas de sélection de texte ni de zoom au double-tap */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 /* Layout principal */
@@ -98,7 +124,7 @@
   padding: var(--gap-lg);
 }
 
-#page-content::-webkit-scrollbar { width: 4px; }
+#page-content::-webkit-scrollbar { width: 6px; }
 #page-content::-webkit-scrollbar-track { background: transparent; }
 #page-content::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 2px; }
 
@@ -112,13 +138,15 @@
   transition: var(--transition);
 }
 
-.card:hover {
-  border-color: var(--border-active);
-  background: var(--bg-card-hover);
+@media (hover: hover) {
+  .card:hover {
+    border-color: var(--border-active);
+    background: var(--bg-card-hover);
+  }
 }
 
 .card-title {
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -132,9 +160,10 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
+  min-height: var(--touch-min);
+  padding: 8px 20px;
   border-radius: var(--radius-btn);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   font-weight: 500;
   cursor: pointer;
   border: none;
@@ -146,23 +175,27 @@
   background: var(--accent-blue);
   color: #fff;
 }
-.btn-primary:hover { opacity: 0.85; }
+@media (hover: hover) {
+  .btn-primary:hover { opacity: 0.85; }
+}
 
 .btn-ghost {
   background: var(--bg-input);
   color: var(--text-secondary);
   border: 1px solid var(--border);
 }
-.btn-ghost:hover { color: var(--text-primary); border-color: var(--border-active); }
+@media (hover: hover) {
+  .btn-ghost:hover { color: var(--text-primary); border-color: var(--border-active); }
+}
 
 /* Chips de statut */
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   font-weight: 500;
 }
 
@@ -199,9 +232,9 @@
 .gap-md      { gap: 16px; }
 .gap-lg      { gap: 24px; }
 .text-secondary { color: var(--text-secondary); }
-.text-sm     { font-size: 12px; }
-.text-lg     { font-size: 18px; }
-.text-xl     { font-size: 24px; }
+.text-sm     { font-size: var(--fs-xs); }
+.text-lg     { font-size: var(--fs-lg); }
+.text-xl     { font-size: var(--fs-xl); }
 .font-semibold { font-weight: 600; }
 .font-bold   { font-weight: 700; }
 .mt-auto     { margin-top: auto; }
@@ -214,7 +247,7 @@
   min-width: 18px;
   height: 18px;
   border-radius: 9px;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   padding: 0 4px;
 }
@@ -262,14 +295,18 @@
 
 .alert-fermer {
   margin-left: auto;
+  min-height: var(--touch-min);
+  padding: 0 16px;
   font: inherit;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   background: none;
   border: none;
   cursor: pointer;
 }
-.alert-fermer:hover { color: var(--text-primary); }
+@media (hover: hover) {
+  .alert-fermer:hover { color: var(--text-primary); }
+}
 
 /* Vue courante : occupe l'espace sous le header */
 #vue {
@@ -289,7 +326,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--accent-orange);
 }
 
@@ -299,8 +336,8 @@
   top: 10px;
   right: 10px;
   z-index: 1000;
-  font-size: 11px;
-  padding: 4px 10px;
+  font-size: var(--fs-xs);
+  padding: 6px 14px;
   border-radius: 20px;
   pointer-events: none;
 }

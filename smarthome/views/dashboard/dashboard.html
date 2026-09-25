@@ -8,7 +8,7 @@
   -->
 
   <!-- LIGNE 1 : Météo + Douas -->
-  <div class="grid" style="grid-template-columns: 1fr 1.2fr; gap: 16px; margin-bottom: 16px;">
+  <div class="dash-ligne dash-ligne-haut">
 
     <!-- MÉTÉO -->
     <div class="card meteo-card">
@@ -34,54 +34,49 @@
     </div>
 
     <!-- DOUAS DU FOYER -->
-    <div class="card">
-      <div class="card-title">🤲 Douas du foyer</div>
-      <div class="douas-grid">
+    <div class="card-douas">
+      <div class="douas-voile"></div>
 
-        <div class="doua-card">
-          <div class="doua-header">
-            <span class="doua-icon">🚪</span>
-            <div>
-              <div class="doua-titre">En sortant</div>
-              <div class="doua-sous-titre">Doua de sortie</div>
-            </div>
-          </div>
-          <div class="doua-arabique">بِسْمِ اللهِ، تَوَكَّلْتُ عَلَى اللهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ</div>
-          <div class="doua-texte">« Au nom d'Allah, je me remets à Allah, et il n'y a ni force ni puissance si ce n'est par Allah. »</div>
-          <button class="doua-btn">🔊 Écouter</button>
+      <div class="douas-titre">
+        <span class="douas-icone">🤲</span>
+        <b>Douas du foyer</b>
+      </div>
+
+      <div class="doua">
+        <div class="doua-moment">
+          <span class="doua-point doua-point-sortie"></span>
+          <b>En sortant de la maison</b>
         </div>
+        <div class="doua-phonetique">Bismillahi tawakkaltu 'ala Allah, wa la hawla wa la quwwata illa billah</div>
+        <div class="doua-traduction">Au nom d'Allah, je place ma confiance en Allah. Il n'y a de force ni de puissance qu'en Allah.</div>
+      </div>
 
-        <div class="doua-card">
-          <div class="doua-header">
-            <span class="doua-icon">🏠</span>
-            <div>
-              <div class="doua-titre">En rentrant</div>
-              <div class="doua-sous-titre">Doua d'entrée</div>
-            </div>
-          </div>
-          <div class="doua-arabique">اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلِجِ وَخَيْرَ الْمَخْرَجِ</div>
-          <div class="doua-texte">« Ô Allah, je Te demande la bonté de l'entrée et la bonté de la sortie. »</div>
-          <button class="doua-btn">🔊 Écouter</button>
+      <div class="douas-separateur"></div>
+
+      <div class="doua">
+        <div class="doua-moment">
+          <span class="doua-point doua-point-entree"></span>
+          <b>En rentrant à la maison</b>
         </div>
-
+        <div class="doua-phonetique">Bismillahi walajna, wa bismillahi kharajna, wa 'ala Rabbina tawakkalna</div>
+        <div class="doua-traduction">Au nom d'Allah nous entrons, au nom d'Allah nous sortons et en notre Seigneur nous plaçons notre confiance.</div>
       </div>
     </div>
-
   </div>
 
   <!-- LIGNE 2 : Lumières + Prières + Batterie -->
-  <div class="grid" style="grid-template-columns: 1.2fr 1fr 0.9fr; gap: 16px; margin-bottom: 16px;">
+  <div class="dash-ligne dash-ligne-milieu">
 
     <!-- CONTRÔLE LUMIÈRES -->
     <div class="card">
-      <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="card-title card-title-ligne">
         💡 Éclairage
-        <span id="lumieres-count" style="font-size:10px; background:rgba(243,156,18,0.15); color:var(--accent-orange); padding:2px 8px; border-radius:10px;">0 allumée(s)</span>
+        <span id="lumieres-count" class="lumieres-compteur">0 allumée(s)</span>
       </div>
 
       <div class="lumieres-grid" id="lumieres-grid"></div>
 
-      <div class="lumiere-all" style="margin-top: 12px;">
+      <div class="lumiere-all">
         <button data-action="tout-allumer">☀️ Tout allumer</button>
         <button data-action="tout-eteindre">🌙 Tout éteindre</button>
       </div>
@@ -93,33 +88,23 @@
       <div class="prieres-list" id="prieres-list"></div>
     </div>
 
-    <!-- BATTERIE MAISON (valeurs fictives en attendant les capteurs) -->
-    <div class="card batterie-card">
-      <div class="card-title">🔋 Énergie maison</div>
+    <!-- BATTERIE DE LA TABLETTE (entités publiées par l'app Home Assistant de la tablette) -->
+    <div class="card batterie-card" id="batterie-card">
+      <div class="card-title">🔋 Batterie tablette</div>
       <div class="batterie-header">
         <div>
-          <div class="batterie-pct"><span id="batterie-pct">78</span><span>%</span></div>
-          <div class="batterie-status" id="batterie-status">⚡ En charge</div>
+          <div class="batterie-pct"><span id="batterie-pct">--</span><span>%</span></div>
+          <div class="batterie-status" id="batterie-status">Chargement...</div>
         </div>
         <div class="batterie-icon-big">🔋</div>
       </div>
       <div class="batterie-bar progress-bar">
-        <div class="progress-fill" id="batterie-fill" style="width: 78%;"></div>
+        <div class="progress-fill" id="batterie-fill"></div>
       </div>
       <div class="batterie-details">
         <span>0%</span>
-        <span id="batterie-label">78% — Bon</span>
+        <span id="batterie-label">—</span>
         <span>100%</span>
-      </div>
-      <div class="batterie-grid">
-        <div class="batterie-stat production">
-          <div class="stat-val" id="prod-val">2.4 kW</div>
-          <div class="stat-lbl">⬆ Production</div>
-        </div>
-        <div class="batterie-stat consommation">
-          <div class="stat-val" id="conso-val">1.1 kW</div>
-          <div class="stat-lbl">⬇ Consommation</div>
-        </div>
       </div>
     </div>
 
@@ -132,7 +117,7 @@
         <div class="cal-today-date" id="cal-date">Aujourd'hui</div>
         <div class="cal-today-sub">Agenda de la famille</div>
       </div>
-      <a data-vue="calendrier" class="btn btn-ghost" style="font-size:11px; padding:6px 12px;">Voir tout →</a>
+      <a data-vue="calendrier" class="btn btn-ghost">Voir tout →</a>
     </div>
 
     <div class="cal-events" id="cal-events">

@@ -19,6 +19,10 @@ config.LUMIERES.forEach((l, i) => definir(l.id, i % 2 === 0 ? 'on' : 'off', l.no
 config.PRESENCES.forEach((p, i) => definir(p.id, i === 0 ? 'home' : 'not_home', p.nom));
 config.ALERTES.forEach((a, i) => definir(a.id, i === 0 ? 'on' : 'off', a.libelle));
 
+const { niveau: batterieNiveau, charge: batterieCharge } = config.BATTERIE_TABLETTE ?? {};
+if (batterieNiveau) definir(batterieNiveau, '78', 'Tablette Niveau de batterie');
+if (batterieCharge) definir(batterieCharge, 'charging', 'Tablette État de la batterie');
+
 const panneau = document.querySelector('smarthome-panel');
 
 async function callService(domaine, service, { entity_id: cibles }) {
@@ -52,8 +56,25 @@ panneau.route = { prefix: `${location.pathname}#`, path: location.hash.slice(1) 
 panneau.narrow = matchMedia('(max-width: 870px)').matches;
 publier();
 
-// Accès depuis la console : mock.basculer('binary_sensor.porte_garage')
+// Accès depuis la console :
+//   mock.basculer('binary_sensor.lave_linge')
+//   mock.definir('sensor.tablette_battery_level', '15')
 window.mock = {
   states,
   basculer: (id) => callService(id.split('.')[0], 'toggle', { entity_id: id }),
+  definir: (id, state) => {
+    definir(id, state, states[id]?.attributes.friendly_name ?? id);
+    publier();
+  },
 };
+
+// Taille d'écran en pixels CSS : ouvrir /dev/ sur la vraie tablette pour relever sa taille de référence
+const taille = document.createElement('div');
+taille.style.cssText = 'position:fixed; right:8px; bottom:8px; z-index:9999; padding:4px 8px; border-radius:6px;'
+  + 'background:#000c; color:#8B9AB0; font:12px monospace; pointer-events:none;';
+const afficherTaille = () => {
+  taille.textContent = `${innerWidth}×${innerHeight} CSS px · DPR ${devicePixelRatio}`;
+};
+afficherTaille();
+addEventListener('resize', afficherTaille);
+document.body.append(taille);
