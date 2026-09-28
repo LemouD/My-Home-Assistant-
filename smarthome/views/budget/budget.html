@@ -11,113 +11,100 @@
       <div class="budget-mois">
         <img src="../../assets/icons/budget/mois.svg" width="14" height="14" alt="">
         <span id="budget-mois"></span>
-        <img src="../../assets/icons/budget/chevron-bas.svg" width="12" height="12" alt="">
       </div>
     </div>
   </div>
 
   <!-- ÉCRAN DE CODE : affiché tant que le budget est verrouillé -->
   <section class="budget-carte budget-verrou" id="budget-verrou">
-    <h2 class="budget-verrou-titre">🔒 Budget protégé</h2>
+    <h2 class="budget-verrou-titre">Budget protégé</h2>
     <p class="budget-libelle">Saisissez le code à 6 chiffres</p>
     <div class="budget-code-points" id="budget-code-points"></div>
     <p class="budget-code-message" id="budget-code-message" role="status"></p>
     <div class="budget-clavier" id="budget-clavier"></div>
   </section>
 
-  <!-- CONTENU : affiché après saisie du code -->
+  <!-- CONTENU : affiché après saisie du code.
+       Disposition : chiffres clés / évolution + catégories / à payer, imprévus, épargne / historique -->
   <div class="budget-contenu" id="budget-contenu" hidden>
 
     <p class="budget-erreur" id="budget-erreur" role="alert" hidden></p>
 
-    <!-- LIGNE 1 : Aperçu global + Évolution mensuelle -->
-    <div class="budget-ligne">
+    <!-- LIGNE 1 : chiffres clés du mois -->
+    <div class="budget-kpis">
 
-      <section class="budget-carte">
-        <h2 class="budget-carte-titre">
-          <img src="../../assets/icons/budget/section-rond.svg" width="14" height="14" alt="">
-          Aperçu global
-        </h2>
+      <section class="budget-kpi budget-kpi-principal">
+        <h2 class="budget-kpi-titre">Reste disponible</h2>
+        <b class="budget-kpi-valeur" id="budget-reste"></b>
+        <span class="budget-libelle" id="budget-reste-detail"></span>
+      </section>
+
+      <section class="budget-kpi budget-kpi-donut">
         <div class="budget-donut" id="budget-donut"></div>
+        <div class="budget-kpi-texte">
+          <h2 class="budget-kpi-titre">Dépensé</h2>
+          <b class="budget-kpi-valeur" id="budget-depense-total"></b>
+        </div>
+      </section>
+
+      <section class="budget-kpi">
+        <h2 class="budget-kpi-titre">Revenus et charges</h2>
         <dl class="budget-chiffres" id="budget-chiffres"></dl>
       </section>
 
-      <section class="budget-carte">
-        <h2 class="budget-carte-titre">
-          <img src="../../assets/icons/budget/section-evolution.svg" width="14" height="14" alt="">
-          Évolution mensuelle
-        </h2>
-        <div class="budget-courbe" id="budget-courbe"></div>
-        <div class="budget-courbe-mois" id="budget-courbe-mois"></div>
+      <section class="budget-kpi">
+        <h2 class="budget-kpi-titre">Épargne du mois</h2>
+        <div class="budget-ligne-texte">
+          <b class="budget-kpi-valeur" id="budget-epargne-resume"></b>
+          <b class="budget-texte-emeraude" id="budget-epargne-pct"></b>
+        </div>
+        <div class="budget-jauge"><div class="budget-jauge-remplie budget-couleur-emeraude" id="budget-epargne-jauge"></div></div>
       </section>
 
     </div>
 
-    <!-- LIGNE 2 : Épargne + Ajustement des dépenses -->
-    <div class="budget-ligne">
+    <!-- LIGNE 2 : évolution sur 6 mois + budget par catégorie -->
+    <div class="budget-ligne budget-ligne-analyse">
 
       <section class="budget-carte">
-        <h2 class="budget-carte-titre">
-          <img src="../../assets/icons/budget/section-rond.svg" width="14" height="14" alt="">
-          Épargne &amp; mise de côté
-        </h2>
-
-        <label class="budget-champ-bloc">
-          <span class="budget-libelle">Objectif épargne mensuel</span>
-          <span class="budget-champ">
-            <span class="budget-devise">€</span>
-            <input type="number" inputmode="decimal" min="0" step="10" id="budget-epargne-objectif" data-chemin="epargne.objectif" data-type="montant">
-          </span>
-        </label>
-
-        <label class="budget-champ-bloc">
-          <span class="budget-libelle">Épargné ce mois</span>
-          <span class="budget-champ">
-            <span class="budget-devise">€</span>
-            <input type="number" inputmode="decimal" min="0" step="10" id="budget-epargne-mois" data-chemin="epargne.ceMois" data-type="montant">
-          </span>
-        </label>
-
-        <div class="budget-progression">
-          <div class="budget-ligne-texte">
-            <span class="budget-libelle">Progression</span>
-            <b id="budget-epargne-pct"></b>
-          </div>
-          <div class="budget-jauge"><div class="budget-jauge-remplie budget-couleur-emeraude" id="budget-epargne-jauge"></div></div>
+        <div class="budget-carte-entete">
+          <h2 class="budget-carte-titre">
+            <img src="../../assets/icons/budget/section-evolution.svg" width="14" height="14" alt="">
+            Évolution sur 6 mois
+          </h2>
+          <span class="budget-legende"><span class="budget-legende-trait"></span>Budget prévu</span>
         </div>
-
-        <div class="budget-chiffre">
-          <span class="budget-libelle">Épargne totale cumulée</span>
-          <b class="budget-montant" id="budget-epargne-total"></b>
-        </div>
-
-        <div class="budget-repartition">
-          <b class="budget-libelle">Répartition</b>
-          <div class="budget-liste" id="budget-comptes"></div>
-        </div>
+        <div class="budget-barres" id="budget-courbe"></div>
       </section>
 
       <section class="budget-carte">
-        <h2 class="budget-carte-titre">
-          <img src="../../assets/icons/budget/section-rond.svg" width="14" height="14" alt="">
-          Ajustement des dépenses
-        </h2>
+        <div class="budget-carte-entete">
+          <h2 class="budget-carte-titre">
+            <img src="../../assets/icons/budget/section-rond.svg" width="14" height="14" alt="">
+            Budget par catégorie
+          </h2>
+          <span class="budget-libelle">Prévu : <b class="budget-total-valeur" id="budget-total-ajuste"></b></span>
+        </div>
         <div class="budget-categories" id="budget-categories"></div>
-        <div class="budget-total">
-          <b>Budget ajusté</b>
-          <b class="budget-total-valeur" id="budget-total-ajuste"></b>
-        </div>
       </section>
 
     </div>
 
-    <!-- LIGNE 3 : Sorties & imprévus + Factures à venir -->
-    <div class="budget-ligne budget-ligne-factures">
+    <!-- LIGNE 3 : à payer + imprévus + épargne -->
+    <div class="budget-ligne budget-ligne-suivi">
+
+      <section class="budget-carte">
+        <h2 class="budget-carte-titre">
+          <img src="../../assets/icons/budget/section-factures.svg" width="14" height="14" alt="">
+          À payer
+        </h2>
+        <div class="budget-liste" id="budget-a-venir"></div>
+      </section>
 
       <section class="budget-carte">
         <h2 class="budget-carte-titre">
           <img src="../../assets/icons/budget/section-carre.svg" width="14" height="14" alt="">
-          Sorties &amp; imprévus
+          Imprévus
         </h2>
         <div class="budget-liste" id="budget-imprevus"></div>
         <div class="budget-total">
@@ -129,20 +116,46 @@
 
       <section class="budget-carte">
         <h2 class="budget-carte-titre">
-          <img src="../../assets/icons/budget/section-carre.svg" width="14" height="14" alt="">
-          Factures à venir
+          <img src="../../assets/icons/budget/section-rond.svg" width="14" height="14" alt="">
+          Épargne
         </h2>
-        <div class="budget-liste" id="budget-a-venir"></div>
+
+        <div class="budget-epargne-champs">
+          <label class="budget-champ-bloc">
+            <span class="budget-libelle">Objectif mensuel</span>
+            <span class="budget-champ">
+              <span class="budget-devise">€</span>
+              <input type="number" inputmode="decimal" min="0" step="10" id="budget-epargne-objectif" data-chemin="epargne.objectif" data-type="montant">
+            </span>
+          </label>
+          <label class="budget-champ-bloc">
+            <span class="budget-libelle">Épargné ce mois</span>
+            <span class="budget-champ">
+              <span class="budget-devise">€</span>
+              <input type="number" inputmode="decimal" min="0" step="10" id="budget-epargne-mois" data-chemin="epargne.ceMois" data-type="montant">
+            </span>
+          </label>
+        </div>
+
+        <div class="budget-liste" id="budget-comptes"></div>
+
+        <div class="budget-total">
+          <b>Épargne totale</b>
+          <b class="budget-total-valeur budget-texte-emeraude" id="budget-epargne-total"></b>
+        </div>
       </section>
 
     </div>
 
-    <!-- LIGNE 4 : Factures récentes & historique -->
+    <!-- LIGNE 4 : historique des factures (replié : les plus récentes seulement) -->
     <section class="budget-carte">
-      <h2 class="budget-carte-titre">
-        <img src="../../assets/icons/budget/section-factures.svg" width="14" height="14" alt="">
-        Factures récentes &amp; historique
-      </h2>
+      <div class="budget-carte-entete">
+        <h2 class="budget-carte-titre">
+          <img src="../../assets/icons/budget/section-factures.svg" width="14" height="14" alt="">
+          Historique des factures
+        </h2>
+        <div id="budget-historique-plus"></div>
+      </div>
       <table class="budget-table">
         <thead>
           <tr>
