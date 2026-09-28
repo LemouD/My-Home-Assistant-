@@ -92,7 +92,6 @@ template:
 Le bouton « Saisir nouvel index » modifie `input_number.index_eau` ; le capteur `sensor.index_eau`
 alimente les statistiques. Un futur capteur automatique remplacera simplement `sensor.index_eau`.
 
-<<<<<<< HEAD
 ## Calendrier familial
 
 Une **catégorie** (Famille, Rendez-vous, Anniversaires…) = un calendrier HA, avec sa couleur.
@@ -108,7 +107,7 @@ Déclarer les entités dans `config.js`, section `CALENDRIER`.
 - Membres : seulement l'entité `person.*` dans `config.js` (fichier public) ; le nom affiché vient de HA.
 - La tablette (compte non-admin) peut lire et créer des événements, et cocher des tâches.
 - La carte « Calendrier famille — aujourd'hui » de l'accueil utilise les mêmes catégories.
-=======
+
 ## Vie
 
 Maison (scénarios, pièces, caméras, appareils) et bien-être & spiritualité, avec quatre
@@ -136,7 +135,6 @@ Sources externes, appelées depuis la tablette, sans clé :
 Les invocations (arabe, translittération, traduction, source) sont dans
 `views/vie/contenus.js`. Le calendrier hégirien est calculé par le navigateur
 (Umm al-Qura) ; les dates peuvent différer d'un jour de l'observation locale.
->>>>>>> origin/main
 
 ## Sécurité
 
