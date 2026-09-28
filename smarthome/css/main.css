@@ -112,6 +112,20 @@
   --violet-clair:     #A78BFA;
   --violet-pale:      #C4B5FD;
   --vert-pale:        #A7F3D0;
+
+  /* Calendrier (maquette Figma calendrier-familial) : une teinte par calendrier HA */
+  --cal-bleu:           #3B82F6;
+  --cal-vert:           #10B981;
+  --cal-rouge:          #EF4444;
+  --cal-ambre:          #F59E0B;
+  --cal-cyan:           #06B6D4;
+  --cal-sur-teinte:     #0A0F14;   /* texte posé sur une teinte pleine (badges de date) */
+  --cal-sarcelle:       linear-gradient(90deg, #0E3F3B, #072023);
+  --cal-nuit:           linear-gradient(90deg, #1A0D3B, #0D1230);
+  --cal-corail:         linear-gradient(90deg, #FF7A50, #FF4E64);
+  --cal-case-vide:      #151A1D;
+  --cal-case-vide-bord: #222A30;
+  --cal-segment-actif:  #1D2429;
 }
 
 /* Reset */

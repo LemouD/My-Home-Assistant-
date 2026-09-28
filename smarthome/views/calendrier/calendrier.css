@@ -1,0 +1,646 @@
+/* =============================================
+   CALENDRIER.CSS — Vue Calendrier familial
+   Maquette Figma « calendrier-familial » adaptée à la tablette :
+   textes à 14 px minimum, zones tactiles de 48 px, pas de flou, ombres ≤ 8 px.
+
+   Logique des couleurs :
+   - le FOND des cartes indique la nature du contenu :
+       sarcelle = planning (mois, semaine, membres), nuit = aujourd'hui, corail = choses à faire ;
+   - la COULEUR d'un événement indique son calendrier Home Assistant (config CALENDRIER) :
+       bleu, vert, rouge, ambre, cyan ; même couleur pour le point, le libellé, le liseré et le badge ;
+   - le BLEU seul signale aussi « aujourd'hui » (case encadrée, numéro sur pastille).
+   ============================================= */
+
+.vue-calendrier {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#page-content.cal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* === COULEURS PAR CALENDRIER ===
+   Chaque classe fixe --cal-teinte ; les composants s'en servent pour le point, le texte, le liseré ou le fond. */
+.cal-couleur-bleu  { --cal-teinte: var(--cal-bleu);  --cal-fond: rgba(59, 130, 246, 0.14); }
+.cal-couleur-vert  { --cal-teinte: var(--cal-vert);  --cal-fond: rgba(16, 185, 129, 0.14); }
+.cal-couleur-rouge { --cal-teinte: var(--cal-rouge); --cal-fond: rgba(239, 68, 68, 0.14); }
+.cal-couleur-ambre { --cal-teinte: var(--cal-ambre); --cal-fond: rgba(245, 158, 11, 0.14); }
+.cal-couleur-cyan  { --cal-teinte: var(--cal-cyan);  --cal-fond: rgba(6, 182, 212, 0.14); }
+
+/* === EN-TÊTE === */
+.cal-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.cal-titre {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.cal-sous-titre {
+  margin-top: 4px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.cal-commandes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cal-navigation,
+.cal-segments {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-verre);
+}
+
+.cal-periode {
+  min-width: 150px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cal-bouton-icone,
+.cal-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cal-bouton-icone { padding: 0; }
+.cal-bouton-icone:active,
+.cal-segment:active { background: var(--surface-verre-on); }
+
+.cal-segment.actif {
+  background: var(--cal-segment-actif);
+  color: var(--text-primary);
+}
+
+@media (hover: hover) {
+  .cal-bouton-icone:hover,
+  .cal-segment:hover { color: var(--text-primary); }
+}
+
+/* === GRILLE DE LA PAGE (paysage) === */
+.cal-ligne {
+  display: grid;
+  gap: var(--gap);
+  align-items: stretch;
+}
+.cal-ligne-haut { grid-template-columns: minmax(0, 1fr) minmax(300px, 0.34fr); }
+.cal-ligne-bas  { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* === CARTES === */
+.cal-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.cal-carte-sarcelle { background: var(--cal-sarcelle); box-shadow: 0 4px 8px rgba(14, 63, 59, 0.2); }
+.cal-carte-nuit     { background: var(--cal-nuit);     box-shadow: 0 4px 8px rgba(124, 58, 237, 0.13); }
+.cal-carte-corail   { background: var(--cal-corail);   box-shadow: 0 4px 8px rgba(255, 78, 100, 0.2); border: none; }
+
+.cal-carte-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cal-carte-titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.cal-titre-detail { color: var(--text-primary); }
+
+/* Sur le corail, le gris de la maquette était illisible : texte blanc */
+.cal-carte-corail .cal-carte-titre { color: var(--text-primary); }
+
+.cal-aide {
+  margin-top: -6px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+.cal-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* === LÉGENDE === */
+.cal-legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  list-style: none;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.cal-legende li { display: flex; align-items: center; gap: 6px; }
+
+.cal-point {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--cal-teinte);
+}
+
+/* === GRILLE DU MOIS === */
+.cal-mois-carte { gap: 10px; }
+
+.cal-jours-semaine,
+.cal-grille {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cal-jours-semaine span {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.cal-grille {
+  flex: 1;
+  grid-auto-rows: minmax(64px, 1fr);
+}
+
+.cal-case {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-verre);
+  overflow: hidden;
+}
+
+.cal-numero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Aujourd'hui : case encadrée en bleu, numéro sur pastille bleue */
+.cal-case-aujourdhui {
+  border: 2px solid var(--cal-bleu);
+  background: rgba(59, 130, 246, 0.11);
+}
+.cal-case-aujourdhui .cal-numero {
+  background: var(--cal-bleu);
+  color: var(--text-primary);
+}
+
+/* Jours des mois voisins : présents pour garder la grille, mais effacés */
+.cal-case-hors-mois {
+  border-color: var(--cal-case-vide-bord);
+  background: var(--cal-case-vide);
+  opacity: 0.35;
+}
+
+/* Un seul événement : en toutes lettres ; plusieurs : une rangée de points */
+.cal-evenement {
+  width: 100%;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--cal-fond);
+  color: var(--cal-teinte);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cal-points {
+  display: flex;
+  gap: 4px;
+  padding-left: 6px;
+}
+
+/* === MEMBRES === */
+.cal-membres { display: flex; flex-direction: column; gap: 4px; }
+
+.cal-membre {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch-min);
+  padding: 4px 8px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cal-membre:active { background: var(--surface-verre-on); }
+
+.cal-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--cal-teinte);
+  border-radius: 50%;
+  background: var(--cal-fond);
+  color: var(--cal-teinte);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.cal-membre-texte {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+.cal-membre-texte b    { font-size: var(--fs-sm); font-weight: 600; }
+.cal-membre-texte span { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+/* Interrupteur dessiné en CSS (état porté par aria-pressed du bouton) */
+.cal-interrupteur {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--cal-bleu);
+  transition: var(--transition);
+}
+.cal-interrupteur::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 19px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-primary);
+}
+.cal-membre[aria-pressed="false"] .cal-interrupteur { background: var(--cal-case-vide-bord); }
+.cal-membre[aria-pressed="false"] .cal-interrupteur::after { left: 3px; }
+.cal-membre[aria-pressed="false"] .cal-membre-texte,
+.cal-membre[aria-pressed="false"] .cal-avatar { opacity: 0.5; }
+
+/* === AUJOURD'HUI (liseré = couleur du calendrier) === */
+.cal-horaire {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 6px 12px;
+  border-left: 4px solid var(--cal-teinte);
+  border-radius: 8px;
+  background: var(--surface-verre);
+}
+
+.cal-heure {
+  width: 52px;
+  flex-shrink: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-horaire-texte {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+.cal-horaire-texte b,
+.cal-horaire-texte span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-horaire-texte b    { font-size: var(--fs-sm); font-weight: 600; }
+.cal-horaire-texte span { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+/* === CETTE SEMAINE (badge de date = couleur du calendrier) === */
+.cal-a-venir {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-verre);
+}
+
+.cal-date {
+  flex-shrink: 0;
+  width: 72px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--cal-teinte);
+  color: var(--cal-sur-teinte);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* === RAPPELS ET TÂCHES (sur corail : tout en blanc) === */
+.cal-tache {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch-min);
+  padding: 4px 8px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cal-tache:active { background: rgba(0, 0, 0, 0.22); }
+.cal-tache .cal-horaire-texte span { color: rgba(255, 255, 255, 0.85); }
+
+.cal-case-a-cocher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 6px;
+  background: var(--cal-segment-actif);
+}
+.cal-tache[aria-checked="true"] .cal-case-a-cocher {
+  border-color: var(--cal-bleu);
+  background: var(--cal-bleu);
+}
+.cal-tache[aria-checked="true"] .cal-horaire-texte b {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* Échéance proche : pastille sombre plutôt que texte rouge, illisible sur le corail */
+.cal-tache-urgente .cal-horaire-texte span {
+  align-self: flex-start;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* === ÉVÉNEMENT RÉPÉTITIF : marque ↻ devant le titre === */
+.cal-recurrent {
+  margin-right: 4px;
+  font-weight: 700;
+}
+
+/* === BOUTONS === */
+.cal-bouton,
+.cal-bouton-principal {
+  min-height: var(--touch-min);
+  padding: 0 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-verre);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cal-bouton-principal {
+  border-color: transparent;
+  background: var(--cal-bleu);
+}
+.cal-bouton:active { background: var(--surface-verre-on); }
+.cal-bouton-principal:active { opacity: 0.85; }
+
+/* === FORMULAIRE D'AJOUT : fenêtre posée sur la vue === */
+.vue-calendrier { position: relative; }
+
+.cal-voile {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gap-lg);
+  background: rgba(7, 10, 14, 0.8);
+}
+
+.cal-formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(100%, 640px);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.cal-formulaire-titre { font-size: var(--fs-lg); font-weight: 700; }
+
+.cal-champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  border: none;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.cal-champ legend { margin-bottom: 6px; }
+
+.cal-champ input[type="text"],
+.cal-champ input[type="date"],
+.cal-champ input[type="time"] {
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  color-scheme: dark;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.cal-champ input:focus { outline: none; border-color: var(--border-active); }
+
+.cal-champs-ligne {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Choix du calendrier : pastilles de couleur, la case radio reste accessible mais invisible */
+.cal-choix-calendrier,
+.cal-jours-choix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cal-choix-calendrier label,
+.cal-repetition label,
+.cal-jours-choix label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-verre);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cal-choix-calendrier input,
+.cal-repetition input,
+.cal-jours-choix input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cal-choix-calendrier label:has(input:checked) {
+  border-color: var(--cal-teinte);
+  background: var(--cal-fond);
+}
+.cal-repetition label:has(input:checked),
+.cal-jours-choix label:has(input:checked) {
+  border-color: var(--cal-bleu);
+  background: rgba(59, 130, 246, 0.18);
+}
+.cal-choix-calendrier label:has(input:focus-visible),
+.cal-repetition label:has(input:focus-visible),
+.cal-jours-choix label:has(input:focus-visible) { outline: 2px solid var(--border-active); }
+
+/* Répétition : segments pleine largeur */
+.cal-repetition {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.cal-repetition label { border: none; background: none; }
+
+.cal-jours-choix label { width: var(--touch-min); padding: 0; }
+
+.cal-repetition-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.cal-case-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch-min);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.cal-case-option input { width: 22px; height: 22px; accent-color: var(--cal-bleu); }
+
+.cal-message {
+  min-height: 1.4em;
+  font-size: var(--fs-xs);
+  color: var(--cal-ambre);
+}
+
+.cal-formulaire-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* « Toute la journée » : les heures n'ont plus de sens */
+.cal-formulaire:has(input[name="journee"]:checked) .cal-champ-heure { opacity: 0.4; pointer-events: none; }
+
+.vue-calendrier [hidden] { display: none !important; }
+
+/* Fonction pas encore disponible (vue Semaine en v2) */
+.cal-segment:disabled { opacity: 0.4; cursor: default; }
+
+/* Ajustements du formulaire (tablette 1280 × 800) :
+   fenêtre plus large pour les 4 choix de répétition, jours sur une ligne, date de fin en dessous */
+.cal-formulaire { width: min(100%, 760px); gap: 12px; padding: 20px 24px; }
+.cal-repetition label { padding: 0 8px; white-space: nowrap; }
+.cal-repetition-details { grid-template-columns: minmax(0, 1fr); }
+.cal-jours-choix { flex-wrap: nowrap; }
+.cal-champs-ligne { grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 1fr)) auto; align-items: end; }
+.cal-champs-ligne .cal-case-option { white-space: nowrap; }

@@ -80,6 +80,28 @@ export async function definirNombre(hass, entityId, valeur) {
   await hass.callService('input_number', 'set_value', { entity_id: entityId, value: valeur });
 }
 
+// ---- CALENDRIER ET TÂCHES ----
+// Lecture par l'API REST de HA (session du panneau, aucun token côté client).
+// Création par le WebSocket du calendrier local : c'est le seul qui accepte une règle
+// de répétition (le service calendar.create_event ne la prend pas).
+
+export const calendrierEvenements = (hass, entityId, debut, fin) =>
+  hass.callApi('GET', `calendars/${encodeURIComponent(entityId)}?start=${encodeURIComponent(debut.toISOString())}&end=${encodeURIComponent(fin.toISOString())}`);
+
+export const calendrierCreer = (hass, entityId, evenement) =>
+  hass.callWS({ type: 'calendar/event/create', entity_id: entityId, event: evenement });
+
+export const tachesLire = (hass, entityId) =>
+  hass.callWS({ type: 'todo/item/list', entity_id: entityId });
+
+export async function tacheStatut(hass, entityId, uid, terminee) {
+  await hass.callService('todo', 'update_item', {
+    entity_id: entityId,
+    item: uid,
+    status: terminee ? 'completed' : 'needs_action',
+  });
+}
+
 // ---- VIE : scénarios, lumières, appareils, caméras ----
 
 // Service appelé par un bouton « Activer / Lancer » selon le type d'entité

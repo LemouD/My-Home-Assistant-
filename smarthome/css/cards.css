@@ -530,6 +530,8 @@
 .cal-ambre  { background: var(--accent-ambre); }
 .cal-orange { background: var(--accent-orange-fonce); }
 .cal-vert   { background: var(--accent-emeraude); }
+.cal-rouge  { background: var(--cal-rouge); }
+.cal-cyan   { background: var(--cal-cyan); }
 
 .cal-empty { text-align: center; padding: 24px 0; color: var(--text-muted); font-size: var(--fs-xs); }
 
