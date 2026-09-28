@@ -25,7 +25,8 @@
         "title": "Maison settings",
         "menu_options": {
           "code": "Change budget code",
-          "menu": "Menu generator"
+          "menu": "Menu generator",
+          "courses": "Stores"
         }
       },
       "code": {
@@ -49,6 +50,13 @@
         },
         "data_description": {
           "meteo": "Home Assistant weather entity: daily juice advice, no external call."
+        }
+      },
+      "courses": {
+        "title": "Stores",
+        "description": "Names of the stores where the family shops, 12 at most. \"Other\" is always offered and excluded from the comparison.",
+        "data": {
+          "magasins": "Stores (one per line)"
         }
       }
     },

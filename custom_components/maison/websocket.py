@@ -17,13 +17,14 @@ from .coffre import Coffre, CodeRefuse
 from .const import DOMAIN
 from .resume import resume_courses
 from .schema import valider_budget
+from .websocket_courses import COMMANDES_COURSES
 from .websocket_menu import COMMANDES_MENU
 
 JETON = vol.All(str, vol.Length(max=128))
 
 
 def async_enregistrer_commandes(hass: HomeAssistant) -> None:
-    for commande in (ws_etat, ws_deverrouiller, ws_lire, ws_resume, ws_enregistrer, ws_verrouiller, *COMMANDES_MENU):
+    for commande in (ws_etat, ws_deverrouiller, ws_lire, ws_resume, ws_enregistrer, ws_verrouiller, *COMMANDES_MENU, *COMMANDES_COURSES):
         websocket_api.async_register_command(hass, commande)
 
 
