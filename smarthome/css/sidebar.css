@@ -100,6 +100,7 @@
 .nav-icon-budget         { --icone: url(../assets/icons/accueil/nav-budget.svg); }
 .nav-icon-energie        { --icone: url(../assets/icons/accueil/nav-energie.svg); }
 .nav-icon-calendrier     { --icone: url(../assets/icons/accueil/nav-calendrier.svg); }
+.nav-icon-menu           { --icone: url(../assets/icons/menu/couverts.svg); }
 .nav-icon-courses        { --icone: url(../assets/icons/accueil/nav-courses.svg); }
 .nav-icon-configurations { --icone: url(../assets/icons/accueil/nav-configurations.svg); }
 

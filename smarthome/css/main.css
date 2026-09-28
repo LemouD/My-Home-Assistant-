@@ -112,6 +112,14 @@
   --violet-clair:     #A78BFA;
   --violet-pale:      #C4B5FD;
   --vert-pale:        #A7F3D0;
+
+  /* Menu (maquettes Figma « Mon Menu ») : violet = générateur et actions */
+  --menu-violet:        #6D63FF;
+  --menu-violet-clair:  #827AFF;
+  --menu-carte:         #141821;
+  --menu-surface:       #202632;
+  --menu-bord:          #292F3B;
+  --menu-vedette-degrade: linear-gradient(115deg, #3A2710 0%, #1B1710 45%, #141821 100%);   /* remplace la photo en v1 */
 }
 
 /* Reset */

@@ -7,6 +7,7 @@
 import '../smarthome-panel.js';
 import config from '../js/config.js';
 import budgetExemple from './budget-exemple.js';
+import { creerMenuSimule } from './mock-menu.js';
 
 const LATENCE_MS = 300;
 
@@ -107,6 +108,10 @@ const budget = {
 };
 
 const erreurWS = (code, message) => Object.assign(new Error(message), { code });
+
+// ---- Menu simulé (dev/mock-menu.js) et liste de courses todo.courses fictive ----
+const articlesCourses = [];
+const menuSimule = creerMenuSimule({ erreur: erreurWS, courses: articlesCourses });
 const attenteBudget = () => Math.max(0, Math.ceil((budget.bloqueJusqua - Date.now()) / 1000));
 const verifierJeton = (jeton) => {
   if (!budget.jetons.has(jeton)) throw erreurWS('session_invalide', 'Session invalide');
@@ -158,6 +163,9 @@ function statistiquesSimulees({ statistic_ids: ids, start_time: debut, end_time:
 async function callWS(message) {
   await new Promise((r) => setTimeout(r, LATENCE_MS));
   switch (message.type) {
+    case 'todo/item/list':
+      if (message.entity_id !== 'todo.courses') throw erreurWS('not_found', message.entity_id);
+      return { items: articlesCourses.map(({ uid, summary, status, description }) => ({ uid, summary, status, description })) };
     case 'recorder/statistics_during_period':
       return statistiquesSimulees(message);
     case 'maison/budget/etat':
@@ -198,6 +206,7 @@ async function callWS(message) {
       budget.jetons.delete(message.jeton);
       return {};
     default:
+      if (message.type.startsWith('maison/menu/')) return menuSimule.commande(message);
       throw erreurWS('unknown_command', message.type);
   }
 }
@@ -238,6 +247,8 @@ window.mock = {
   },
   budget,                                            // mock.budget.donnees, mock.budget.jetons…
   expirerSessions: () => budget.jetons.clear(),      // simule l'expiration côté serveur
+  menu: menuSimule,                                  // mock.menu.etat.indisponible = true, mock.menu.vider()
+  courses: articlesCourses,
 };
 
 // Taille d'écran en pixels CSS : ouvrir /dev/ sur la vraie tablette pour relever sa taille de référence

@@ -120,6 +120,18 @@ Les invocations (arabe, translittération, traduction, source) sont dans
 `views/vie/contenus.js`. Le calendrier hégirien est calculé par le navigateur
 (Umm al-Qura) ; les dates peuvent différer d'un jour de l'observation locale.
 
+## Menu
+
+Menus de la semaine générés par un worker externe (IA), appelé **uniquement par l'intégration `maison`** :
+la tablette ne contacte jamais le générateur. Quota de générations par jour, filtre halal et allergies
+côté serveur, recettes validées avant d'être enregistrées.
+
+- Réglages (compte administrateur) : Maison → Configurer → **Générateur de menu** : URL https du worker,
+  secret (jamais réaffiché), repas proposés, quota par jour, liste de courses (`todo.*`).
+- « Ajouter aux courses » : les ingrédients sont écrits par le serveur dans la liste de courses,
+  avec les doublons additionnés. Format des articles : `qte=…;unite=…;rayon=…;source=menu|manuel`.
+- Les recettes sont générées automatiquement : la vue affiche toujours « à vérifier (cuisson, allergènes) ».
+
 ## Sécurité
 
 - Tout ce qui est dans `/config/www` est servi en `/local/` **sans authentification** :

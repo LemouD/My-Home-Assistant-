@@ -1,0 +1,272 @@
+<div id="page-content" class="menu">
+
+  <!--
+    Maquettes Figma « Mon Menu » (118:1152), « Générer le menu » (168:2725), « Menu » (173:221),
+    adaptées au contrat serveur (maison/menu/*) et à la tablette. Trois sous-pages : semaine, generer, recette.
+    Contenu rempli par menu.js à partir de maison/menu/*. Pas de photo en v1 : les fonds sont des dégradés.
+
+    Logique des couleurs :
+    - violet  = le générateur et les actions (générer, remplacer, ajouter aux courses) ;
+    - ambre   = la cuisine (type de plat, repas, conseils, avertissement « à vérifier ») ;
+    - rose    = un plat retiré (non conforme) ou une erreur ;
+    - neutre  = le contenu (cartes, listes).
+  -->
+
+  <!-- =====================================================
+       SOUS-PAGE 1 : MENU DE LA SEMAINE
+       ===================================================== -->
+  <section class="menu-page" data-sous-page="semaine">
+
+    <div class="menu-entete">
+      <div>
+        <h1 class="menu-titre">Menu de la semaine</h1>
+        <p class="menu-sous-titre" id="menu-periode"></p>
+      </div>
+      <div class="menu-commandes">
+        <span class="menu-puce"><img src="../../assets/icons/menu/personnes.svg" width="16" height="16" alt=""><span id="menu-personnes"></span></span>
+        <button class="menu-bouton-principal" data-action="aller-generer">
+          <img src="../../assets/icons/menu/etincelles.svg" width="16" height="16" alt="">
+          Générer un menu
+        </button>
+      </div>
+    </div>
+
+    <!-- ÉTATS DU GÉNÉRATEUR : un seul visible à la fois (le JS choisit) -->
+    <div class="menu-etat menu-etat-encours" id="menu-etat-encours" role="status" hidden>
+      <span class="menu-etat-icone"><img src="../../assets/icons/menu/etincelles.svg" width="16" height="16" alt=""></span>
+      <span class="menu-etat-texte"><b>Génération en cours…</b><span>Cela peut prendre jusqu'à 5 minutes. Vous pouvez quitter cette page, le menu s'affichera ici.</span></span>
+    </div>
+    <div class="menu-etat menu-etat-attention" id="menu-etat-quota" role="status" hidden>
+      <span class="menu-etat-texte"><b>Plus de génération disponible aujourd'hui</b><span>Le quota se renouvelle demain. Le menu actuel reste utilisable.</span></span>
+    </div>
+    <div class="menu-etat menu-etat-erreur" id="menu-etat-indispo" role="alert" hidden>
+      <span class="menu-etat-texte"><b id="menu-erreur-titre">Générateur indisponible</b><span id="menu-erreur-texte">Réessayez dans quelques minutes.</span></span>
+      <button class="menu-bouton" data-action="reessayer">Réessayer</button>
+    </div>
+
+    <!-- AUCUN MENU : état vide -->
+    <div class="menu-vide" id="menu-vide" hidden>
+      <img src="../../assets/icons/menu/couverts.svg" width="19" height="19" alt="">
+      <h2>Pas encore de menu</h2>
+      <p>Choisissez les jours, les repas et vos préférences : le menu et sa liste de courses sont prêts en quelques minutes.</p>
+      <button class="menu-bouton-principal" data-action="aller-generer">Générer un menu</button>
+    </div>
+
+    <div class="menu-contenu" id="menu-contenu" hidden>
+
+      <!-- LIGNE 1 : ce soir (recette mise en avant) + résumé de la semaine -->
+      <div class="menu-ligne-haut">
+
+        <article class="menu-vedette">
+          <span class="menu-badge-ambre"><img src="../../assets/icons/menu/toque.svg" width="14" height="14" alt=""><span id="menu-vedette-moment"></span></span>
+          <div class="menu-vedette-texte">
+            <p class="menu-surtitre" id="menu-vedette-tags"></p>
+            <h2 class="menu-vedette-nom" id="menu-vedette-nom"></h2>
+            <div class="menu-caracteristiques">
+              <span class="menu-caracteristique"><img src="../../assets/icons/menu/horloge.svg" width="14" height="14" alt=""><span id="menu-vedette-duree"></span></span>
+              <span class="menu-caracteristique"><img src="../../assets/icons/menu/personnes-clair.svg" width="14" height="14" alt=""><span id="menu-vedette-portions"></span></span>
+            </div>
+          </div>
+          <div class="menu-vedette-actions">
+            <button class="menu-bouton-principal" data-action="ouvrir-recette" id="menu-vedette-ouvrir">Voir la recette</button>
+          </div>
+        </article>
+
+        <aside class="menu-carte menu-resume">
+          <h2 class="menu-carte-titre">Cette semaine</h2>
+          <dl class="menu-resume-liste">
+            <div><dt>Repas prévus</dt><dd id="menu-resume-repas"></dd></div>
+            <div><dt>Ingrédients</dt><dd id="menu-resume-ingredients"></dd></div>
+            <div><dt>Générations restantes</dt><dd id="menu-quota"></dd></div>
+          </dl>
+          <button class="menu-bouton-principal menu-bouton-large" data-action="vers-courses">
+            <img src="../../assets/icons/menu/plus.svg" width="17" height="17" alt="">
+            Tout ajouter aux courses
+          </button>
+        </aside>
+
+      </div>
+
+      <!-- LIGNE 2 : la semaine. Une ligne par jour, une colonne par repas activé (1 à 4). -->
+      <section class="menu-carte menu-semaine">
+        <div class="menu-grille-entete" id="menu-entetes-repas">
+          <span></span>
+        </div>
+
+        <div class="menu-grille" id="menu-grille"></div>
+      </section>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       SOUS-PAGE 2 : GÉNÉRER LE MENU (listes fermées uniquement)
+       ===================================================== -->
+  <section class="menu-page" data-sous-page="generer" hidden>
+
+    <button class="menu-retour" data-action="retour-semaine">← Menu de la semaine</button>
+    <div class="menu-entete">
+      <div>
+        <h1 class="menu-titre">Générer le menu</h1>
+        <p class="menu-sous-titre">Composez une semaine qui ressemble à votre foyer.</p>
+      </div>
+    </div>
+
+    <form class="menu-generer" id="menu-formulaire" novalidate>
+
+      <div class="menu-generer-champs">
+
+        <fieldset class="menu-carte menu-bloc">
+          <legend class="menu-bloc-titre"><span class="menu-numero">01</span>Nombre de jours, à partir d'aujourd'hui</legend>
+          <div class="menu-choix">
+            <label><input type="radio" name="jours" value="1"><span>1</span></label>
+            <label><input type="radio" name="jours" value="2"><span>2</span></label>
+            <label><input type="radio" name="jours" value="3"><span>3</span></label>
+            <label><input type="radio" name="jours" value="4"><span>4</span></label>
+            <label><input type="radio" name="jours" value="5"><span>5</span></label>
+            <label><input type="radio" name="jours" value="6"><span>6</span></label>
+            <label><input type="radio" name="jours" value="7" checked><span>7</span></label>
+          </div>
+        </fieldset>
+
+        <!-- Seuls les repas activés dans les options de l'intégration sont affichés -->
+        <fieldset class="menu-carte menu-bloc">
+          <legend class="menu-bloc-titre"><span class="menu-numero">02</span>Repas</legend>
+          <div class="menu-choix" id="menu-choix-repas"></div>
+        </fieldset>
+
+        <fieldset class="menu-carte menu-bloc">
+          <legend class="menu-bloc-titre"><span class="menu-numero">03</span>Personnes</legend>
+          <div class="menu-pas">
+            <button type="button" class="menu-bouton-pas" data-action="personnes-moins" aria-label="Une personne de moins">−</button>
+            <input type="number" name="personnes" inputmode="numeric" min="1" max="12" step="1" value="4" aria-label="Nombre de personnes">
+            <button type="button" class="menu-bouton-pas" data-action="personnes-plus" aria-label="Une personne de plus">+</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="menu-carte menu-bloc">
+          <legend class="menu-bloc-titre"><span class="menu-numero">04</span>Préférences</legend>
+          <div class="menu-choix">
+            <label><input type="checkbox" name="preference" value="rapide" checked><span>Rapide</span></label>
+            <label><input type="checkbox" name="preference" value="economique"><span>Économique</span></label>
+            <label><input type="checkbox" name="preference" value="vegetarien"><span>Végétarien</span></label>
+            <label><input type="checkbox" name="preference" value="poisson"><span>Poisson</span></label>
+            <label><input type="checkbox" name="preference" value="leger"><span>Léger</span></label>
+            <label><input type="checkbox" name="preference" value="enfants" checked><span>Enfants</span></label>
+          </div>
+        </fieldset>
+
+        <!-- Allergies : pastilles ambre quand elles sont cochées (ce qu'il faut éviter) -->
+        <fieldset class="menu-carte menu-bloc menu-bloc-large">
+          <legend class="menu-bloc-titre"><span class="menu-numero">05</span>Allergies à exclure</legend>
+          <div class="menu-choix menu-choix-allergies">
+            <label><input type="checkbox" name="allergie" value="gluten"><span>Gluten</span></label>
+            <label><input type="checkbox" name="allergie" value="lactose"><span>Lactose</span></label>
+            <label><input type="checkbox" name="allergie" value="arachide" checked><span>Arachide</span></label>
+            <label><input type="checkbox" name="allergie" value="fruits-a-coque"><span>Fruits à coque</span></label>
+            <label><input type="checkbox" name="allergie" value="oeuf"><span>Œuf</span></label>
+            <label><input type="checkbox" name="allergie" value="poisson"><span>Poisson</span></label>
+            <label><input type="checkbox" name="allergie" value="crustaces"><span>Crustacés</span></label>
+            <label><input type="checkbox" name="allergie" value="soja"><span>Soja</span></label>
+            <label><input type="checkbox" name="allergie" value="sesame"><span>Sésame</span></label>
+          </div>
+        </fieldset>
+
+        <label class="menu-carte menu-bloc menu-bloc-large">
+          <span class="menu-bloc-titre"><span class="menu-numero">06</span>Une envie ? (facultatif)</span>
+          <textarea name="note" maxlength="200" rows="2" placeholder="Ex. : un plat sénégalais, moins de viande en semaine"></textarea>
+          <span class="menu-compteur" id="menu-note-compteur">0 / 200</span>
+        </label>
+
+      </div>
+
+      <!-- RÉSUMÉ ET ACTION -->
+      <aside class="menu-carte menu-resume menu-generer-resume">
+        <h2 class="menu-carte-titre">Résumé</h2>
+        <dl class="menu-resume-liste">
+          <div><dt>Jours</dt><dd id="menu-resume-jours"></dd></div>
+          <div><dt>Repas</dt><dd id="menu-resume-types"></dd></div>
+          <div><dt>Personnes</dt><dd id="menu-resume-personnes"></dd></div>
+          <div><dt>À exclure</dt><dd id="menu-resume-allergies"></dd></div>
+        </dl>
+        <div class="menu-quota" id="menu-quota-generer">
+          <span>Générations restantes aujourd'hui</span>
+          <b></b>
+        </div>
+        <button type="submit" class="menu-bouton-principal menu-bouton-large">
+          <img src="../../assets/icons/menu/etincelles.svg" width="16" height="16" alt="">
+          Générer mon menu
+        </button>
+        <p class="menu-aide">La génération peut prendre jusqu'à 5 minutes. Chaque plat pourra être remplacé ensuite.</p>
+        <p class="menu-message" id="menu-formulaire-message" role="status"></p>
+      </aside>
+
+    </form>
+  </section>
+
+  <!-- =====================================================
+       SOUS-PAGE 3 : RECETTE
+       ===================================================== -->
+  <section class="menu-page" data-sous-page="recette" hidden>
+
+    <button class="menu-retour" data-action="retour-semaine">← Menu de la semaine</button>
+
+    <article class="menu-vedette menu-vedette-recette">
+      <span class="menu-badge-ambre"><img src="../../assets/icons/menu/toque.svg" width="14" height="14" alt=""><span id="recette-contexte"></span></span>
+      <div class="menu-vedette-texte">
+        <p class="menu-surtitre" id="recette-tags"></p>
+        <h1 class="menu-vedette-nom" id="recette-nom"></h1>
+        <div class="menu-caracteristiques">
+          <span class="menu-caracteristique"><img src="../../assets/icons/menu/horloge.svg" width="14" height="14" alt=""><span id="recette-duree"></span></span>
+          <span class="menu-caracteristique"><img src="../../assets/icons/menu/personnes-clair.svg" width="14" height="14" alt=""><span id="recette-portions"></span></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- Toujours affiché : la recette vient d'un générateur -->
+    <p class="menu-avertissement" id="recette-mention">
+      <img src="../../assets/icons/menu/ampoule.svg" width="17" height="17" alt="">
+      Recette générée automatiquement, à vérifier (cuisson, allergènes).
+    </p>
+
+    <div class="menu-recette-detail">
+
+      <section class="menu-carte">
+        <div class="menu-carte-entete">
+          <h2 class="menu-section-titre">
+            <span class="menu-section-icone menu-section-icone-ambre"><img src="../../assets/icons/menu/panier.svg" width="19" height="19" alt=""></span>
+            Ingrédients
+          </h2>
+          <span class="menu-puce-violette" id="recette-nb-ingredients"></span>
+        </div>
+        <ul class="menu-ingredients" id="recette-ingredients"></ul>
+      </section>
+
+      <section class="menu-carte">
+        <div class="menu-carte-entete">
+          <h2 class="menu-section-titre">
+            <span class="menu-section-icone menu-section-icone-violette"><img src="../../assets/icons/menu/couverts.svg" width="19" height="19" alt=""></span>
+            Préparation
+          </h2>
+          <span class="menu-aide" id="recette-nb-etapes"></span>
+        </div>
+        <ol class="menu-etapes" id="recette-etapes"></ol>
+      </section>
+
+    </div>
+
+    <!-- ACTIONS : courses (principal), vidéo (lien de recherche construit par le panneau), remplacer -->
+    <div class="menu-carte menu-barre-actions">
+      <span class="menu-section-icone menu-section-icone-ambre"><img src="../../assets/icons/menu/panier.svg" width="19" height="19" alt=""></span>
+      <span class="menu-barre-texte"><b>Prêt à cuisiner ?</b><span id="recette-resume-courses"></span></span>
+      <button class="menu-bouton" data-action="remplacer" id="recette-remplacer">Remplacer ce plat <span class="menu-quota-mini" id="recette-quota"></span></button>
+      <a class="menu-bouton" id="recette-youtube" target="_blank" rel="noopener noreferrer">Voir sur YouTube</a>
+      <button class="menu-bouton-principal" data-action="recette-vers-courses">
+        <img src="../../assets/icons/menu/plus.svg" width="17" height="17" alt="">
+        Ajouter aux courses
+      </button>
+    </div>
+
+  </section>
+
+</div>

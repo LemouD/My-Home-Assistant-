@@ -22,18 +22,48 @@
   "options": {
     "step": {
       "init": {
+        "title": "Maison settings",
+        "menu_options": {
+          "code": "Change budget code",
+          "menu": "Menu generator"
+        }
+      },
+      "code": {
         "title": "Change budget code",
         "description": "Sessions opened with the previous code will be closed.",
         "data": {
           "code": "New code (6 digits)",
           "confirmation": "Confirm new code"
         }
+      },
+      "menu": {
+        "title": "Menu generator",
+        "description": "Generation worker (\"ha\" mode). The secret is never shown again: leave empty to keep the current one.",
+        "data": {
+          "url": "Worker URL (https)",
+          "secret": "Shared secret (X-App-Secret)",
+          "repas": "Meals offered",
+          "quota": "Generations per day",
+          "todo": "Shopping list"
+        }
       }
     },
     "error": {
       "code_invalide": "The code must be exactly 6 digits.",
       "code_faible": "Code too easy to guess (sequence, repeated digit or pattern).",
-      "codes_differents": "The two codes do not match."
+      "codes_differents": "The two codes do not match.",
+      "url_invalide": "Full https URL expected, without credentials.",
+      "secret_requis": "The worker secret is required."
+    }
+  },
+  "selector": {
+    "repas": {
+      "options": {
+        "petit_dej": "Breakfast",
+        "jus": "Juice / smoothie",
+        "dejeuner": "Lunch",
+        "diner": "Dinner"
+      }
     }
   }
 }
