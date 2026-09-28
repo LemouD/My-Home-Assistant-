@@ -153,6 +153,24 @@ côté serveur, recettes validées avant d'être enregistrées.
   (stockées dans `/config/maison/photos`, jamais dans `/config/www`), servies par une adresse signée.
   Il faut la clé `PEXELS_API_KEY` dans les secrets du worker ; sans elle, un dégradé remplace la photo.
 
+## Liste de courses
+
+Liste partagée : une entité `todo.*` (intégration **Liste de tâches locale**), déclarée dans `config.js`
+(section `COURSES`). C'est la même que celle choisie dans les options du générateur de menu, et elle
+apparaît aussi dans l'application HA du téléphone, pratique au magasin.
+
+- Articles au format commun avec le Menu (`qte=…;unite=…;rayon=…;source=menu|manuel`) : un article saisi
+  à la main et le même ingrédient envoyé par le Menu s'additionnent. Un article ajouté depuis
+  l'application HA, sans ce format, s'affiche tel quel dans « Autre ».
+- « Retirer du panier » et « Ajouter les ingrédients » du menu demandent un second appui.
+- **Imprimer / PDF** : imprime les articles à acheter par rayon ; la fenêtre d'impression de la tablette
+  propose « Enregistrer en PDF » (en mode kiosque, l'impression doit y être autorisée).
+- **Terminer les courses** : magasin, date, total (facultatif) et prix des articles cochés, pré-remplis par
+  le dernier prix connu dans ce magasin. Magasins à saisir dans Maison → Configurer → Magasins.
+- **Comparateur** : le magasin le moins cher sur votre panier habituel (articles achetés au moins 2 fois
+  en 90 jours), comparé au prix au kilo, au litre ou à la pièce. **Dernières courses** : sans montant ;
+  les totaux ne se lisent qu'avec le code du Budget.
+
 ## Sécurité
 
 - Tout ce qui est dans `/config/www` est servi en `/local/` **sans authentification** :

@@ -166,3 +166,39 @@ export const menuVersCourses = (hass, recettes) =>
 export const jusCatalogue = (hass) => hass.callWS({ type: 'maison/jus/catalogue' });
 
 export const jusRegenerer = (hass) => hass.callWS({ type: 'maison/jus/regenerer' });
+
+// ---- LISTE DE COURSES ----
+// Entité todo.* de la config (la même que celle des options du générateur de menu).
+// Lecture : tachesLire ; cocher : tacheStatut.
+
+export async function coursesAjouter(hass, entityId, titre, description) {
+  await hass.callService('todo', 'add_item', { entity_id: entityId, item: titre, description });
+}
+
+export async function coursesModifier(hass, entityId, uid, titre, description) {
+  await hass.callService('todo', 'update_item', { entity_id: entityId, item: uid, rename: titre, description });
+}
+
+export async function coursesRetirerCoches(hass, entityId) {
+  await hass.callService('todo', 'remove_completed_items', { entity_id: entityId });
+}
+
+// ---- DERNIÈRES COURSES ET COMPARATEUR (intégration « maison ») ----
+// Les prix et le comparateur se lisent sans code ; le total d'un passage n'est renvoyé
+// par historique qu'avec un jeton Budget valide (sinon la clé « total » est absente).
+
+export const coursesMagasins = (hass) => hass.callWS({ type: 'maison/courses/magasins' });
+
+export const coursesAjouterPassage = (hass, passage) =>
+  hass.callWS({ type: 'maison/courses/passage/ajouter', passage });
+
+export const coursesHistorique = (hass, limite = 10, jeton = null) =>
+  hass.callWS({ type: 'maison/courses/historique', limite, ...(jeton ? { jeton } : {}) });
+
+export const coursesPrix = (hass, magasin, noms) => hass.callWS({ type: 'maison/courses/prix', magasin, noms });
+
+export const coursesComparer = (hass) => hass.callWS({ type: 'maison/courses/comparer' });
+
+export async function coursesRetirerArticles(hass, entityId, uids) {
+  await hass.callService('todo', 'remove_item', { entity_id: entityId, item: uids });
+}

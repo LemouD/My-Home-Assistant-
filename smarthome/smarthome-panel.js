@@ -21,7 +21,7 @@ const VUES = {
   energie:    { titre: 'Énergie & Fluides', charger: () => import('./views/energie/energie.js') },
   calendrier: { titre: 'Calendrier famille', charger: () => import('./views/calendrier/calendrier.js') },
   menu:       { titre: 'Menu', charger: () => import('./views/menu/menu.js') },
-  courses:    { titre: 'Liste de courses' },
+  courses:    { titre: 'Liste de courses', charger: () => import('./views/courses/courses.js') },
 };
 const VUE_A_VENIR = () => import('./views/a-venir/a-venir.js');
 

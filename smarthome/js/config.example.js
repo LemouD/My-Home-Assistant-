@@ -152,4 +152,10 @@ export default {
       { personne: 'person.enfant_2', couleur: 'cyan', calendriers: ['calendar.activites'] },
     ],
   },
+
+  // Liste de courses : entité todo.* (intégration « Liste de tâches locale »), la même que celle
+  // choisie dans les options du générateur de menu (Maison → Configurer → Générateur de menu).
+  COURSES: {
+    liste: 'todo.courses',
+  },
 };
