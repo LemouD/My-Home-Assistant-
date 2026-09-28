@@ -134,6 +134,14 @@
   --menu-surface:       #202632;
   --menu-bord:          #292F3B;
   --menu-vedette-degrade: linear-gradient(115deg, #3A2710 0%, #1B1710 45%, #141821 100%);   /* remplace la photo en v1 */
+
+  /* Jus du jour : une couleur par objectif */
+  --jus-fraicheur:   #06B6D4;
+  --jus-vitalite:    #F59E0B;
+  --jus-immunite:    #10B981;
+  --jus-antioxydant: #C026D3;
+  --jus-digestif:    #84CC16;
+  --jus-sur-teinte:  #0A0F14;   /* texte posé sur une teinte pleine (badges) */
 }
 
 /* Reset */

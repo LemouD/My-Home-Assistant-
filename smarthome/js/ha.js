@@ -161,3 +161,8 @@ export const menuRemplacer = (hass, date, repas) =>
 // recettes absent : tout le menu
 export const menuVersCourses = (hass, recettes) =>
   hass.callWS({ type: 'maison/menu/vers_courses', ...(recettes ? { recettes } : {}) });
+
+// Catalogue de jus du jour (généré au premier appel du jour, hors quota) et régénération (dans le quota)
+export const jusCatalogue = (hass) => hass.callWS({ type: 'maison/jus/catalogue' });
+
+export const jusRegenerer = (hass) => hass.callWS({ type: 'maison/jus/regenerer' });
