@@ -1,0 +1,145 @@
+<div class="vie">
+
+  <!-- EN-TÊTE -->
+  <div class="vie-entete">
+    <div>
+      <h1 class="vie-titre">Vie</h1>
+      <p class="vie-sous-titre">Maison &amp; bien-être</p>
+    </div>
+    <div class="vie-pastille">
+      <img src="../../../assets/icons/vie/foyer.svg" width="16" height="16" alt="">
+      <span id="vie-foyer">Notre Foyer</span>
+    </div>
+  </div>
+
+  <!-- ACTIONS RAPIDES -->
+  <section class="vie-bloc">
+    <h2 class="vie-repere">Actions rapides</h2>
+    <div class="vie-carte vie-scenarios" id="vie-scenarios"></div>
+  </section>
+
+  <!-- MAISON + SURVEILLANCE -->
+  <div class="vie-ligne vie-ligne-maison">
+
+    <section class="vie-carte">
+      <div class="vie-section-entete">
+        <span class="vie-icone"><img src="../../../assets/icons/vie/maison.svg" width="17" height="17" alt=""></span>
+        <div>
+          <h2 class="vie-section-titre">Maison</h2>
+          <p class="vie-section-texte">Pièces et fonctions essentielles</p>
+        </div>
+      </div>
+      <div class="vie-repere-ligne">
+        <h3 class="vie-repere">Éclairage</h3>
+        <img src="../../../assets/icons/vie/ampoule-repere.svg" width="15" height="15" alt="">
+      </div>
+      <div class="vie-liste" id="vie-pieces"></div>
+      <div class="vie-fonctions">
+        <button class="vie-fonction" data-action="thermostat" id="vie-acces-temperature">
+          <img src="../../../assets/icons/vie/thermometre.svg" width="16" height="16" alt="">
+          <span>Température</span>
+          <img src="../../../assets/icons/vie/chevron-gris.svg" width="14" height="14" alt="">
+        </button>
+        <button class="vie-fonction" data-action="voir-appareils">
+          <img src="../../../assets/icons/vie/prise.svg" width="16" height="16" alt="">
+          <span>Appareils</span>
+          <img src="../../../assets/icons/vie/chevron-gris.svg" width="14" height="14" alt="">
+        </button>
+      </div>
+    </section>
+
+    <section class="vie-carte">
+      <div class="vie-section-entete">
+        <span class="vie-icone"><img src="../../../assets/icons/vie/video.svg" width="17" height="17" alt=""></span>
+        <div>
+          <h2 class="vie-section-titre">Surveillance</h2>
+          <p class="vie-section-texte">Aperçus des caméras</p>
+        </div>
+      </div>
+      <div class="vie-cameras" id="vie-cameras"></div>
+    </section>
+
+  </div>
+
+  <!-- APPAREILS + BIEN-ÊTRE -->
+  <div class="vie-ligne">
+
+    <section class="vie-carte" id="vie-carte-appareils">
+      <div class="vie-section-entete">
+        <span class="vie-icone"><img src="../../../assets/icons/vie/prise-eclair.svg" width="17" height="17" alt=""></span>
+        <div>
+          <h2 class="vie-section-titre">Appareils</h2>
+          <p class="vie-section-texte">Contrôles du foyer</p>
+        </div>
+      </div>
+      <div class="vie-liste" id="vie-appareils"></div>
+    </section>
+
+    <section class="vie-carte">
+      <div class="vie-section-entete vie-section-entete-action">
+        <span class="vie-icone"><img src="../../../assets/icons/vie/etincelles-section.svg" width="17" height="17" alt=""></span>
+        <h2 class="vie-section-titre">Bien-être &amp; spiritualité</h2>
+        <a class="vie-bouton vie-bouton-petit" data-vue="vie/bien-etre">
+          Voir plus
+          <img src="../../../assets/icons/vie/fleche-droite.svg" width="14" height="14" alt="">
+        </a>
+      </div>
+
+      <div class="vie-encart vie-encart-ambre">
+        <span class="vie-icone vie-icone-rond vie-icone-ambre"><img src="../../../assets/icons/vie/cafe.svg" width="17" height="17" alt=""></span>
+        <div>
+          <b class="vie-encart-titre">Inspiration du jour</b>
+          <p class="vie-encart-texte" id="vie-citation">…</p>
+          <p class="vie-encart-auteur" id="vie-citation-auteur"></p>
+        </div>
+      </div>
+
+      <a class="vie-lien" data-vue="vie/bien-etre">
+        <img src="../../../assets/icons/vie/horloge.svg" width="16" height="16" alt="">
+        <span class="vie-lien-ambre" id="vie-prochaine-priere">Prochaine prière…</span>
+        <img src="../../../assets/icons/vie/chevron-gris.svg" width="14" height="14" alt="">
+      </a>
+      <a class="vie-lien" data-vue="vie/bien-etre">
+        <img src="../../../assets/icons/vie/livre.svg" width="16" height="16" alt="">
+        <span>Verset du jour</span>
+        <img src="../../../assets/icons/vie/chevron-gris.svg" width="14" height="14" alt="">
+      </a>
+      <a class="vie-lien" data-vue="vie/bien-etre">
+        <img src="../../../assets/icons/vie/invocation.svg" width="16" height="16" alt="">
+        <span>Invocation du jour</span>
+        <img src="../../../assets/icons/vie/chevron-gris.svg" width="14" height="14" alt="">
+      </a>
+
+      <!-- Rappel : masqué s'il n'y a rien à rappeler aujourd'hui -->
+      <div class="vie-sous-carte" id="vie-rappel" hidden>
+        <div class="vie-section-entete">
+          <span class="vie-icone vie-icone-ambre"><img src="../../../assets/icons/vie/calendrier.svg" width="17" height="17" alt=""></span>
+          <h3 class="vie-section-titre">Rappel du jour</h3>
+        </div>
+        <div class="vie-encart vie-encart-ambre">
+          <span class="vie-icone vie-icone-rond vie-icone-ambre"><img src="../../../assets/icons/vie/calendrier.svg" width="17" height="17" alt=""></span>
+          <div>
+            <b class="vie-encart-titre" id="vie-rappel-titre"></b>
+            <p class="vie-encart-texte" id="vie-rappel-texte"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="vie-sous-carte" id="vie-ramadan" hidden>
+        <div class="vie-section-entete">
+          <span class="vie-icone"><img src="../../../assets/icons/vie/lune.svg" width="17" height="17" alt=""></span>
+          <h3 class="vie-section-titre" id="vie-ramadan-titre">Compte à rebours Ramadan</h3>
+        </div>
+        <div class="vie-encart">
+          <span class="vie-icone vie-icone-rond"><img src="../../../assets/icons/vie/lune.svg" width="17" height="17" alt=""></span>
+          <div>
+            <b class="vie-encart-titre vie-texte-violet" id="vie-ramadan-jours"></b>
+            <p class="vie-encart-texte" id="vie-ramadan-texte"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</div>

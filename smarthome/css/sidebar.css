@@ -96,6 +96,7 @@
   mask: var(--icone) center / contain no-repeat;
 }
 .nav-icon-accueil        { --icone: url(../assets/icons/accueil/nav-accueil.svg); }
+.nav-icon-vie            { --icone: url(../assets/icons/vie/nav-vie.svg); }
 .nav-icon-budget         { --icone: url(../assets/icons/accueil/nav-budget.svg); }
 .nav-icon-energie        { --icone: url(../assets/icons/accueil/nav-energie.svg); }
 .nav-icon-calendrier     { --icone: url(../assets/icons/accueil/nav-calendrier.svg); }
