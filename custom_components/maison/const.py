@@ -48,3 +48,20 @@ NOTE_MAX = 200                # texte libre envoyé au générateur
 EXPIRATION_GENERATION = 300   # secondes : au-delà, une génération bloquée est oubliée
 DELAI_WORKER = 240            # secondes : le worker réessaie lui-même jusqu'à 3 fois
 CLE_CUISINE = f"{DOMAIN}_cuisine"   # hass.data : état du menu
+
+# ---- JUS ET PHOTOS ----
+
+OBJECTIFS_JUS = ("fraicheur", "vitalite", "immunite", "antioxydant", "digestif")
+MOMENTS_JUS = ("matin", "midi", "apres-effort", "gouter", "soiree")
+TAILLE_CATALOGUE_JUS = 6
+PERSONNES_CATALOGUE_DEFAUT = 2   # sans menu existant pour reprendre ses paramètres
+
+# Photos : téléchargées depuis la seule origine autorisée, réencodées, servies par HA
+HOTE_IMAGES = "images.pexels.com"
+HOTES_CREDIT = ("pexels.com", "www.pexels.com")
+PHOTO_TELECHARGEMENT_MAX = 3_000_000   # octets
+PHOTO_PIXELS_MAX = 40_000_000          # contre les « bombes » de décompression
+PHOTO_COTE_MAX = 800                   # pixels
+PHOTO_POIDS_CIBLE = 200_000            # octets
+PHOTOS_DISQUE_MAX = 30_000_000         # octets, tout le dossier
+SIGNATURE_PHOTO_HEURES = 24

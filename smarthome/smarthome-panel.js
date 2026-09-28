@@ -19,7 +19,7 @@ const VUES = {
   vie:        { titre: 'Vie', charger: () => import('./views/vie/vie.js') },
   budget:     { titre: 'Budget & Factures', charger: () => import('./views/budget/budget.js') },
   energie:    { titre: 'Énergie & Fluides', charger: () => import('./views/energie/energie.js') },
-  calendrier: { titre: 'Calendrier famille' },
+  calendrier: { titre: 'Calendrier famille', charger: () => import('./views/calendrier/calendrier.js') },
   menu:       { titre: 'Menu', charger: () => import('./views/menu/menu.js') },
   courses:    { titre: 'Liste de courses' },
 };

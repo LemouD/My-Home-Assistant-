@@ -30,6 +30,90 @@ if (energie.eau?.index) definir(energie.eau.index, '1247.318', 'Index eau');
 if (energie.eau?.saisie) definir(energie.eau.saisie, '1247.318', 'Saisie index eau');
 (energie.temperatures ?? []).forEach((id, i) => definir(id, String(20.4 + i * 0.8), `Température ${i + 1}`));
 
+// ---- Calendrier familial simulé : événements fictifs, datés par rapport à aujourd'hui ----
+const cal = config.CALENDRIER ?? {};
+const idsCalendriers = (cal.calendriers ?? []).map((c) => c.id);
+const deuxChiffres = (n) => String(n).padStart(2, '0');
+const jourTexte = (d) => `${d.getFullYear()}-${deuxChiffres(d.getMonth() + 1)}-${deuxChiffres(d.getDate())}`;
+const dansJours = (n, h = null, m = 0) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  if (h === null) return jourTexte(d);
+  d.setHours(h, m, 0, 0);
+  return d.toISOString();
+};
+const idCal = (i) => idsCalendriers[i % Math.max(idsCalendriers.length, 1)];
+const jourRrule = (n) => ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][new Date(Date.now() + n * 86400000).getDay()];
+const evenementsCalendrier = idsCalendriers.length ? [
+  { calendrier: idCal(3), summary: 'Déposer les enfants', dtstart: dansJours(0, 8), dtend: dansJours(0, 8, 30), rrule: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR' },
+  { calendrier: idCal(0), summary: 'Dîner en famille', dtstart: dansJours(0, 19, 30), dtend: dansJours(0, 21) },
+  { calendrier: idCal(1), summary: 'Rendez-vous médecin', dtstart: dansJours(2, 14), dtend: dansJours(2, 15) },
+  { calendrier: idCal(2), summary: 'Anniversaire Membre 2', dtstart: dansJours(3), dtend: dansJours(4), rrule: 'FREQ=YEARLY' },
+  { calendrier: idCal(4), summary: 'Sport', dtstart: dansJours(5, 17, 30), dtend: dansJours(5, 18, 30), rrule: `FREQ=WEEKLY;BYDAY=${jourRrule(5)}` },
+  { calendrier: idCal(3), summary: 'Réunion parents', dtstart: dansJours(10, 18), dtend: dansJours(10, 19) },
+  { calendrier: idCal(2), summary: 'Anniversaire Enfant 1', dtstart: dansJours(-6), dtend: dansJours(-5), rrule: 'FREQ=YEARLY' },
+  { calendrier: idCal(0), summary: 'Courses de la semaine', dtstart: dansJours(-2, 10), dtend: dansJours(-2, 11) },
+] : [];
+evenementsCalendrier.forEach((e, i) => { e.uid = `demo-${i}`; });
+idsCalendriers.forEach((id) => definir(id, 'off', id));
+(cal.membres ?? []).forEach((m, i) => {
+  if (m.personne && !states[m.personne]) definir(m.personne, 'home', i < 2 ? `Membre ${i + 1}` : `Enfant ${i - 1}`);
+});
+
+const tachesDemo = [
+  { uid: 't1', summary: 'Sortir les poubelles', status: 'needs_action', due: dansJours(1) },
+  { uid: 't2', summary: 'Arroser les plantes', status: 'completed', due: dansJours(2) },
+  { uid: 't3', summary: 'Payer une facture', status: 'needs_action', due: dansJours(0) },
+  { uid: 't4', summary: 'Acheter un cadeau', status: 'needs_action' },
+];
+const majEtatTaches = () => {
+  if (cal.taches) definir(cal.taches, String(tachesDemo.filter((t) => t.status === 'needs_action').length), 'Tâches');
+};
+majEtatTaches();
+
+// Occurrences d'un événement entre deux dates, au format de l'API REST de HA.
+// Répétitions gérées : WEEKLY;BYDAY, MONTHLY, YEARLY et UNTIL (suffisant pour la démo).
+function occurrences(evenement, debut, fin) {
+  const journee = evenement.dtstart.length === 10;
+  const lire = (t) => (journee ? new Date(`${t}T00:00`) : new Date(t));
+  const depart = lire(evenement.dtstart);
+  const duree = lire(evenement.dtend) - depart;
+  const regle = Object.fromEntries((evenement.rrule ?? '').split(';').filter(Boolean).map((p) => p.split('=')));
+  const jusqua = regle.UNTIL ? new Date(`${regle.UNTIL.slice(0, 4)}-${regle.UNTIL.slice(4, 6)}-${regle.UNTIL.slice(6, 8)}T23:59:59`) : null;
+  const candidats = [];
+  if (!regle.FREQ) candidats.push(depart);
+  for (let d = new Date(debut.getTime() - duree - 86400000); d < fin && regle.FREQ; d.setDate(d.getDate() + 1)) {
+    const c = new Date(d.getFullYear(), d.getMonth(), d.getDate(), depart.getHours(), depart.getMinutes());
+    if (c < depart) continue;
+    const ok = (regle.FREQ === 'WEEKLY' && (regle.BYDAY ?? '').split(',').includes(['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][c.getDay()]))
+      || (regle.FREQ === 'MONTHLY' && c.getDate() === depart.getDate())
+      || (regle.FREQ === 'YEARLY' && c.getDate() === depart.getDate() && c.getMonth() === depart.getMonth());
+    if (ok && (!jusqua || c <= jusqua)) candidats.push(c);
+  }
+  return candidats
+    .filter((c) => c < fin && new Date(c.getTime() + duree) > debut)
+    .map((c) => {
+      const finOcc = new Date(c.getTime() + duree);
+      return {
+        summary: evenement.summary,
+        uid: evenement.uid,
+        rrule: evenement.rrule ?? null,
+        start: journee ? { date: jourTexte(c) } : { dateTime: c.toISOString() },
+        end: journee ? { date: jourTexte(finOcc) } : { dateTime: finOcc.toISOString() },
+      };
+    });
+}
+
+async function callApi(methode, chemin) {
+  await new Promise((r) => setTimeout(r, LATENCE_MS));
+  const url = new URL(chemin, 'http://ha.local/api/');
+  const [, id] = url.pathname.match(/calendars\/(.+)$/) ?? [];
+  if (methode !== 'GET' || !idsCalendriers.includes(id)) throw new Error(`API simulée : ${methode} ${chemin}`);
+  const debut = new Date(url.searchParams.get('start'));
+  const fin = new Date(url.searchParams.get('end'));
+  return evenementsCalendrier.filter((e) => e.calendrier === id).flatMap((e) => occurrences(e, debut, fin));
+}
+
 // ---- Vie : lumières (avec luminosité), appareils, caméras ----
 const vie = config.VIE ?? {};
 const avecAttributs = (id, state, attributs) => {
@@ -58,6 +142,14 @@ const panneau = document.querySelector('smarthome-panel');
 async function callService(domaine, service, donnees) {
   await new Promise((r) => setTimeout(r, LATENCE_MS));
   const { entity_id: cibles } = donnees;
+  if (domaine === 'todo' && service === 'update_item') {
+    const tache = tachesDemo.find((t) => t.uid === donnees.item);
+    if (!tache) throw new Error('Tâche inconnue');
+    tache.status = donnees.status;
+    majEtatTaches();
+    publier();
+    return;
+  }
   if (domaine === 'input_number' && service === 'set_value') {
     definir(cibles, String(donnees.value), states[cibles]?.attributes.friendly_name);
     // Le capteur d'index suit l'input_number, comme le template sensor décrit dans le README
@@ -163,9 +255,19 @@ function statistiquesSimulees({ statistic_ids: ids, start_time: debut, end_time:
 async function callWS(message) {
   await new Promise((r) => setTimeout(r, LATENCE_MS));
   switch (message.type) {
+    case 'calendar/event/create': {
+      if (!idsCalendriers.includes(message.entity_id)) throw erreurWS('not_found', 'Calendrier inconnu');
+      const { summary, dtstart, dtend, rrule } = message.event;
+      evenementsCalendrier.push({ calendrier: message.entity_id, summary, dtstart, dtend, rrule, uid: crypto.randomUUID() });
+      console.info('[mock] événement créé :', message.event);
+      return {};
+    }
     case 'todo/item/list':
-      if (message.entity_id !== 'todo.courses') throw erreurWS('not_found', message.entity_id);
-      return { items: articlesCourses.map(({ uid, summary, status, description }) => ({ uid, summary, status, description })) };
+      // todo.courses : liste de courses alimentée par le menu ; les autres : tâches du calendrier
+      if (message.entity_id === 'todo.courses') {
+        return { items: articlesCourses.map(({ uid, summary, status, description }) => ({ uid, summary, status, description })) };
+      }
+      return { items: structuredClone(tachesDemo) };
     case 'recorder/statistics_during_period':
       return statistiquesSimulees(message);
     case 'maison/budget/etat':
@@ -223,6 +325,7 @@ function publier() {
     },
     callService,
     callWS,
+    callApi,
   };
 }
 
