@@ -22,18 +22,48 @@
   "options": {
     "step": {
       "init": {
+        "title": "Réglages de Maison",
+        "menu_options": {
+          "code": "Changer le code du budget",
+          "menu": "Générateur de menu"
+        }
+      },
+      "code": {
         "title": "Changer le code du budget",
         "description": "Les sessions ouvertes avec l'ancien code seront fermées.",
         "data": {
           "code": "Nouveau code (6 chiffres)",
           "confirmation": "Confirmer le nouveau code"
         }
+      },
+      "menu": {
+        "title": "Générateur de menu",
+        "description": "Worker de génération (mode « ha »). Le secret n'est jamais réaffiché : laisser vide pour conserver l'actuel.",
+        "data": {
+          "url": "Adresse du worker (https)",
+          "secret": "Secret partagé (X-App-Secret)",
+          "repas": "Repas proposés",
+          "quota": "Générations par jour",
+          "todo": "Liste de courses"
+        }
       }
     },
     "error": {
       "code_invalide": "Le code doit contenir exactement 6 chiffres.",
       "code_faible": "Code trop facile à deviner (suite, chiffre répété ou motif).",
-      "codes_differents": "Les deux codes ne correspondent pas."
+      "codes_differents": "Les deux codes ne correspondent pas.",
+      "url_invalide": "Adresse https complète attendue, sans identifiant.",
+      "secret_requis": "Le secret du worker est obligatoire."
+    }
+  },
+  "selector": {
+    "repas": {
+      "options": {
+        "petit_dej": "Petit-déjeuner",
+        "jus": "Jus / smoothie",
+        "dejeuner": "Déjeuner",
+        "diner": "Dîner"
+      }
     }
   }
 }

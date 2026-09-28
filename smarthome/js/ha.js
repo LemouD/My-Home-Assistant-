@@ -141,3 +141,23 @@ export function ouvrirFiche(element, entityId) {
     composed: true,
   }));
 }
+
+// ---- MENU ----
+// Génération et stockage côté serveur (intégration « maison ») : le panneau n'appelle
+// jamais le générateur lui-même. En cas d'erreur, la promesse est rejetée avec { code, message } :
+// non_configure, parametres_invalides, quota_atteint, generation_en_cours, generation_invalide,
+// generation_indisponible, menu_absent, courses_non_configure.
+
+export const menuEtat = (hass) => hass.callWS({ type: 'maison/menu/etat' });
+
+export const menuLire = (hass) => hass.callWS({ type: 'maison/menu/lire' });
+
+export const menuGenerer = (hass, parametres) =>
+  hass.callWS({ type: 'maison/menu/generer', parametres });
+
+export const menuRemplacer = (hass, date, repas) =>
+  hass.callWS({ type: 'maison/menu/remplacer', date, repas });
+
+// recettes absent : tout le menu
+export const menuVersCourses = (hass, recettes) =>
+  hass.callWS({ type: 'maison/menu/vers_courses', ...(recettes ? { recettes } : {}) });

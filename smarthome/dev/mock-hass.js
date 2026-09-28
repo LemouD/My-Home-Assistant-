@@ -7,6 +7,7 @@
 import '../smarthome-panel.js';
 import config from '../js/config.js';
 import budgetExemple from './budget-exemple.js';
+import { creerMenuSimule } from './mock-menu.js';
 
 const LATENCE_MS = 300;
 
@@ -199,6 +200,10 @@ const budget = {
 };
 
 const erreurWS = (code, message) => Object.assign(new Error(message), { code });
+
+// ---- Menu simulé (dev/mock-menu.js) et liste de courses todo.courses fictive ----
+const articlesCourses = [];
+const menuSimule = creerMenuSimule({ erreur: erreurWS, courses: articlesCourses });
 const attenteBudget = () => Math.max(0, Math.ceil((budget.bloqueJusqua - Date.now()) / 1000));
 const verifierJeton = (jeton) => {
   if (!budget.jetons.has(jeton)) throw erreurWS('session_invalide', 'Session invalide');
@@ -258,6 +263,10 @@ async function callWS(message) {
       return {};
     }
     case 'todo/item/list':
+      // todo.courses : liste de courses alimentée par le menu ; les autres : tâches du calendrier
+      if (message.entity_id === 'todo.courses') {
+        return { items: articlesCourses.map(({ uid, summary, status, description }) => ({ uid, summary, status, description })) };
+      }
       return { items: structuredClone(tachesDemo) };
     case 'recorder/statistics_during_period':
       return statistiquesSimulees(message);
@@ -299,6 +308,7 @@ async function callWS(message) {
       budget.jetons.delete(message.jeton);
       return {};
     default:
+      if (message.type.startsWith('maison/menu/')) return menuSimule.commande(message);
       throw erreurWS('unknown_command', message.type);
   }
 }
@@ -340,6 +350,8 @@ window.mock = {
   },
   budget,                                            // mock.budget.donnees, mock.budget.jetons…
   expirerSessions: () => budget.jetons.clear(),      // simule l'expiration côté serveur
+  menu: menuSimule,                                  // mock.menu.etat.indisponible = true, mock.menu.vider()
+  courses: articlesCourses,
 };
 
 // Taille d'écran en pixels CSS : ouvrir /dev/ sur la vraie tablette pour relever sa taille de référence

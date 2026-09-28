@@ -1,0 +1,665 @@
+/* =============================================
+   MENU.CSS — Section Menu (semaine, générer, recette)
+   Maquettes Figma « Mon Menu » adaptées à la tablette et au contrat serveur :
+   textes à 14 px minimum, zones tactiles de 48 px, pas de flou ni d'animation en boucle,
+   ombres ≤ 8 px, pas de photo en v1.
+
+   Logique des couleurs :
+   - violet (--menu-violet) : le générateur et les actions ;
+   - ambre  (--accent-ambre) : la cuisine (repas, type de plat, avertissement « à vérifier ») ;
+   - rose   (--accent-rose)  : un plat retiré ou une erreur ;
+   - neutre (--menu-carte)   : le contenu.
+   ============================================= */
+
+.vue-menu {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#page-content.menu { display: flex; flex-direction: column; }
+
+.menu-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* === EN-TÊTE === */
+.menu-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.menu-titre {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.menu-sous-titre {
+  margin-top: 4px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.menu-commandes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-puce {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 12px;
+  background: var(--menu-carte);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.menu-retour {
+  align-self: flex-start;
+  min-height: var(--touch-min);
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: var(--menu-violet-clair);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* === BOUTONS === */
+.menu-bouton-principal,
+.menu-bouton,
+.menu-bouton-rose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.menu-bouton-principal {
+  border-color: var(--menu-violet-clair);
+  background: var(--menu-violet);
+  color: var(--text-primary);
+}
+.menu-bouton-principal:active { opacity: 0.85; }
+
+.menu-bouton {
+  border-color: var(--menu-bord);
+  background: var(--menu-surface);
+  color: var(--text-primary);
+}
+.menu-bouton:active { background: var(--menu-bord); }
+
+.menu-bouton-rose {
+  border-color: rgba(225, 29, 72, 0.5);
+  background: rgba(225, 29, 72, 0.14);
+  color: var(--text-primary);
+}
+.menu-bouton-rose:active { background: rgba(225, 29, 72, 0.26); }
+
+.menu-bouton-large { width: 100%; }
+
+/* Quota restant affiché dans les boutons « Remplacer » */
+.menu-quota-mini {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* === CARTES === */
+.menu-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 16px;
+  background: var(--menu-carte);
+}
+
+.menu-carte-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-carte-titre {
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.menu-aide {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+/* === ÉTATS DU GÉNÉRATEUR === */
+.menu-etat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--menu-bord);
+  border-left-width: 4px;
+  border-radius: 12px;
+  background: var(--menu-carte);
+}
+.menu-etat-encours   { border-left-color: var(--menu-violet); }
+.menu-etat-attention { border-left-color: var(--accent-ambre); }
+.menu-etat-erreur    { border-left-color: var(--accent-rose); }
+
+.menu-etat-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(109, 99, 255, 0.18);
+}
+
+.menu-etat-texte {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.menu-etat-texte b { font-size: var(--fs-sm); color: var(--text-primary); }
+
+/* === ÉTAT VIDE === */
+.menu-vide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  border: 1px dashed var(--menu-bord);
+  border-radius: 16px;
+  background: var(--menu-carte);
+  text-align: center;
+}
+.menu-vide h2 { font-size: var(--fs-lg); font-weight: 700; }
+.menu-vide p  { max-width: 520px; font-size: var(--fs-sm); color: var(--text-secondary); }
+
+/* === SEMAINE : ligne du haut === */
+.menu-contenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.menu-ligne-haut {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: var(--gap);
+}
+
+/* Plat mis en avant : dégradé chaud à la place de la photo */
+.menu-vedette {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px 28px;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 22px;
+  background: var(--menu-vedette-degrade);
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.12);
+}
+
+.menu-badge-ambre {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 100px;
+  background: rgba(245, 158, 11, 0.13);
+  color: var(--accent-ambre);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.menu-vedette-texte { display: flex; flex-direction: column; gap: 8px; }
+
+.menu-surtitre {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-ambre);
+}
+
+.menu-vedette-nom {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.menu-caracteristiques { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.menu-caracteristique {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 100px;
+  background: rgba(10, 12, 17, 0.6);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.menu-vedette-actions { display: flex; gap: 12px; }
+
+/* Résumé de la semaine */
+.menu-resume { justify-content: space-between; }
+
+.menu-resume-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.menu-resume-liste div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--menu-bord);
+}
+.menu-resume-liste dt { font-size: var(--fs-xs); color: var(--text-secondary); }
+.menu-resume-liste dd { font-size: var(--fs-sm); font-weight: 700; text-align: right; }
+
+/* === SEMAINE : grille jours × repas (1 à 4 repas) === */
+.menu-semaine { gap: 8px; padding: 16px 20px; }
+
+.menu-grille-entete,
+.menu-jour {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.menu-grille-entete span {
+  flex: 1;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--accent-ambre);
+}
+.menu-grille-entete span:first-child,
+.menu-jour-nom { flex: 0 0 76px; }
+
+.menu-grille { display: flex; flex-direction: column; gap: 6px; }
+
+.menu-jour-nom {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+.menu-jour-nom b { font-size: var(--fs-md); color: var(--text-primary); }
+
+/* Aujourd'hui : jour en violet, créneaux encadrés */
+.menu-jour-aujourdhui .menu-jour-nom,
+.menu-jour-aujourdhui .menu-jour-nom b { color: var(--menu-violet-clair); }
+.menu-jour-aujourdhui .menu-creneau { border-color: rgba(130, 122, 255, 0.55); }
+
+.menu-creneau {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  padding: 6px 14px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 12px;
+  background: var(--menu-surface);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.menu-creneau:active { background: var(--menu-bord); }
+
+.menu-creneau b,
+.menu-creneau > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.menu-creneau b      { font-size: var(--fs-sm); font-weight: 600; }
+.menu-creneau > span { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+/* Plat retiré par le serveur (halal, allergie, invalide) */
+.menu-creneau-rejete {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px 4px 14px;
+  border-style: dashed;
+  border-color: rgba(225, 29, 72, 0.5);
+  background: rgba(225, 29, 72, 0.06);
+  cursor: default;
+}
+.menu-rejete-texte {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.menu-rejete-texte b { font-size: var(--fs-sm); color: var(--text-primary); }
+
+/* === GÉNÉRER : formulaire en listes fermées === */
+.menu-generer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+  gap: var(--gap);
+  align-items: start;
+}
+
+.menu-generer-champs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.menu-bloc { gap: 10px; padding: 16px 18px; }
+.menu-bloc-large { grid-column: 1 / -1; }
+
+.menu-bloc-titre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.menu-numero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(130, 122, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(109, 99, 255, 0.13);
+  color: var(--menu-violet-clair);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+/* Pastilles à cocher : la case reste accessible mais invisible */
+.menu-choix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.menu-choix label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 100px;
+  background: var(--menu-surface);
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.menu-choix input { position: absolute; opacity: 0; pointer-events: none; }
+.menu-choix label:has(input:checked) {
+  border-color: var(--menu-violet-clair);
+  background: rgba(109, 99, 255, 0.2);
+  color: var(--text-primary);
+}
+.menu-choix label:has(input:focus-visible) { outline: 2px solid var(--menu-violet-clair); }
+
+/* Allergies cochées : ambre (ce qui sera exclu) */
+.menu-choix-allergies label:has(input:checked) {
+  border-color: var(--accent-ambre);
+  background: rgba(245, 158, 11, 0.16);
+}
+
+/* Personnes : − [ 4 ] + */
+.menu-pas { display: flex; align-items: center; gap: 8px; }
+.menu-pas input {
+  width: 72px;
+  min-height: var(--touch-min);
+  border: 1px solid var(--menu-bord);
+  border-radius: 10px;
+  background: var(--menu-surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.menu-pas input::-webkit-outer-spin-button,
+.menu-pas input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.menu-bouton-pas {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 1px solid var(--menu-bord);
+  border-radius: 10px;
+  background: var(--menu-surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.menu-bouton-pas:active { background: var(--menu-bord); }
+
+.menu-bloc textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 12px 14px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 10px;
+  background: var(--menu-surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  resize: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.menu-bloc textarea:focus { outline: none; border-color: var(--menu-violet-clair); }
+
+.menu-compteur { align-self: flex-end; font-size: var(--fs-xs); color: var(--text-secondary); }
+
+.menu-generer-resume { position: sticky; top: 0; }
+
+.menu-quota {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(109, 99, 255, 0.13);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.menu-quota b { font-size: var(--fs-sm); color: var(--menu-violet-clair); }
+
+.menu-message { min-height: 1.4em; font-size: var(--fs-xs); color: var(--accent-ambre); }
+
+/* === RECETTE === */
+.menu-vedette-recette { min-height: 200px; }
+
+.menu-avertissement {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  font-size: var(--fs-sm);
+}
+
+.menu-recette-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--gap);
+  align-items: start;
+}
+
+.menu-section-titre {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.menu-section-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+.menu-section-icone-ambre    { background: rgba(245, 158, 11, 0.13); }
+.menu-section-icone-violette { background: rgba(109, 99, 255, 0.13); }
+
+.menu-puce-violette {
+  min-width: 34px;
+  padding: 4px 10px;
+  border: 1px solid rgba(130, 122, 255, 0.35);
+  border-radius: 100px;
+  background: rgba(109, 99, 255, 0.13);
+  color: var(--menu-violet-clair);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-align: center;
+}
+
+.menu-ingredients { list-style: none; display: flex; flex-direction: column; }
+.menu-ingredients li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  border-bottom: 1px solid var(--menu-bord);
+  font-size: var(--fs-sm);
+}
+.menu-ingredients li:last-child { border-bottom: none; }
+.menu-ingredient-nom { flex: 1; min-width: 0; }
+.menu-ingredients b { font-size: var(--fs-xs); font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+
+/* Rayon de l'ingrédient : sert au classement dans la liste de courses */
+.menu-rayon {
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--menu-surface);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.menu-etapes {
+  list-style: none;
+  counter-reset: etape;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.menu-etapes li {
+  counter-increment: etape;
+  position: relative;
+  min-height: 30px;
+  padding-left: 44px;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+.menu-etapes li::before {
+  content: counter(etape);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(130, 122, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(109, 99, 255, 0.13);
+  color: var(--menu-violet-clair);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.menu-barre-actions {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+}
+.menu-barre-texte {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.menu-barre-texte b { font-size: var(--fs-sm); color: var(--text-primary); }
+
+.vue-menu [hidden] { display: none !important; }
