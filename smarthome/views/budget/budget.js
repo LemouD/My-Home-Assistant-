@@ -16,6 +16,7 @@ import {
 const LONGUEUR_CODE = 6;
 const INACTIVITE_MS = 5 * 60 * 1000;
 const PAS_AJUSTEMENT = 10;   // € ajoutés ou retirés par les boutons − / +
+const HISTORIQUE_REPLIE = 3; // factures affichées tant que l'historique n'est pas déplié
 
 const euros = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 const eurosCentimes = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
@@ -72,6 +73,7 @@ export async function monter() {
   let code = '';
   let minuteurInactivite = null;
   let minuteurBlocage = null;
+  let historiqueDeplie = false;
 
   const courant = () => brouillon ?? donnees;
   const enEdition = () => brouillon !== null;
@@ -135,12 +137,31 @@ export async function monter() {
     }
   }
 
+  // Au verrouillage, les montants sont retirés du DOM (et pas seulement masqués) :
+  // ils ne restent pas lisibles dans les outils de développement. rendreTout() reconstruit tout.
+  function viderContenu() {
+    for (const id of ['budget-chiffres', 'budget-donut', 'budget-courbe', 'budget-categories', 'budget-comptes',
+      'budget-imprevus', 'budget-fonds-urgence', 'budget-a-venir', 'budget-factures', 'budget-factures-ajout',
+      'budget-historique-plus']) {
+      remplacer($(id));
+    }
+    for (const id of ['budget-reste', 'budget-reste-detail', 'budget-depense-total', 'budget-epargne-resume',
+      'budget-epargne-pct', 'budget-epargne-total', 'budget-total-ajuste', 'budget-imprevus-total', 'budget-erreur']) {
+      $(id).textContent = '';
+    }
+    $('budget-epargne-objectif').value = '';
+    $('budget-epargne-mois').value = '';
+    $('budget-epargne-jauge').style.width = '0%';
+  }
+
   function afficherVerrou(texte = '') {
     clearTimeout(minuteurInactivite);
+    historiqueDeplie = false;
     jeton = null;
     donnees = null;
     brouillon = null;
     code = '';
+    viderContenu();
     $('budget-contenu').hidden = true;
     $('budget-verrou').hidden = false;
     $('budget-mois').textContent = majuscule(new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
@@ -211,7 +232,7 @@ export async function monter() {
 
     let boutons = [];
     if (jeton && enEdition()) boutons = [bouton('annuler', 'Annuler'), bouton('enregistrer', 'Enregistrer', true)];
-    else if (jeton) boutons = [bouton('modifier', '✏️ Modifier le mois', true), bouton('verrouiller', '🔒 Verrouiller')];
+    else if (jeton) boutons = [bouton('modifier', 'Modifier le mois', true), bouton('verrouiller', 'Verrouiller')];
     remplacer($('budget-actions'), ...boutons);
   }
 
@@ -257,13 +278,11 @@ export async function monter() {
   function rendreApercu() {
     const d = courant();
     const lignes = [['Revenus', 'revenus'], ['Dépenses fixes', 'depensesFixes'], ['Dépenses variables', 'depensesVariables']];
-    remplacer($('budget-chiffres'), 
-      ...lignes.flatMap(([libelle, cle]) => [
+    remplacer($('budget-chiffres'),
+      ...lignes.map(([libelle, cle]) => el('div', { class: 'budget-chiffre-ligne' },
         el('dt', { class: 'budget-libelle' }, libelle),
-        el('dd', { class: 'budget-montant' }, enEdition() ? champMontant(d[cle], cle, false) : euros.format(d[cle])),
-      ]),
-      el('dt', { class: 'budget-libelle' }, 'Reste disponible'),
-      el('dd', { class: 'budget-montant', id: 'budget-reste' }),
+        el('dd', { class: 'budget-gras' }, enEdition() ? champMontant(d[cle], cle) : euros.format(d[cle])),
+      )),
     );
   }
 
@@ -273,7 +292,7 @@ export async function monter() {
       $(id).value = epargne[cle];
       $(id).readOnly = !enEdition();
     }
-    remplacer($('budget-comptes'), 
+    remplacer($('budget-comptes'),
       ...epargne.comptes.map((c, i) => (enEdition()
         ? el('div', { class: 'budget-ligne-edition' },
           champTexte(c.nom, `epargne.comptes.${i}.nom`, 'Nom du compte'),
@@ -291,8 +310,11 @@ export async function monter() {
     remplacer($('budget-categories'), ...courant().categories.map((c, i) =>
       el('div', { class: 'budget-categorie' },
         el('div', { class: 'budget-ligne-texte' },
-          el('span', { class: c.alerte ? 'budget-libelle budget-texte-rose' : 'budget-libelle' }, c.nom),
-          champMontant(c.budget, `categories.${i}.budget`)),
+          el('span', { class: c.alerte ? 'budget-categorie-nom budget-texte-rose' : 'budget-categorie-nom' }, c.nom),
+          enEdition()
+            ? champMontant(c.budget, `categories.${i}.budget`)
+            : el('span', { class: 'budget-libelle' },
+              el('b', { class: 'budget-categorie-depense' }, euros.format(c.depense)), ` / ${euros.format(c.budget)}`)),
         el('div', { class: 'budget-jauge' },
           el('div', { class: `budget-jauge-remplie budget-couleur-${c.couleur}`, 'data-jauge': i })),
         enEdition()
@@ -302,13 +324,13 @@ export async function monter() {
             el('button', { class: 'budget-bouton-pas', 'data-action': 'plus', 'data-index': i, 'aria-label': `Augmenter ${c.nom}` }, '+'),
             el('span', { class: 'budget-libelle budget-depense-libelle' }, 'Dépensé'),
             champMontant(c.depense, `categories.${i}.depense`))
-          : el('span', { class: 'budget-libelle' }, `Dépensé : ${euros.format(c.depense)}`),
+          : null,
       )));
   }
 
   function rendreImprevus() {
     const d = courant();
-    remplacer($('budget-imprevus'), 
+    remplacer($('budget-imprevus'),
       ...d.imprevus.map((x, i) => (enEdition()
         ? el('div', { class: 'budget-ligne-edition' },
           champTexte(x.libelle, `imprevus.${i}.libelle`, 'Libellé'),
@@ -316,11 +338,11 @@ export async function monter() {
           boutonSupprimer('imprevus', i, x.libelle))
         : el('div', { class: 'budget-ligne-texte budget-imprevu' },
           el('span', {}, x.libelle),
-          champMontant(x.montant, `imprevus.${i}.montant`)))),
+          el('b', {}, euros.format(x.montant))))),
       !d.imprevus.length && !enEdition() && vide('Aucun imprévu ce mois-ci.'),
       boutonAjouter('imprevus', 'Ajouter un imprévu'),
     );
-    remplacer($('budget-fonds-urgence'), 
+    remplacer($('budget-fonds-urgence'),
       el('b', {}, 'Fonds d\'urgence'),
       enEdition()
         ? champMontant(d.fondsUrgence, 'fondsUrgence')
@@ -331,7 +353,15 @@ export async function monter() {
   function rendreFactures() {
     const d = courant();
 
-    remplacer($('budget-a-venir'), 
+    const enRetard = enEdition() ? [] : d.factures.filter((f) => f.statut === 'retard');
+    remplacer($('budget-a-venir'),
+      ...enRetard.map((f) => el('div', { class: 'budget-facture budget-facture-retard' },
+        el('div', { class: 'budget-ligne-texte' },
+          el('b', {}, f.fournisseur),
+          el('span', { class: 'budget-libelle' }, majuscule(dateCourte.format(dateDe(f.echeance))))),
+        el('div', { class: 'budget-ligne-texte' },
+          el('b', { class: 'budget-facture-montant' }, eurosCentimes.format(f.montant)),
+          badge('retard')))),
       ...d.facturesAVenir.map((f, i) => (enEdition()
         ? el('div', { class: 'budget-facture' },
           champTexte(f.fournisseur, `facturesAVenir.${i}.fournisseur`, 'Fournisseur'),
@@ -346,11 +376,17 @@ export async function monter() {
           el('div', { class: 'budget-ligne-texte' },
             el('b', { class: 'budget-facture-montant' }, eurosCentimes.format(f.montant)),
             badge('a-payer'))))),
-      !d.facturesAVenir.length && !enEdition() && vide('Aucune facture à venir.'),
+      !d.facturesAVenir.length && !enRetard.length && !enEdition() && vide('Rien à payer pour le moment.'),
       boutonAjouter('facturesAVenir', 'Ajouter une facture'),
     );
 
-    remplacer($('budget-factures'), ...d.factures.map((f, i) => (enEdition()
+    // Index conservé pour les chemins d'édition ; hors édition, la plus récente en premier
+    const triees = d.factures.map((f, i) => ({ f, i }))
+      .sort((a, b) => (enEdition() ? a.i - b.i : b.f.echeance.localeCompare(a.f.echeance)));
+    const replie = !enEdition() && !historiqueDeplie && triees.length > HISTORIQUE_REPLIE;
+    const visibles = replie ? triees.slice(0, HISTORIQUE_REPLIE) : triees;
+
+    remplacer($('budget-factures'), ...visibles.map(({ f, i }) => (enEdition()
       ? el('tr', {},
         el('td', {}, champTexte(f.fournisseur, `factures.${i}.fournisseur`, 'Fournisseur')),
         el('td', {}, champDate(f.echeance, `factures.${i}.echeance`)),
@@ -364,7 +400,12 @@ export async function monter() {
         el('td', { class: 'budget-libelle' }, dateLongue.format(dateDe(f.echeance))),
         el('td', { class: 'budget-droite budget-gras' }, eurosCentimes.format(f.montant)),
         el('td', { class: 'budget-droite' }, badge(f.statut))))));
-    remplacer($('budget-factures-ajout'), 
+    remplacer($('budget-historique-plus'),
+      !enEdition() && triees.length > HISTORIQUE_REPLIE && el('button', {
+        class: 'budget-bouton', 'data-action': 'historique', 'aria-expanded': historiqueDeplie ? 'true' : 'false',
+      }, historiqueDeplie ? 'Réduire' : `Tout afficher (${triees.length})`),
+    );
+    remplacer($('budget-factures-ajout'),
       !d.factures.length && !enEdition() && vide('Aucune facture enregistrée.'),
       boutonAjouter('factures', 'Ajouter une facture'),
     );
@@ -379,26 +420,29 @@ export async function monter() {
     // Arrondi à l'inférieur : on n'affiche pas 100 % tant que tout n'est pas dépensé
     const utilise = d.revenus > 0 ? Math.min(100, Math.floor((depenses / d.revenus) * 100)) : 0;
 
-    const rayon = 52;
+    const rayon = 30;
     const circonference = 2 * Math.PI * rayon;
-    remplacer($('budget-donut'), 
-      svg('svg', { viewBox: '0 0 120 120', width: 120, height: 120, 'aria-hidden': 'true' },
-        svg('circle', { cx: 60, cy: 60, r: rayon, class: 'budget-donut-fond' }),
+    remplacer($('budget-donut'),
+      svg('svg', { viewBox: '0 0 72 72', width: 72, height: 72, 'aria-hidden': 'true' },
+        svg('circle', { cx: 36, cy: 36, r: rayon, class: 'budget-donut-fond' }),
         utilise > 0 && svg('circle', {
-          cx: 60, cy: 60, r: rayon, class: 'budget-donut-arc',
+          cx: 36, cy: 36, r: rayon, class: 'budget-donut-arc',
           'stroke-dasharray': `${(circonference * utilise) / 100} ${circonference}`,
-          transform: 'rotate(-90 60 60)',
+          transform: 'rotate(-90 36 36)',
         })),
-      el('div', { class: 'budget-donut-texte' }, el('b', {}, `${utilise}%`), el('span', {}, 'Utilisé')),
+      el('b', { class: 'budget-donut-texte' }, `${utilise} %`),
     );
+    $('budget-depense-total').textContent = euros.format(depenses);
 
     const resteEl = $('budget-reste');
     resteEl.textContent = euros.format(reste);
-    resteEl.className = `budget-montant ${reste >= 0 ? 'budget-texte-emeraude' : 'budget-texte-rose'}`;
+    resteEl.className = `budget-kpi-valeur ${reste >= 0 ? 'budget-texte-emeraude' : 'budget-texte-rose'}`;
+    $('budget-reste-detail').textContent = `sur ${euros.format(d.revenus)} de revenus`;
 
     const { objectif, ceMois, comptes } = d.epargne;
     const pctEpargne = pourcent(ceMois, objectif);
-    $('budget-epargne-pct').textContent = `${pctEpargne}%`;
+    $('budget-epargne-resume').textContent = `${euros.format(ceMois)} / ${euros.format(objectif)}`;
+    $('budget-epargne-pct').textContent = `${pctEpargne} %`;
     $('budget-epargne-jauge').style.width = `${pctEpargne}%`;
     $('budget-epargne-total').textContent = euros.format(somme(comptes, 'montant'));
 
@@ -411,34 +455,34 @@ export async function monter() {
     rendreEvolution(depenses);
   }
 
-  // Mois clôturés (historique) + mois en cours
+  // Mois clôturés (historique) + mois en cours, en barres.
+  // La ligne pointillée marque le budget prévu (somme des budgets par catégorie).
   function rendreEvolution(totalCourant) {
     const d = courant();
     const points = [...d.historique.slice(-5), { mois: d.mois, total: totalCourant }];
-    const valeurs = points.map((p) => p.total);
-    const L = 400, H = 110, marge = 12;
-    const min = Math.min(...valeurs), max = Math.max(...valeurs);
+    const prevu = somme(d.categories, 'budget');
+    // 10 % de marge au-dessus de la valeur la plus haute, pour que la ligne pointillée reste lisible
+    const max = Math.max(prevu, ...points.map((p) => p.total), 1) * 1.1;
     const dernier = points.length - 1;
-    const x = (i) => (dernier === 0 ? L / 2 : marge + (i * (L - 2 * marge)) / dernier);
-    const y = (v) => 20 + ((max - v) / (max - min || 1)) * (H - 40);
-    const bulleX = Math.max(0, Math.min(x(dernier) - 30, L - 62));
+    const hauteur = (v) => `${Math.round((v / max) * 100)}%`;
 
-    remplacer($('budget-courbe'), 
-      svg('svg', { viewBox: `0 0 ${L} ${H}`, class: 'budget-courbe-svg', 'aria-hidden': 'true' },
-        ...[0, 30, 60, 90].map((ligne) => svg('line', { x1: 0, x2: L, y1: ligne + 0.5, y2: ligne + 0.5, class: 'budget-courbe-grille' })),
-        dernier > 0 && svg('polyline', { points: valeurs.map((v, i) => `${x(i)},${y(v)}`).join(' '), class: 'budget-courbe-ligne' }),
-        ...valeurs.map((v, i) => svg('circle', {
-          cx: x(i), cy: y(v), r: i === dernier ? 4 : 2.5,
-          class: i === dernier ? 'budget-courbe-point budget-courbe-actuel' : 'budget-courbe-point',
-        })),
-        svg('rect', { x: bulleX, y: y(valeurs[dernier]) - 30, width: 60, height: 18, rx: 4, class: 'budget-courbe-bulle' }),
-        svg('text', { x: bulleX + 30, y: y(valeurs[dernier]) - 17, class: 'budget-courbe-bulle-texte' }, euros.format(valeurs[dernier])),
-      ),
+    remplacer($('budget-courbe'),
+      el('div', { class: 'budget-barres-zone' },
+        prevu > 0 && el('div', { class: 'budget-barres-prevu', style: `bottom: ${hauteur(prevu)}` }),
+        ...points.map((p, i) => el('div', { class: 'budget-barre-colonne' },
+          el('div', {
+            class: [
+              'budget-barre',
+              i === dernier && 'budget-barre-actuelle',
+              prevu > 0 && p.total > prevu && 'budget-barre-depasse',
+            ].filter(Boolean).join(' '),
+            style: `height: ${hauteur(p.total)}`,
+          })))),
+      el('div', { class: 'budget-barres-legendes' },
+        ...points.map((p, i) => el('div', { class: i === dernier ? 'budget-barre-legende budget-mois-actuel' : 'budget-barre-legende' },
+          el('b', {}, euros.format(p.total)),
+          el('span', {}, i === dernier ? 'Ce mois' : majuscule(nomDuMois(p.mois, 'short')))))),
     );
-
-    remplacer($('budget-courbe-mois'), ...points.map((p, i) => (i === dernier
-      ? el('span', { class: 'budget-mois-actuel' }, `${majuscule(nomDuMois(p.mois, 'short'))} (Auj)`)
-      : el('span', {}, majuscule(nomDuMois(p.mois, 'long').split(' ')[0])))));
   }
 
   function rendreTout() {
@@ -505,6 +549,10 @@ export async function monter() {
         break;
       case 'verrouiller':
         verrouiller();
+        break;
+      case 'historique':
+        historiqueDeplie = !historiqueDeplie;
+        rendreFactures();
         break;
       case 'plus':
       case 'moins': {

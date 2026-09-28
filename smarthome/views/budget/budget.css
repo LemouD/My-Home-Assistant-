@@ -13,7 +13,7 @@
 .budget {
   display: flex;
   flex-direction: column;
-  gap: var(--gap-lg);
+  gap: var(--gap);
 }
 
 /* === EN-TÊTE === */
@@ -50,25 +50,42 @@
   white-space: nowrap;
 }
 
-/* === GRILLE (paysage) === */
+/* === GRILLE (paysage) ===
+   1. chiffres clés (4 tuiles)
+   2. évolution (2/3) + budget par catégorie (1/3)
+   3. à payer + imprévus + épargne
+   4. historique, replié */
+.budget-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
 .budget-ligne {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--gap-lg);
-  align-items: start;
+  gap: var(--gap);
+  align-items: stretch;
 }
-.budget-ligne-factures { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+.budget-ligne-analyse { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.budget-ligne-suivi   { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
 /* === CARTES === */
 .budget-carte {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
+  gap: 14px;
+  padding: 20px;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   background: var(--bg-card);
   box-shadow: var(--shadow-card);
+}
+
+.budget-carte-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .budget-carte-titre {
@@ -87,23 +104,11 @@
   color: var(--text-secondary);
 }
 
-.budget-montant {
-  font-size: var(--fs-lg);
-  font-weight: 700;
-  text-align: right;
-}
-
 .budget-ligne-texte {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-}
-
-.budget-chiffre {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
 .budget-droite { text-align: right; }
@@ -113,11 +118,50 @@
 .budget-texte-rose     { color: var(--accent-rose); font-weight: 600; }
 .budget-texte-ambre    { color: var(--accent-ambre); }
 
-/* === APERÇU GLOBAL === */
+/* === CHIFFRES CLÉS === */
+.budget-kpi {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+}
+
+/* Le reste disponible est le chiffre que l'on vient chercher : tuile mise en avant */
+.budget-kpi-principal {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.budget-kpi-titre {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.budget-kpi-valeur {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.budget-kpi-donut {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+}
+.budget-kpi-texte { display: flex; flex-direction: column; gap: 4px; }
+
 .budget-donut {
   position: relative;
-  width: 120px;
-  height: 120px;
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
 }
 
 .budget-donut svg { display: block; }
@@ -125,7 +169,7 @@
 .budget-donut-fond,
 .budget-donut-arc {
   fill: none;
-  stroke-width: 12;
+  stroke-width: 8;
 }
 .budget-donut-fond { stroke: var(--piste); }
 .budget-donut-arc  { stroke: var(--accent-bleu-vif); stroke-linecap: round; }
@@ -134,49 +178,96 @@
   position: absolute;
   inset: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  font-size: var(--fs-xs);
 }
-.budget-donut-texte b    { font-size: var(--fs-xl); line-height: 1.1; }
-.budget-donut-texte span { font-size: var(--fs-xs); color: var(--text-secondary); }
 
+/* Revenus et charges : libellé à gauche, montant à droite, sur la même ligne */
 .budget-chiffres {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
-.budget-chiffres dd { margin-bottom: 10px; }
-.budget-chiffres dd:last-child { margin-bottom: 0; }
-
-/* === ÉVOLUTION MENSUELLE === */
-.budget-courbe-svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.budget-courbe-grille { stroke: var(--border); stroke-width: 1; }
-.budget-courbe-ligne  { fill: none; stroke: var(--accent-bleu-vif); stroke-width: 2; stroke-linejoin: round; }
-.budget-courbe-point  { fill: var(--accent-bleu-vif); }
-.budget-courbe-actuel { stroke: var(--bg-card); stroke-width: 2; }
-.budget-courbe-bulle  { fill: var(--bg-main); stroke: var(--border); }
-.budget-courbe-bulle-texte {
-  fill: var(--text-primary);
-  font-size: 12px;   /* unités du viewBox SVG : ≥ 14 px à l'écran une fois le graphique agrandi */
-  font-weight: 600;
-  text-anchor: middle;
-}
-
-.budget-courbe-mois {
+.budget-chiffre-ligne {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 0 4px;
+  gap: 12px;
+  font-size: var(--fs-sm);
+}
+
+/* === ÉVOLUTION SUR 6 MOIS (barres) === */
+.budget-legende {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: var(--fs-xs);
   color: var(--text-secondary);
 }
-.budget-mois-actuel { font-weight: 600; color: var(--text-primary); }
+.budget-legende-trait {
+  width: 20px;
+  border-top: 2px dashed var(--text-secondary);
+}
+
+.budget-barres {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.budget-barres-zone {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex: 1;
+  min-height: 140px;
+  border-bottom: 1px solid var(--border);
+}
+
+.budget-barre-colonne {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+}
+
+.budget-barre {
+  width: min(56px, 100%);
+  border-radius: 8px 8px 0 0;
+  background: rgba(59, 130, 246, 0.35);
+  transition: height 0.3s ease;
+}
+.budget-barre-actuelle { background: var(--accent-bleu-vif); }
+.budget-barre-depasse  { background: rgba(225, 29, 72, 0.55); }
+.budget-barre-actuelle.budget-barre-depasse { background: var(--accent-rose); }
+
+/* Budget prévu : ligne pointillée sur toute la largeur */
+.budget-barres-prevu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed var(--text-secondary);
+  pointer-events: none;
+}
+
+.budget-barres-legendes {
+  display: flex;
+  gap: 16px;
+}
+.budget-barre-legende {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.budget-barre-legende b { color: var(--text-primary); font-weight: 600; }
+.budget-mois-actuel span { font-weight: 600; color: var(--accent-bleu-vif); }
 
 /* === CHAMPS DE SAISIE === */
 .budget-champ-bloc {
@@ -224,13 +315,6 @@
 .budget-champ input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 /* === JAUGES === */
-.budget-progression {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.budget-progression b { font-size: var(--fs-xs); }
-
 .budget-jauge {
   height: 6px;
   border-radius: 3px;
@@ -250,20 +334,21 @@
 .budget-couleur-emeraude { background: var(--accent-emeraude); }
 
 /* === ÉPARGNE === */
-.budget-repartition {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.budget-epargne-champs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
-.budget-repartition b.budget-libelle { font-weight: 600; }
-.budget-repartition .budget-ligne-texte b { font-size: var(--fs-xs); }
 
-/* === AJUSTEMENT DES DÉPENSES === */
+/* === BUDGET PAR CATÉGORIE === */
 .budget-categories {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
+
+.budget-categorie-nom { font-size: var(--fs-sm); font-weight: 500; }
+.budget-categorie-depense { color: var(--text-primary); }
 
 .budget-categorie {
   display: flex;
@@ -316,7 +401,31 @@
 }
 .budget-imprevu > span:first-child { font-size: var(--fs-sm); font-weight: 500; }
 
-/* === FACTURES À VENIR === */
+/* === À PAYER === */
+.budget-facture-retard { border-color: rgba(225, 29, 72, 0.45); }
+
+/* En lecture, une facture tient sur une ligne : fournisseur et date à gauche, montant et statut à droite */
+.vue-budget:not(.budget-en-edition) .budget-facture {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.vue-budget:not(.budget-en-edition) .budget-facture .budget-ligne-texte {
+  justify-content: flex-start;
+  min-width: 0;
+}
+.vue-budget:not(.budget-en-edition) .budget-facture .budget-ligne-texte:last-child { flex-shrink: 0; }
+/* Fournisseur sur toute la largeur, date en dessous : le libellé ne se coupe plus à côté du badge */
+.vue-budget:not(.budget-en-edition) .budget-facture .budget-ligne-texte:first-child {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+.vue-budget:not(.budget-en-edition) .budget-facture .budget-libelle { white-space: nowrap; }
+
 .budget-a-venir {
   display: flex;
   flex-direction: column;
@@ -326,8 +435,8 @@
 .budget-facture {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 12px 14px;
+  gap: 4px;
+  padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--bg-input);
@@ -383,7 +492,7 @@
 .budget-contenu {
   display: flex;
   flex-direction: column;
-  gap: var(--gap-lg);
+  gap: var(--gap);
 }
 
 .budget-entete-droite {
@@ -544,3 +653,12 @@
 }
 
 .budget-table td .budget-champ { min-width: 0; }
+
+/* === LARGEURS RÉDUITES (tablette 1280 px) : pas de retour à la ligne dans les chiffres === */
+.budget-carte-entete { flex-wrap: wrap; }
+.budget-carte-entete > * { white-space: nowrap; }
+.budget-kpi-valeur, #budget-epargne-pct { white-space: nowrap; }
+
+@media (max-width: 1400px) {
+  .budget-kpi-valeur { font-size: var(--fs-lg); }
+}
