@@ -6,6 +6,7 @@ import { chargerGabarit, el, remplacer } from '../../js/dom.js';
 import { aChange, basculer, commanderLumieres, estActif, etat, nom } from '../../js/ha.js';
 import { demarrerMeteo } from '../../js/weather.js';
 import { demarrerPrieres } from '../../js/prayer.js';
+import { couleurDe, evenementsDuJour } from '../../js/calendrier.js';
 
 export async function monter({ config }) {
   const racine = el('div', { class: 'vue-dashboard' });
@@ -161,6 +162,32 @@ export async function monter({ config }) {
     }
   });
 
+  // ---- CALENDRIER DU JOUR ----
+
+  const calendriers = (config.CALENDRIER?.calendriers ?? []).map((c) => ({ ...c, couleur: couleurDe(c.couleur) }));
+  const MAX_EVENEMENTS = 5;
+  // Teintes de la carte d'accueil pour chaque couleur de catégorie
+  const LIGNES = { bleu: 'cal-bleu', vert: 'cal-vert', rouge: 'cal-rouge', ambre: 'cal-ambre', cyan: 'cal-cyan' };
+  const heureAccueil = (d) => `${String(d.getHours()).padStart(2, '0')}h${String(d.getMinutes()).padStart(2, '0')}`;
+
+  async function rendreCalendrier() {
+    if (!calendriers.length) {
+      remplacer($('cal-events'), el('p', { class: 'cal-empty' }, 'Aucun calendrier configuré.'));
+      return;
+    }
+    const { evenements, erreurs } = await evenementsDuJour(hass, calendriers);
+    if (!evenements.length) {
+      remplacer($('cal-events'), el('p', { class: 'cal-empty' },
+        erreurs ? 'Calendrier indisponible pour le moment.' : 'Rien de prévu aujourd\'hui.'));
+      return;
+    }
+    remplacer($('cal-events'), ...evenements.slice(0, MAX_EVENEMENTS).map((e) =>
+      el('div', { class: 'cal-event' },
+        el('span', { class: 'cal-event-heure' }, e.journee ? 'Journée' : heureAccueil(e.debut)),
+        el('span', { class: `cal-event-ligne ${LIGNES[e.couleur]}` }),
+        el('span', { class: 'cal-event-titre' }, e.titre))));
+  }
+
   // ---- CYCLE DE VIE ----
 
   return {
@@ -175,6 +202,9 @@ export async function monter({ config }) {
         arrets.push(demarrerMeteo(racine, { latitude, longitude, fuseau }, config.REFRESH_METEO));
         arrets.push(demarrerPrieres(racine, { latitude, longitude, methode: config.METHODE_PRIERE, ville: config.VILLE }));
         $('meteo-ville').textContent = config.VILLE ?? '';
+        rendreCalendrier();
+        const minuteurCalendrier = setInterval(rendreCalendrier, 5 * 60_000);
+        arrets.push(() => clearInterval(minuteurCalendrier));
       }
 
       if (aChange(precedent, hass, idsLumieres)) rendreLumieres();

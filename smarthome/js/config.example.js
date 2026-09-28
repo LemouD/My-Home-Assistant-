@@ -70,4 +70,27 @@ export default {
   ALERTES: [
     { id: 'binary_sensor.lave_linge', libelle: 'Lave-linge terminé', gravite: 'info' },
   ],
+
+  // Calendrier familial. Une catégorie = un calendrier « Calendrier local » créé dans HA
+  // (Paramètres → Appareils et services → Ajouter une intégration → Calendrier local).
+  // couleur : bleu, vert, rouge, ambre ou cyan. discret: true → affiché « Occupé », sans titre.
+  CALENDRIER: {
+    calendriers: [
+      { id: 'calendar.famille',      nom: 'Famille',       couleur: 'bleu' },
+      { id: 'calendar.rendez_vous',  nom: 'Rendez-vous',   couleur: 'vert', discret: true },
+      { id: 'calendar.anniversaires', nom: 'Anniversaires', couleur: 'ambre' },
+      { id: 'calendar.ecole',        nom: 'École',         couleur: 'cyan' },
+      { id: 'calendar.activites',    nom: 'Activités',     couleur: 'rouge' },
+    ],
+    // Liste de tâches (intégration « Liste de tâches locale »)
+    taches: 'todo.maison',
+    // Interrupteurs « Membres » : masquent les catégories liées au membre.
+    // Pas de prénoms ici (fichier public) : le nom affiché est celui de l'entité person.* dans HA.
+    membres: [
+      { personne: 'person.membre_1', couleur: 'bleu', calendriers: [] },
+      { personne: 'person.membre_2', couleur: 'ambre', calendriers: [] },
+      { personne: 'person.enfant_1', couleur: 'vert', calendriers: ['calendar.ecole'] },
+      { personne: 'person.enfant_2', couleur: 'cyan', calendriers: ['calendar.activites'] },
+    ],
+  },
 };

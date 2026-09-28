@@ -92,6 +92,22 @@ template:
 Le bouton « Saisir nouvel index » modifie `input_number.index_eau` ; le capteur `sensor.index_eau`
 alimente les statistiques. Un futur capteur automatique remplacera simplement `sensor.index_eau`.
 
+## Calendrier familial
+
+Une **catégorie** (Famille, Rendez-vous, Anniversaires…) = un calendrier HA, avec sa couleur.
+Dans Home Assistant : Paramètres → Appareils et services → Ajouter une intégration →
+**Calendrier local**, une fois par catégorie ; puis **Liste de tâches locale** pour les tâches.
+Déclarer les entités dans `config.js`, section `CALENDRIER`.
+
+- « + Ajouter un événement » : date fixe, ou répétition chaque semaine, mois ou année
+  (anniversaires : « Chaque année », journée entière). La règle de répétition est construite
+  uniquement à partir des choix du formulaire.
+- `discret: true` sur une catégorie : ses événements s'affichent « Occupé », sans titre.
+  « Rendez-vous » est discret par défaut (à reporter dans le vrai `config.js`).
+- Membres : seulement l'entité `person.*` dans `config.js` (fichier public) ; le nom affiché vient de HA.
+- La tablette (compte non-admin) peut lire et créer des événements, et cocher des tâches.
+- La carte « Calendrier famille — aujourd'hui » de l'accueil utilise les mêmes catégories.
+
 ## Sécurité
 
 - Tout ce qui est dans `/config/www` est servi en `/local/` **sans authentification** :
