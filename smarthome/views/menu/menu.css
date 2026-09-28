@@ -662,4 +662,242 @@
 }
 .menu-barre-texte b { font-size: var(--fs-sm); color: var(--text-primary); }
 
+/* =============================================
+   JUS DU JOUR (catalogue) ET DÉTAIL D'UN JUS
+   Une couleur par objectif (--jus-*), portée par la classe jus-objectif-* :
+   pastille du filtre, badge, quantités et fond de secours quand il n'y a pas de photo.
+   ============================================= */
+
+.jus-objectif-fraicheur   { --jus-teinte: var(--jus-fraicheur);   --jus-fond: rgba(6, 182, 212, 0.16); }
+.jus-objectif-vitalite    { --jus-teinte: var(--jus-vitalite);    --jus-fond: rgba(245, 158, 11, 0.16); }
+.jus-objectif-immunite    { --jus-teinte: var(--jus-immunite);    --jus-fond: rgba(16, 185, 129, 0.16); }
+.jus-objectif-antioxydant { --jus-teinte: var(--jus-antioxydant); --jus-fond: rgba(192, 38, 211, 0.16); }
+.jus-objectif-digestif    { --jus-teinte: var(--jus-digestif);    --jus-fond: rgba(132, 204, 22, 0.16); }
+
+/* === CONSEIL DU JOUR === */
+.jus-conseil {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--menu-bord);
+  border-left: 4px solid var(--jus-teinte);
+  border-radius: 12px;
+  background: var(--jus-fond);
+}
+.jus-conseil-pastille {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--jus-teinte);
+}
+
+/* === FILTRES : pastille de couleur devant chaque objectif === */
+.jus-filtres label { gap: 8px; }
+.jus-point {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--jus-teinte);
+}
+.jus-filtres label:has(input:checked) {
+  border-color: var(--jus-teinte, var(--menu-violet-clair));
+  background: var(--jus-fond, rgba(109, 99, 255, 0.2));
+}
+
+/* === CATALOGUE : 3 colonnes × 2 lignes === */
+.jus-grille {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.jus-carte {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--menu-bord);
+  border-radius: 16px;
+  background: var(--menu-carte);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.jus-carte:active { border-color: var(--jus-teinte); }
+
+/* Photo (img posée par le JS) ou, à défaut, dégradé dans la couleur de l'objectif */
+.jus-photo {
+  position: relative;
+  display: block;
+  height: 150px;
+  background: linear-gradient(140deg, var(--jus-fond), var(--menu-carte) 85%);
+  overflow: hidden;
+}
+.jus-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.jus-photo-grande { height: 100%; min-height: 300px; border-radius: 22px; }
+
+.jus-badge,
+.jus-moment {
+  position: absolute;
+  z-index: 1;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+.jus-badge {
+  top: 12px;
+  left: 12px;
+  background: var(--jus-teinte);
+  color: var(--jus-sur-teinte);   /* texte foncé : lisible sur toutes les teintes */
+}
+.jus-moment {
+  bottom: 12px;
+  left: 12px;
+  background: rgba(10, 12, 17, 0.75);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.jus-carte-texte {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px 6px;
+}
+.jus-carte-texte b    { font-size: var(--fs-md); font-weight: 700; }
+.jus-carte-texte span { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+.jus-carte-pied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--touch-min);
+  margin-top: auto;
+  padding: 0 16px 10px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.jus-voir { font-weight: 700; color: var(--menu-violet-clair); }
+
+/* === DÉTAIL : photo à gauche, texte et action à droite === */
+.jus-detail-haut {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.jus-detail-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+.jus-credit { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+.jus-detail-texte {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+.jus-detail-texte .menu-surtitre { color: var(--jus-teinte); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.jus-description { font-size: var(--fs-sm); color: var(--text-secondary); line-height: 1.5; }
+
+/* Conseil selon la météo : ambre, comme les autres conseils de cuisine */
+.jus-conseil-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  font-size: var(--fs-sm);
+}
+.jus-conseil-mini b {
+  font-size: var(--fs-xs);
+  color: var(--accent-ambre);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jus-bouton-courses { align-self: flex-start; }
+
+/* === DÉTAIL : ingrédients / préparation / service === */
+.jus-detail-colonnes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 0.9fr);
+  gap: var(--gap);
+  align-items: start;
+}
+
+.jus-ingredients { list-style: none; display: flex; flex-direction: column; }
+.jus-ingredients li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  border-bottom: 1px solid var(--menu-bord);
+  font-size: var(--fs-sm);
+}
+.jus-ingredients li:last-child { border-bottom: none; }
+.jus-ingredients b {
+  flex: 0 0 74px;
+  font-size: var(--fs-sm);
+  color: var(--jus-teinte, var(--accent-ambre));
+}
+
+.jus-service { font-size: var(--fs-sm); line-height: 1.5; color: var(--text-secondary); }
+
+/* === PHOTO DU PLAT (vedette et recette) ===
+   Photo à droite, fondue dans le dégradé par un voile ; sans photo, le dégradé seul reste. */
+.menu-vedette { position: relative; isolation: isolate; overflow: hidden; }
+
+.menu-vedette-photo {
+  position: absolute;
+  inset: 0 0 0 40%;
+  z-index: -1;
+}
+.menu-vedette-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Fondu progressif vers la gauche : pas de raccord visible avec le dégradé, texte lisible */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.55) 35%, #000 70%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.55) 35%, #000 70%);
+}
+
+.menu-vedette-credit {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(10, 12, 17, 0.7);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+/* Catalogue d'un autre jour */
+.jus-date {
+  margin-top: 6px;
+  font-size: var(--fs-xs);
+  color: var(--accent-ambre);
+}
+
 .vue-menu [hidden] { display: none !important; }

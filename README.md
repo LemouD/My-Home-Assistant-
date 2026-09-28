@@ -147,6 +147,11 @@ côté serveur, recettes validées avant d'être enregistrées.
 - « Ajouter aux courses » : les ingrédients sont écrits par le serveur dans la liste de courses,
   avec les doublons additionnés. Format des articles : `qte=…;unite=…;rayon=…;source=menu|manuel`.
 - Les recettes sont générées automatiquement : la vue affiche toujours « à vérifier (cuisson, allergènes) ».
+- **Jus du jour** : 6 jus préparés au premier affichage de la journée (hors quota), avec un conseil selon
+  la météo. Choisir l'entité `weather.*` dans les options du générateur de menu (facultatif).
+- **Photos** (plats et jus) : trouvées par le worker sur Pexels, téléchargées et réencodées par l'intégration
+  (stockées dans `/config/maison/photos`, jamais dans `/config/www`), servies par une adresse signée.
+  Il faut la clé `PEXELS_API_KEY` dans les secrets du worker ; sans elle, un dégradé remplace la photo.
 
 ## Sécurité
 

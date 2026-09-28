@@ -308,7 +308,7 @@ async function callWS(message) {
       budget.jetons.delete(message.jeton);
       return {};
     default:
-      if (message.type.startsWith('maison/menu/')) return menuSimule.commande(message);
+      if (message.type.startsWith('maison/menu/') || message.type.startsWith('maison/jus/')) return menuSimule.commande(message);
       throw erreurWS('unknown_command', message.type);
   }
 }

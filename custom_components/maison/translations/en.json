@@ -44,7 +44,11 @@
           "secret": "Shared secret (X-App-Secret)",
           "repas": "Meals offered",
           "quota": "Generations per day",
-          "todo": "Shopping list"
+          "todo": "Shopping list",
+          "meteo": "Weather (juice advice)"
+        },
+        "data_description": {
+          "meteo": "Home Assistant weather entity: daily juice advice, no external call."
         }
       }
     },

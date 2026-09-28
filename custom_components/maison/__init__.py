@@ -14,6 +14,7 @@ from homeassistant.helpers.typing import ConfigType
 from .coffre import Coffre
 from .const import CLE_CUISINE, DOMAIN
 from .cuisine import Cuisine
+from .photos import VuePhoto, dossier_photos
 from .websocket import async_enregistrer_commandes
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
@@ -22,6 +23,7 @@ CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     # Commandes enregistrées une seule fois ; elles répondent "non_configure" sans entrée
     async_enregistrer_commandes(hass)
+    hass.http.register_view(VuePhoto(dossier_photos(hass)))
     return True
 
 

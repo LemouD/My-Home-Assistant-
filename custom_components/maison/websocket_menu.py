@@ -87,4 +87,21 @@ async def ws_menu_vers_courses(hass: HomeAssistant, connection, msg: dict[str, A
         await _executer(connection, msg, lambda: cuisine.vers_courses(msg.get("recettes")))
 
 
-COMMANDES_MENU = (ws_menu_etat, ws_menu_generer, ws_menu_lire, ws_menu_remplacer, ws_menu_vers_courses)
+@websocket_api.websocket_command({vol.Required("type"): "maison/jus/catalogue"})
+@websocket_api.async_response
+async def ws_jus_catalogue(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    if (cuisine := _cuisine(hass, connection, msg)) is not None:
+        await _executer(connection, msg, cuisine.catalogue)
+
+
+@websocket_api.websocket_command({vol.Required("type"): "maison/jus/regenerer"})
+@websocket_api.async_response
+async def ws_jus_regenerer(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    if (cuisine := _cuisine(hass, connection, msg)) is not None:
+        await _executer(connection, msg, cuisine.regenerer_catalogue)
+
+
+COMMANDES_MENU = (
+    ws_menu_etat, ws_menu_generer, ws_menu_lire, ws_menu_remplacer, ws_menu_vers_courses,
+    ws_jus_catalogue, ws_jus_regenerer,
+)

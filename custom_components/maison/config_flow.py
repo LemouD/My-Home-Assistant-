@@ -89,7 +89,7 @@ class MaisonOptionsFlow(OptionsFlow):
         return self.async_show_form(step_id="code", data_schema=SCHEMA_CODE, errors=erreurs)
 
     async def async_step_menu(self, saisie: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Générateur (worker « mode ha ») : URL, secret, repas, quota, liste de courses."""
+        """Générateur (worker « mode ha ») : URL, secret, repas, quota, liste de courses, météo."""
         actuel = self.config_entry.options.get("menu", {})
         erreurs: dict[str, str] = {}
         if saisie is not None:
@@ -106,6 +106,7 @@ class MaisonOptionsFlow(OptionsFlow):
                     "repas": [r for r in REPAS if r in saisie["repas"]],
                     "quota": int(saisie["quota"]),
                     "todo": saisie.get("todo"),
+                    "meteo": saisie.get("meteo"),
                 })
 
         schema = vol.Schema({
@@ -118,6 +119,8 @@ class MaisonOptionsFlow(OptionsFlow):
                 NumberSelectorConfig(min=1, max=50, step=1, mode=NumberSelectorMode.BOX)),
             vol.Optional("todo", **({"default": actuel["todo"]} if actuel.get("todo") else {})): EntitySelector(
                 EntitySelectorConfig(domain="todo")),
+            vol.Optional("meteo", **({"default": actuel["meteo"]} if actuel.get("meteo") else {})): EntitySelector(
+                EntitySelectorConfig(domain="weather")),
         })
         return self.async_show_form(step_id="menu", data_schema=schema, errors=erreurs)
 

@@ -44,7 +44,11 @@
           "secret": "Secret partagé (X-App-Secret)",
           "repas": "Repas proposés",
           "quota": "Générations par jour",
-          "todo": "Liste de courses"
+          "todo": "Liste de courses",
+          "meteo": "Météo (conseil de jus)"
+        },
+        "data_description": {
+          "meteo": "Entité météo de Home Assistant : conseil de jus du jour, sans appel externe."
         }
       }
     },

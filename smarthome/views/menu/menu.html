@@ -23,6 +23,7 @@
         <p class="menu-sous-titre" id="menu-periode"></p>
       </div>
       <div class="menu-commandes">
+        <button class="menu-bouton" data-action="aller-jus">Jus du jour</button>
         <span class="menu-puce"><img src="../../assets/icons/menu/personnes.svg" width="16" height="16" alt=""><span id="menu-personnes"></span></span>
         <button class="menu-bouton-principal" data-action="aller-generer">
           <img src="../../assets/icons/menu/etincelles.svg" width="16" height="16" alt="">
@@ -58,6 +59,9 @@
       <div class="menu-ligne-haut">
 
         <article class="menu-vedette">
+          <!-- Photo du plat : <img alt="" src="URL signée"> posée par le JS ; sinon le dégradé reste visible -->
+          <span class="menu-vedette-photo" id="menu-vedette-photo"></span>
+          <span class="menu-vedette-credit" id="menu-vedette-credit" hidden>Photo : Auteur / Pexels</span>
           <span class="menu-badge-ambre"><img src="../../assets/icons/menu/toque.svg" width="14" height="14" alt=""><span id="menu-vedette-moment"></span></span>
           <div class="menu-vedette-texte">
             <p class="menu-surtitre" id="menu-vedette-tags"></p>
@@ -212,6 +216,9 @@
     <button class="menu-retour" data-action="retour-semaine">← Menu de la semaine</button>
 
     <article class="menu-vedette menu-vedette-recette">
+      <!-- Photo du plat : <img alt="" src="URL signée"> posée par le JS ; sinon le dégradé reste visible -->
+      <span class="menu-vedette-photo" id="recette-photo"></span>
+      <span class="menu-vedette-credit" id="recette-credit" hidden>Photo : Auteur / Pexels</span>
       <span class="menu-badge-ambre"><img src="../../assets/icons/menu/toque.svg" width="14" height="14" alt=""><span id="recette-contexte"></span></span>
       <div class="menu-vedette-texte">
         <p class="menu-surtitre" id="recette-tags"></p>
@@ -267,6 +274,127 @@
       </button>
     </div>
 
+  </section>
+
+  <!-- =====================================================
+       SOUS-PAGE 4 : JUS DU JOUR (catalogue selon la météo)
+       Couleur d'un jus = son objectif (--jus-*) : badge, filtre et fond de secours sans photo.
+       Exemples fictifs ci-dessous : à retirer au branchement.
+       ===================================================== -->
+  <section class="menu-page" data-sous-page="jus" hidden>
+
+    <button class="menu-retour" data-action="retour-semaine">← Menu de la semaine</button>
+    <div class="menu-entete">
+      <div>
+        <h1 class="menu-titre">Jus du jour</h1>
+        <p class="menu-sous-titre">Six jus frais, choisis selon vos objectifs et le temps qu'il fait.</p>
+        <!-- Si la génération du jour a échoué, le catalogue précédent reste affiché avec sa date -->
+        <p class="jus-date" id="jus-date" hidden></p>
+      </div>
+      <div class="menu-commandes">
+        <!-- Météo : masquée si non configurée, « Météo indisponible » si l'entité ne répond pas -->
+        <span class="menu-puce" id="jus-meteo" hidden></span>
+        <button class="menu-bouton" data-action="regenerer-jus">Autres idées <span class="menu-quota-mini" id="jus-quota"></span></button>
+      </div>
+    </div>
+
+    <!-- CONSEIL DU JOUR : calculé par le serveur à partir de la météo de Home Assistant -->
+    <div class="jus-conseil" id="jus-conseil" hidden>
+      <span class="jus-conseil-pastille"></span>
+      <span class="menu-etat-texte"><b id="jus-conseil-titre"></b><span id="jus-conseil-texte"></span></span>
+    </div>
+
+    <!-- États : même logique que le menu (un seul visible) -->
+    <div class="menu-etat menu-etat-encours" id="jus-etat-encours" role="status" hidden>
+      <span class="menu-etat-texte"><b>Préparation des jus du jour…</b><span>Cela peut prendre quelques minutes.</span></span>
+    </div>
+    <div class="menu-etat menu-etat-erreur" id="jus-etat-erreur" role="alert" hidden>
+      <span class="menu-etat-texte"><b id="jus-erreur-titre">Jus indisponibles</b><span id="jus-erreur-texte">Réessayez dans quelques minutes.</span></span>
+    </div>
+
+    <!-- AUCUN CATALOGUE (échec du jour, pas de catalogue précédent) -->
+    <div class="menu-vide" id="jus-vide" hidden>
+      <h2>Pas encore de jus aujourd'hui</h2>
+      <p>Les idées du jour n'ont pas pu être préparées. Vous pouvez relancer la préparation.</p>
+      <button class="menu-bouton-principal" data-action="regenerer-jus">Préparer les jus <span class="menu-quota-mini"></span></button>
+    </div>
+
+    <!-- FILTRE PAR OBJECTIF (côté panneau, sur les 6 jus reçus) -->
+    <div class="menu-choix jus-filtres" role="radiogroup" aria-label="Filtrer par objectif" id="jus-filtres">
+      <label><input type="radio" name="objectif" value="" checked><span>Tous</span></label>
+      <label class="jus-objectif-fraicheur"><input type="radio" name="objectif" value="fraicheur"><span class="jus-point"></span><span>Fraîcheur</span></label>
+      <label class="jus-objectif-vitalite"><input type="radio" name="objectif" value="vitalite"><span class="jus-point"></span><span>Vitalité</span></label>
+      <label class="jus-objectif-immunite"><input type="radio" name="objectif" value="immunite"><span class="jus-point"></span><span>Immunité</span></label>
+      <label class="jus-objectif-antioxydant"><input type="radio" name="objectif" value="antioxydant"><span class="jus-point"></span><span>Antioxydant</span></label>
+      <label class="jus-objectif-digestif"><input type="radio" name="objectif" value="digestif"><span class="jus-point"></span><span>Digestif</span></label>
+    </div>
+
+    <!-- CATALOGUE : une carte par jus ; photo facultative (repli sur le dégradé de l'objectif) -->
+    <div class="jus-grille" id="jus-catalogue"></div>
+  </section>
+
+  <!-- =====================================================
+       SOUS-PAGE 5 : DÉTAIL D'UN JUS
+       ===================================================== -->
+  <!-- La classe jus-objectif-* de la section donne la couleur de tout le détail (posée par le JS) -->
+  <section class="menu-page jus-objectif-fraicheur" data-sous-page="jus-detail" id="jus-detail-page" hidden>
+
+    <button class="menu-retour" data-action="retour-jus">← Jus du jour</button>
+
+    <div class="jus-detail-haut" id="jus-detail">
+
+      <!-- Photo : <img alt="" src="URL signée"> posée par le JS dans .jus-photo ; sinon dégradé de l'objectif -->
+      <figure class="jus-detail-figure">
+        <span class="jus-photo jus-photo-grande" id="jus-detail-photo"><span class="jus-badge" id="jus-detail-objectif"></span></span>
+        <!-- Crédit Pexels obligatoire quand il y a une photo (texte seul, non cliquable) -->
+        <figcaption class="jus-credit" id="jus-detail-credit" hidden>Photo : Auteur / Pexels</figcaption>
+      </figure>
+
+      <div class="jus-detail-texte">
+        <p class="menu-surtitre" id="jus-detail-surtitre"></p>
+        <h1 class="menu-vedette-nom" id="jus-detail-nom"></h1>
+        <p class="jus-description" id="jus-detail-description"></p>
+
+        <!-- Conseil météo (serveur) : masqué si aucune entité météo -->
+        <p class="jus-conseil-mini" id="jus-detail-meteo" hidden><b></b> <span></span></p>
+
+        <div class="menu-caracteristiques">
+          <span class="menu-caracteristique"><img src="../../assets/icons/menu/horloge.svg" width="14" height="14" alt=""><span id="jus-detail-duree"></span></span>
+          <span class="menu-caracteristique"><img src="../../assets/icons/menu/personnes-clair.svg" width="14" height="14" alt=""><span id="jus-detail-portions"></span></span>
+        </div>
+
+        <button class="menu-bouton-principal jus-bouton-courses" data-action="jus-vers-courses">
+          <img src="../../assets/icons/menu/plus.svg" width="17" height="17" alt="">
+          Ajouter aux courses
+        </button>
+        <p class="menu-aide" id="jus-detail-bilan" role="status"></p>
+      </div>
+    </div>
+
+    <p class="menu-avertissement">
+      <img src="../../assets/icons/menu/ampoule.svg" width="17" height="17" alt="">
+      Recette générée automatiquement, à vérifier (allergènes).
+    </p>
+
+    <div class="jus-detail-colonnes">
+
+      <section class="menu-carte">
+        <h2 class="menu-section-titre">Ingrédients</h2>
+        <!-- Quantité en tête, dans la couleur de l'objectif -->
+        <ul class="jus-ingredients" id="jus-detail-ingredients"></ul>
+      </section>
+
+      <section class="menu-carte">
+        <h2 class="menu-section-titre">Préparation</h2>
+        <ol class="menu-etapes" id="jus-detail-etapes"></ol>
+      </section>
+
+      <section class="menu-carte">
+        <h2 class="menu-section-titre">Conseil de service</h2>
+        <p class="jus-service" id="jus-detail-service"></p>
+      </section>
+
+    </div>
   </section>
 
 </div>

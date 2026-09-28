@@ -2,16 +2,21 @@
 // MOCK-MENU.JS — Commandes maison/menu/* simulées pour le mode dev
 // =============================================
 // Même contrat que custom_components/maison (websocket_menu.py) : quota, créneaux rejetés,
-// erreurs. Recettes fictives et halal ; aucun appel réseau.
+// erreurs, catalogue de jus, photos arrivant en arrière-plan. Recettes fictives et halal ;
+// aucun appel réseau (les photos de dev sont servies par dev/serveur.py).
 // Depuis la console : mock.menu.indisponible = true (erreur du générateur), mock.menu.vider().
 
 const DELAI_GENERATION_MS = 1500;
+const DELAI_PHOTOS_MS = 4000;
 
 const RECETTES = {
   jus: [
     { nom: 'Orange et carotte', duree_min: 10, tags: ['vitaminé'], ingredients: [['Oranges', 4, 'piece', 'fruits-legumes'], ['Carottes', 3, 'piece', 'fruits-legumes']] },
     { nom: 'Pomme et gingembre', duree_min: 10, tags: ['tonique'], ingredients: [['Pommes', 4, 'piece', 'fruits-legumes'], ['Gingembre frais', 20, 'g', 'fruits-legumes']] },
     { nom: 'Concombre et menthe', duree_min: 10, tags: ['léger'], ingredients: [['Concombre', 1, 'piece', 'fruits-legumes'], ['Menthe', 1, 'botte', 'fruits-legumes'], ['Citron', 1, 'piece', 'fruits-legumes']] },
+    { nom: 'Betterave et pomme', duree_min: 10, tags: ['coloré'], ingredients: [['Betterave crue', 1, 'piece', 'fruits-legumes'], ['Pommes', 2, 'piece', 'fruits-legumes']] },
+    { nom: 'Ananas et citron vert', duree_min: 10, tags: ['digestif'], ingredients: [['Ananas', 1, 'piece', 'fruits-legumes'], ['Citron vert', 1, 'piece', 'fruits-legumes']] },
+    { nom: 'Fraise et banane', duree_min: 10, tags: ['enfants'], ingredients: [['Fraises', 250, 'g', 'fruits-legumes'], ['Bananes', 2, 'piece', 'fruits-legumes'], ['Lait', 20, 'cl', 'cremerie']] },
   ],
   diner: [
     { nom: 'Poulet yassa', duree_min: 45, tags: ['familial', 'sénégalais'], ingredients: [['Cuisses de poulet halal', 4, 'piece', 'boucherie'], ['Oignons', 4, 'piece', 'fruits-legumes'], ['Citrons', 3, 'piece', 'fruits-legumes'], ['Moutarde', 45, 'g', 'epicerie'], ['Riz', 280, 'g', 'epicerie']] },
@@ -21,6 +26,16 @@ const RECETTES = {
     { nom: 'Pâtes à la tomate', duree_min: 25, tags: ['rapide', 'enfants'], ingredients: [['Pâtes', 500, 'g', 'epicerie'], ['Tomates', 800, 'g', 'fruits-legumes'], ['Ail', 2, 'piece', 'fruits-legumes'], ['Parmesan', 60, 'g', 'cremerie']] },
   ],
 };
+// Sous-objet « jus » du contrat, pour les jus du menu et du catalogue
+const INFOS_JUS = {
+  'Orange et carotte': { objectif: 'vitalite', moment: 'matin', description: 'Doux et vitaminé pour bien démarrer.', service: 'Bien frais, sans glaçons' },
+  'Pomme et gingembre': { objectif: 'immunite', moment: 'gouter', description: 'Relevé par le gingembre frais.', service: 'Frais' },
+  'Concombre et menthe': { objectif: 'fraicheur', moment: 'midi', description: 'Très désaltérant les jours chauds.', service: 'Avec des glaçons' },
+  'Betterave et pomme': { objectif: 'antioxydant', moment: 'apres-effort', description: 'Riche et coloré.', service: 'Frais' },
+  'Ananas et citron vert': { objectif: 'digestif', moment: 'soiree', description: 'Léger après le repas.', service: 'À température ambiante' },
+  'Fraise et banane': { objectif: 'vitalite', moment: 'gouter', description: 'Onctueux, apprécié des enfants.', service: 'Bien frais' },
+};
+
 const ETAPES = [
   'Préparer et laver les ingrédients.',
   'Cuire à feu moyen en remuant régulièrement.',
@@ -51,6 +66,8 @@ export function creerMenuSimule({ erreur, courses }) {
     quota: { utilise: 1, max: 3 },
     enCours: false,
     indisponible: false,
+    meteo: { ok: true, raison: null },   // mock.menu.etat.meteo = { ok: false, raison: 'non_configuree' }
+    catalogue: null,
     menu: null,
     tirage: 0,
   };
@@ -67,6 +84,8 @@ export function creerMenuSimule({ erreur, courses }) {
       duree_min: modele.duree_min,
       tags: modele.tags,
       etapes: ETAPES,
+      photo: null,   // cherchée en arrière-plan après la génération, comme le serveur
+      ...(INFOS_JUS[modele.nom] ? { jus: INFOS_JUS[modele.nom] } : {}),
       ingredients: modele.ingredients.map(([nom, quantite, unite, rayon]) => ({ nom, quantite, unite, rayon })),
     };
   }
@@ -94,6 +113,31 @@ export function creerMenuSimule({ erreur, courses }) {
     return { id: `m${Date.now()}`, cree: new Date().toISOString(), parametres: { ...parametres, repas }, jours, recettes };
   }
 
+  let photos = 0;
+  function ajouterPhotosPlusTard(recettes) {
+    setTimeout(() => {
+      for (const r of recettes) {
+        if (r.photo) continue;
+        photos += 1;
+        r.photo = {
+          url: `/api/maison/photo/${photos.toString(16).padStart(16, '0')}.webp?authSig=demo`,
+          credit: { auteur: 'Photographe démo', lien: 'https://www.pexels.com' },
+        };
+      }
+    }, DELAI_PHOTOS_MS);
+  }
+
+  // Catalogue de jus du jour : généré au premier appel du jour, hors quota
+  function construireCatalogue() {
+    const jus = RECETTES.jus.map(() => recette('jus', etat.menu?.parametres.personnes ?? 2));
+    ajouterPhotosPlusTard(jus);
+    return {
+      date: new Date().toLocaleDateString('sv-SE'),
+      conseil: etat.meteo.ok ? { objectif: 'fraicheur', texte: 'Il fait chaud : privilégiez un jus rafraîchissant.', condition: 'sunny', temperature: 27 } : null,
+      jus,
+    };
+  }
+
   function consommerQuota() {
     if (etat.quota.utilise >= etat.quota.max) throw erreur('quota_atteint', 'Quota atteint');
     if (etat.enCours) throw erreur('generation_en_cours', 'Génération en cours');
@@ -107,6 +151,7 @@ export function creerMenuSimule({ erreur, courses }) {
       await new Promise((r) => setTimeout(r, DELAI_GENERATION_MS));
       if (etat.indisponible) throw erreur('generation_indisponible', 'Générateur injoignable');
       etat.menu = construire(parametres);
+      ajouterPhotosPlusTard(Object.values(etat.menu.recettes));
       return structuredClone(etat.menu);
     } finally {
       etat.enCours = false;
@@ -123,13 +168,15 @@ export function creerMenuSimule({ erreur, courses }) {
     const nouvelle = recette(repas, etat.menu.parametres.personnes);
     etat.menu.recettes[nouvelle.id] = nouvelle;
     jour.repas[repas] = { recette: nouvelle.id };
+    ajouterPhotosPlusTard([nouvelle]);
     return structuredClone(etat.menu);
   }
 
   // Ingrédients → articles todo au format commun ; quantités additionnées sur un article non coché
   function versCourses(ids) {
-    if (!etat.menu) throw erreur('menu_absent', 'Aucun menu');
-    const choisies = Object.values(etat.menu.recettes).filter((r) => !ids || ids.includes(r.id));
+    if (!etat.menu && !ids) throw erreur('menu_absent', 'Aucun menu');
+    const toutes = [...Object.values(etat.menu?.recettes ?? {}), ...(ids ? etat.catalogue?.jus ?? [] : [])];
+    const choisies = toutes.filter((r) => !ids || ids.includes(r.id));
     let ajoutes = 0;
     let fusionnes = 0;
     for (const ing of choisies.flatMap((r) => r.ingredients)) {
@@ -162,7 +209,19 @@ export function creerMenuSimule({ erreur, courses }) {
   async function commande(message) {
     switch (message.type) {
       case 'maison/menu/etat':
-        return { configure: true, repas: [...etat.repasActives], quota: { ...etat.quota }, enCours: etat.enCours };
+        return { configure: true, repas: [...etat.repasActives], quota: { ...etat.quota }, enCours: etat.enCours, meteo: { ...etat.meteo } };
+      case 'maison/jus/catalogue':
+        if (etat.catalogue?.date !== new Date().toLocaleDateString('sv-SE')) {
+          if (etat.indisponible) throw erreur('generation_indisponible', 'Générateur injoignable');
+          etat.catalogue = construireCatalogue();
+        }
+        return structuredClone(etat.catalogue);
+      case 'maison/jus/regenerer':
+        consommerQuota();
+        await new Promise((r) => setTimeout(r, DELAI_GENERATION_MS));
+        if (etat.indisponible) throw erreur('generation_indisponible', 'Générateur injoignable');
+        etat.catalogue = construireCatalogue();
+        return structuredClone(etat.catalogue);
       case 'maison/menu/lire':
         return etat.menu ? structuredClone(etat.menu) : null;
       case 'maison/menu/generer':

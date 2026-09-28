@@ -13,7 +13,18 @@ from urllib.parse import urlsplit
 
 import voluptuous as vol
 
-from .const import ALLERGIES, NOTE_MAX, PREFERENCES, RAYONS, REPAS, UNITES
+from .const import (
+    ALLERGIES,
+    HOTE_IMAGES,
+    HOTES_CREDIT,
+    MOMENTS_JUS,
+    NOTE_MAX,
+    OBJECTIFS_JUS,
+    PREFERENCES,
+    RAYONS,
+    REPAS,
+    UNITES,
+)
 
 # ---- NORMALISATION DES NOMS ----
 # Règle commune avec le panneau (vue Courses) : toute modification doit être faite des deux côtés.
@@ -100,6 +111,20 @@ INGREDIENT = _objet({
     vol.Required("rayon"): _dans(RAYONS, "autre"),
 })
 
+def _requete_photo(valeur: object) -> str:
+    """Mots-clés de recherche de photo : lettres latines et espaces uniquement, 60 caractères max."""
+    if not isinstance(valeur, str):
+        raise vol.Invalid("texte attendu")
+    return re.sub(r"\s+", " ", re.sub(r"[^A-Za-z ]", " ", valeur)).strip()[:60]
+
+
+INFOS_JUS = _objet({
+    vol.Required("objectif"): _dans(OBJECTIFS_JUS),
+    vol.Required("moment"): _dans(MOMENTS_JUS, "matin"),
+    vol.Required("description"): _texte(200),
+    vol.Required("service"): _texte(200),
+})
+
 RECETTE = _objet({
     vol.Required("nom"): _texte(80),
     vol.Required("portions"): _nombre(1, 12, entier=True),
@@ -107,6 +132,8 @@ RECETTE = _objet({
     vol.Required("ingredients"): _liste(INGREDIENT, 1, 30),
     vol.Required("etapes"): _liste(_texte(500), 1, 30),
     vol.Optional("tags", default=list): _liste(_texte(30), 0, 10),
+    vol.Optional("photo_requete", default=""): _requete_photo,
+    vol.Optional("jus"): INFOS_JUS,
 })
 
 PARAMETRES = _objet({
@@ -127,10 +154,14 @@ def valider_parametres(parametres: object) -> dict:
     return PARAMETRES(parametres)
 
 
-def valider_recette(recette: object) -> dict:
+def valider_recette(recette: object, jus: bool = False) -> dict:
+    """`jus` : le sous-objet « jus » (objectif, moment…) est obligatoire."""
     if not isinstance(recette, dict):
         raise vol.Invalid("objet attendu")
-    return RECETTE(recette)
+    valide = RECETTE(recette)
+    if jus and "jus" not in valide:
+        raise vol.Invalid("informations du jus manquantes")
+    return valide
 
 
 # ---- CONFORMITÉ : HALAL ET ALLERGIES ----
@@ -200,13 +231,13 @@ def motif_rejet(recette: dict, allergies: list[str]) -> str | None:
     return None
 
 
-def evaluer_plat(brut: object, allergies: list[str]) -> tuple[dict | None, str | None]:
+def evaluer_plat(brut: object, allergies: list[str], jus: bool = False) -> tuple[dict | None, str | None]:
     """(recette validée, None) si le plat est utilisable, sinon (None, motif).
 
     motif : « invalide » (format), « halal » ou « allergie ».
     """
     try:
-        recette = valider_recette(brut)
+        recette = valider_recette(brut, jus)
     except vol.Invalid:
         return None, "invalide"
     if motif := motif_rejet(recette, allergies):
@@ -289,3 +320,79 @@ def url_generateur_valide(url: object) -> bool:
         return decoupe.scheme == "https" and bool(decoupe.hostname) and not decoupe.username and not decoupe.password
     except ValueError:
         return False
+
+
+# ---- MÉTÉO : CONSEIL DE JUS DU JOUR ----
+# Calculé à partir de l'entité météo de HA : aucun appel externe.
+
+_LIBELLES_CONDITIONS = {
+    "sunny": "ciel dégagé", "clear-night": "nuit claire", "partlycloudy": "éclaircies",
+    "cloudy": "ciel couvert", "fog": "brouillard", "rainy": "pluie", "pouring": "forte pluie",
+    "lightning": "orage", "lightning-rainy": "orage", "snowy": "neige", "snowy-rainy": "pluie et neige",
+    "hail": "grêle", "windy": "vent", "windy-variant": "vent", "exceptional": "temps exceptionnel",
+}
+_LIBELLES_OBJECTIFS = {
+    "fraicheur": "la fraîcheur", "vitalite": "la vitalité", "immunite": "l'immunité",
+    "antioxydant": "les antioxydants", "digestif": "la digestion",
+}
+
+
+def conseil_meteo(condition: object, temperature: object) -> dict:
+    """{objectif, texte, condition, temperature} ; règles fixes, sans IA."""
+    condition = condition if isinstance(condition, str) else ""
+    try:
+        temperature = round(float(temperature))
+    except (TypeError, ValueError):
+        temperature = None
+    if (temperature is not None and temperature >= 25) or condition == "sunny":
+        objectif = "fraicheur"
+    elif (temperature is not None and temperature <= 8) or condition in (
+            "rainy", "pouring", "snowy", "snowy-rainy", "hail", "lightning", "lightning-rainy"):
+        objectif = "immunite"
+    elif condition in ("cloudy", "fog", "partlycloudy", "windy", "windy-variant"):
+        objectif = "vitalite"
+    else:
+        objectif = "antioxydant"
+    morceaux = [f"{temperature} °C" if temperature is not None else "", _LIBELLES_CONDITIONS.get(condition, "")]
+    constat = ", ".join(m for m in morceaux if m)
+    texte = f"{constat[:1].upper() + constat[1:]} → privilégiez {_LIBELLES_OBJECTIFS[objectif]}" if constat \
+        else f"Privilégiez {_LIBELLES_OBJECTIFS[objectif]}"
+    return {"objectif": objectif, "texte": texte, "condition": condition or None, "temperature": temperature}
+
+
+# ---- PHOTOS : CONTRÔLES AVANT TÉLÉCHARGEMENT ET AFFICHAGE ----
+
+FORMAT_ID_PHOTO = re.compile(r"[0-9a-f]{16}")
+
+
+def _url_https(url: object, hotes: tuple[str, ...]) -> bool:
+    if not isinstance(url, str) or len(url) > 500:
+        return False
+    try:
+        decoupe = urlsplit(url)
+        return (decoupe.scheme == "https" and decoupe.hostname in hotes and decoupe.port in (None, 443)
+                and not decoupe.username and not decoupe.password)
+    except ValueError:
+        return False
+
+
+def url_image_autorisee(url: object) -> bool:
+    """Seule origine de téléchargement acceptée : https://images.pexels.com/…"""
+    return _url_https(url, (HOTE_IMAGES,))
+
+
+def credit_photo(auteur: object, lien: object) -> dict | None:
+    """Crédit affichable (texte seulement) ; lien conservé uniquement vers pexels.com."""
+    auteur = re.sub(r"[\x00-\x1f\x7f]", " ", auteur).strip()[:80] if isinstance(auteur, str) else ""
+    return {"auteur": auteur or "Pexels", "lien": lien if _url_https(lien, HOTES_CREDIT) else None}
+
+
+def type_image(debut: bytes) -> str | None:
+    """Type réel d'après la signature binaire (le Content-Type annoncé ne suffit pas)."""
+    if debut.startswith(b"\xff\xd8\xff"):
+        return "jpeg"
+    if debut.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "png"
+    if debut[:4] == b"RIFF" and debut[8:12] == b"WEBP":
+        return "webp"
+    return None

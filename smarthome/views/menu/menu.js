@@ -2,15 +2,18 @@
 // MENU.JS — Section Menu (semaine, générer, recette)
 // =============================================
 // Tout passe par l'intégration « maison » (maison/menu/*) : le panneau ne contacte jamais
-// le générateur. Sous-pages : « menu » (semaine), « menu/generer », « menu/recette/<date>/<repas> ».
+// le générateur. Sous-pages : « menu » (semaine), « menu/generer », « menu/recette/<date>/<repas> »,
+// « menu/jus » (catalogue du jour) et « menu/jus/<id> ».
 // Affichage en nœuds texte uniquement ; aucun stockage navigateur.
 
 import { ajouterStyle, chargerGabarit, el, remplacer } from '../../js/dom.js';
-import { menuEtat, menuGenerer, menuLire, menuRemplacer, menuVersCourses } from '../../js/ha.js';
+import { jusCatalogue, jusRegenerer, menuEtat, menuGenerer, menuLire, menuRemplacer, menuVersCourses } from '../../js/ha.js';
 
 const PERSONNES_MIN = 1;
 const PERSONNES_MAX = 12;
 const SUIVI_MS = 15_000;          // relecture pendant une génération (lancée ici ou ailleurs)
+const PHOTOS_MS = 25_000;         // les photos arrivent en arrière-plan après une génération
+const SIGNATURES_MS = 6 * 3600_000;   // les adresses signées des photos expirent après 24 h
 
 const REPAS = { petit_dej: 'Petit-déjeuner', jus: 'Jus', dejeuner: 'Déjeuner', diner: 'Dîner' };
 // Heure à partir de laquelle un repas du jour n'est plus « à venir » (recette mise en avant)
@@ -44,6 +47,48 @@ const ERREURS = {
   courses_non_configure: ['Liste de courses non configurée', 'À régler dans Home Assistant : Maison → Configurer → Générateur de menu.'],
   parametres_invalides: ['Choix invalides', 'Vérifiez les jours, les repas et le nombre de personnes.'],
 };
+const OBJECTIFS = { fraicheur: 'Fraîcheur', vitalite: 'Vitalité', immunite: 'Immunité', antioxydant: 'Antioxydant', digestif: 'Digestif' };
+const MOMENTS = { matin: 'Matin', midi: 'Midi', 'apres-effort': 'Après l\'effort', gouter: 'Goûter', soiree: 'Soirée' };
+const CONDITIONS = {
+  sunny: 'Ciel dégagé', 'clear-night': 'Nuit claire', partlycloudy: 'Éclaircies', cloudy: 'Nuageux', fog: 'Brouillard',
+  rainy: 'Pluie', pouring: 'Forte pluie', snowy: 'Neige', 'snowy-rainy': 'Neige et pluie', hail: 'Grêle',
+  lightning: 'Orage', 'lightning-rainy': 'Orage', windy: 'Venteux', 'windy-variant': 'Venteux', exceptional: 'Conditions exceptionnelles',
+};
+const CONSEILS = { fraicheur: 'la fraîcheur', vitalite: 'la vitalité', immunite: 'l\'immunité', antioxydant: 'les antioxydants', digestif: 'la digestion' };
+const objectifDe = (recette) => (OBJECTIFS[recette?.jus?.objectif] ? recette.jus.objectif : 'fraicheur');
+
+// Photo servie par l'intégration : seul un chemin relatif signé est accepté, sinon le dégradé reste
+const PHOTO_SIGNEE = /^\/api\/maison\/photo\/[0-9a-f]{16}\.webp\?authSig=[A-Za-z0-9._-]+$/;
+const photoValide = (photo) => typeof photo?.url === 'string' && PHOTO_SIGNEE.test(photo.url);
+
+// Segment d'URL tapé à la main : un « % » mal formé ne doit pas casser la vue
+const decoder = (texte) => {
+  try {
+    return decodeURIComponent(texte);
+  } catch {
+    return '';
+  }
+};
+
+// Pose (ou retire) la photo en premier enfant du conteneur, et le crédit en texte non cliquable.
+// Même photo avec une nouvelle signature : l'image affichée est gardée (pas de clignotement).
+function poserPhoto(conteneur, credit, photo) {
+  const valide = photoValide(photo);
+  const actuelle = conteneur.querySelector(':scope > img');
+  const cheminPhoto = valide ? photo.url.split('?')[0] : null;
+  if (actuelle && actuelle.dataset.chemin !== cheminPhoto) actuelle.remove();
+  if (valide && actuelle?.dataset.chemin !== cheminPhoto) {
+    const img = el('img', { src: photo.url, alt: '', 'data-chemin': cheminPhoto, decoding: 'async' });
+    img.addEventListener('error', () => img.remove());   // adresse expirée ou photo absente : dégradé
+    conteneur.prepend(img);
+  }
+  if (credit) {
+    const auteur = valide && typeof photo.credit?.auteur === 'string' ? photo.credit.auteur.slice(0, 80) : '';
+    credit.hidden = !auteur;
+    credit.textContent = auteur ? `Photo : ${auteur} / Pexels` : '';
+  }
+}
+
 const texteErreur = (e) => ERREURS[e?.code] ?? ['Erreur', 'L\'action n\'a pas abouti. Réessayez.'];
 
 const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
@@ -84,6 +129,16 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
   let suivi = null;
   let action = false;       // une action serveur lancée depuis cette tablette est en cours
   let confirmation = null;  // « Tout ajouter » : second appui attendu jusqu'à ce minuteur
+  let catalogue = null;     // jus du jour (maison/jus/catalogue), lu à la première visite
+  let chargeJus = false;
+  let erreurJus = null;
+  let actionJus = false;
+  let relecturePhotos = null;
+  // Adresses signées des photos : relecture régulière avant leur expiration
+  const signatures = setInterval(() => {
+    actualiser();
+    if (chargeJus) chargerCatalogue();
+  }, SIGNATURES_MS);
 
   const restant = () => (etat ? Math.max(0, etat.quota.max - etat.quota.utilise) : 0);
   const texteRestant = () => `${restant()} restant${restant() > 1 ? 's' : ''}`;
@@ -100,12 +155,19 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
   function afficher(nouveauChemin = '') {
     chemin = nouveauChemin;
     const [page, date, repas] = chemin.split('/');
-    const sousPage = ['generer', 'recette'].includes(page) ? page : 'semaine';
+    let sousPage = ['generer', 'recette', 'jus'].includes(page) ? page : 'semaine';
+    if (page === 'jus' && date) sousPage = 'jus-detail';
     racine.querySelectorAll('[data-sous-page]').forEach((section) => {
       section.hidden = section.dataset.sousPage !== sousPage;
     });
     if (sousPage === 'generer') preparerFormulaire();
     else if (sousPage === 'recette') rendreRecette(date, repas);
+    else if (sousPage === 'jus') afficherJus();
+    else if (sousPage === 'jus-detail') {
+      const id = decoder(date);
+      if (id) afficherJus(id);
+      else aller('jus');
+    }
     else rendreSemaine();
   }
 
@@ -172,6 +234,7 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
       $('menu-vedette-duree').textContent = `${recette.duree_min} min`;
       $('menu-vedette-portions').textContent = pluriel(recette.portions, 'personne');
       Object.assign($('menu-vedette-ouvrir').dataset, { jour: jour.date, repas });
+      poserPhoto($('menu-vedette-photo'), $('menu-vedette-credit'), recette.photo);
     }
 
     const recettes = jours.flatMap((j) => Object.values(j.repas).map(recetteDe)).filter(Boolean);
@@ -221,6 +284,7 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     $('recette-contexte').textContent = libelleMoment(date, repas);
     $('recette-tags').textContent = recette.tags.slice(0, 3).map(majuscule).join(' · ');
     $('recette-nom').textContent = recette.nom;
+    poserPhoto($('recette-photo'), $('recette-credit'), recette.photo);
     $('recette-duree').textContent = `${recette.duree_min} min`;
     $('recette-portions').textContent = pluriel(recette.portions, 'personne');
     $('recette-nb-ingredients').textContent = String(recette.ingredients.length);
@@ -323,6 +387,7 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     afficher(chemin);
     try {
       menu = await appel();
+      programmerPhotos();
     } catch (e) {
       erreur = e?.code ? e : { code: 'generation_indisponible' };
       console.warn('Menu, action refusée :', erreur.code);
@@ -347,8 +412,7 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     executer(() => menuRemplacer(hass, jour, repas));
   }
 
-  async function versCourses(bouton, recettes) {
-    const zone = recettes ? $('recette-resume-courses') : bilanSemaine;
+  async function versCourses(bouton, recettes, zone = recettes ? $('recette-resume-courses') : bilanSemaine) {
     bouton.disabled = true;
     zone.textContent = 'Ajout en cours…';
     try {
@@ -364,6 +428,158 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     } finally {
       bouton.disabled = false;
     }
+  }
+
+  // Photos cherchées en arrière-plan : une relecture quelques secondes après la génération
+  function programmerPhotos() {
+    const sansPhoto = (liste) => liste.some((r) => !r.photo);
+    const attente = (menu && sansPhoto(Object.values(menu.recettes))) || (catalogue && sansPhoto(catalogue.jus));
+    if (!attente || relecturePhotos) return;
+    relecturePhotos = setTimeout(() => {
+      relecturePhotos = null;
+      actualiser();
+      if (chargeJus) chargerCatalogue();
+    }, PHOTOS_MS);
+  }
+
+  // ---- JUS DU JOUR ----
+
+  // Lu à la première visite : le serveur le génère alors, une fois par jour, hors quota
+  function afficherJus(id) {
+    if (!chargeJus && !actionJus && hass) chargerCatalogue();
+    if (id) rendreJusDetail(id);
+    else rendreJus();
+  }
+
+  async function chargerCatalogue() {
+    actionJus = !chargeJus;   // première lecture du jour : la préparation peut prendre un moment
+    rendreJus();
+    try {
+      catalogue = await jusCatalogue(hass);
+      erreurJus = null;
+    } catch (e) {
+      erreurJus = e?.code ? e : { code: 'generation_indisponible' };
+      console.warn('Jus :', erreurJus.code);
+    }
+    actionJus = false;
+    chargeJus = true;
+    programmerPhotos();
+    afficher(chemin);
+  }
+
+  async function regenererJus() {
+    actionJus = true;
+    erreurJus = null;
+    rendreJus();
+    try {
+      catalogue = await jusRegenerer(hass);
+      programmerPhotos();
+    } catch (e) {
+      erreurJus = e?.code ? e : { code: 'generation_indisponible' };
+      console.warn('Jus, régénération refusée :', erreurJus.code);
+    }
+    actionJus = false;
+    await actualiser();
+  }
+
+  function rendreJus() {
+    const jourJ = aujourdhui();
+    const conseil = catalogue?.conseil ?? null;
+
+    $('jus-date').hidden = !catalogue || catalogue.date === jourJ;
+    if (catalogue && catalogue.date !== jourJ) {
+      const date = dateLocale(catalogue.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+      $('jus-date').textContent = `Jus du ${date} : ceux d'aujourd'hui n'ont pas pu être préparés.`;
+    }
+
+    // Météo : masquée si non configurée, « Météo indisponible » si l'entité ne répond pas
+    const meteo = etat?.meteo;
+    const puce = $('jus-meteo');
+    puce.hidden = !meteo || meteo.raison === 'non_configuree' || (meteo.ok && !conseil);
+    if (meteo?.raison === 'indisponible') puce.textContent = 'Météo indisponible';
+    else if (conseil) {
+      puce.textContent = [
+        Number.isFinite(conseil.temperature) ? `${Math.round(conseil.temperature)} °C` : '',
+        CONDITIONS[conseil.condition],
+      ].filter(Boolean).join(' · ');
+    }
+
+    const bloque = restant() === 0 || actionJus || Boolean(etat?.enCours);
+    racine.querySelectorAll('[data-action="regenerer-jus"]').forEach((b) => {
+      b.disabled = bloque;
+      const mini = b.querySelector('.menu-quota-mini');
+      if (mini) mini.textContent = texteRestant();
+    });
+
+    $('jus-conseil').hidden = !conseil;
+    if (conseil) {
+      const objectif = OBJECTIFS[conseil.objectif] ? conseil.objectif : 'fraicheur';
+      $('jus-conseil').className = `jus-conseil jus-objectif-${objectif}`;
+      $('jus-conseil-titre').textContent = `Aujourd'hui, privilégiez ${CONSEILS[objectif]}`;
+      $('jus-conseil-texte').textContent = typeof conseil.texte === 'string' ? conseil.texte : '';
+    }
+
+    $('jus-etat-encours').hidden = !actionJus;
+    $('jus-etat-erreur').hidden = actionJus || !erreurJus;
+    if (erreurJus) {
+      const [titre, texte] = texteErreur(erreurJus);
+      $('jus-erreur-titre').textContent = titre;
+      $('jus-erreur-texte').textContent = texte;
+    }
+    $('jus-vide').hidden = actionJus || !chargeJus || Boolean(catalogue);
+    $('jus-filtres').hidden = !catalogue?.jus.length;
+
+    const filtre = $('jus-filtres').querySelector('input[name="objectif"]:checked')?.value ?? '';
+    const jus = (catalogue?.jus ?? []).filter((r) => !filtre || objectifDe(r) === filtre);
+    remplacer($('jus-catalogue'), ...jus.map((r) => {
+      const objectif = objectifDe(r);
+      const photo = el('span', { class: 'jus-photo' },
+        el('span', { class: 'jus-badge' }, OBJECTIFS[objectif]),
+        el('span', { class: 'jus-moment' }, MOMENTS[r.jus?.moment] ?? ''));
+      poserPhoto(photo, null, r.photo);
+      return el('button', { class: `jus-carte jus-objectif-${objectif}`, 'data-action': 'ouvrir-jus', 'data-id': r.id },
+        photo,
+        el('span', { class: 'jus-carte-texte' },
+          el('b', {}, r.nom),
+          el('span', {}, r.ingredients.slice(0, 3).map((i) => i.nom).join(' · '))),
+        el('span', { class: 'jus-carte-pied' },
+          el('span', {}, `${r.duree_min} min`),
+          el('span', { class: 'jus-voir' }, 'Voir la recette →')));
+    }));
+    $('jus-catalogue').hidden = !jus.length;
+  }
+
+  function rendreJusDetail(id) {
+    const recette = catalogue?.jus.find((r) => r.id === id);
+    if (!recette) {
+      if (chargeJus) aller('jus');   // catalogue régénéré : retour à la liste
+      return;
+    }
+    const objectif = objectifDe(recette);
+    const conseil = catalogue.conseil;
+    $('jus-detail-page').className = `menu-page jus-objectif-${objectif}`;
+    $('jus-detail-objectif').textContent = OBJECTIFS[objectif];
+    poserPhoto($('jus-detail-photo'), $('jus-detail-credit'), recette.photo);
+    $('jus-detail-surtitre').textContent = [OBJECTIFS[objectif], MOMENTS[recette.jus?.moment]].filter(Boolean).join(' · ');
+    $('jus-detail-nom').textContent = recette.nom;
+    $('jus-detail-description').textContent = recette.jus?.description ?? '';
+    const meteo = $('jus-detail-meteo');
+    meteo.hidden = !conseil || conseil.objectif !== objectif;
+    if (!meteo.hidden) {
+      meteo.querySelector('b').textContent = 'Conseil du jour';
+      meteo.querySelector('span').textContent = typeof conseil.texte === 'string' ? conseil.texte : '';
+    }
+    $('jus-detail-duree').textContent = `${recette.duree_min} min`;
+    $('jus-detail-portions').textContent = pluriel(recette.portions, 'verre');
+    remplacer($('jus-detail-ingredients'), ...recette.ingredients.map((i) =>
+      el('li', {},
+        el('b', {}, quantite(i)),
+        el('span', { class: 'menu-ingredient-nom' }, i.nom),
+        el('span', { class: 'menu-rayon' }, RAYONS[i.rayon] ?? RAYONS.autre))));
+    remplacer($('jus-detail-etapes'), ...recette.etapes.map((e) => el('li', {}, e)));
+    $('jus-detail-service').textContent = recette.jus?.service ?? '';
+    $('jus-detail-bilan').textContent = '';
+    racine.querySelector('[data-action="jus-vers-courses"]').dataset.recette = recette.id;
   }
 
   // « Tout ajouter » ajoute d'un coup les ingrédients de la semaine : un premier appui
@@ -405,6 +621,11 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
       case 'remplacer': remplacerPlat(cible); break;
       case 'vers-courses': confirmerToutAjouter(cible); break;
       case 'recette-vers-courses': versCourses(cible, [cible.dataset.recette]); break;
+      case 'aller-jus': aller('jus'); break;
+      case 'retour-jus': aller('jus'); break;
+      case 'ouvrir-jus': aller(`jus/${encodeURIComponent(cible.dataset.id)}`); break;
+      case 'regenerer-jus': regenererJus(); break;
+      case 'jus-vers-courses': versCourses(cible, [cible.dataset.recette], $('jus-detail-bilan')); break;
       case 'reessayer':
         erreur = null;
         actualiser();
@@ -412,6 +633,8 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
       default:
     }
   });
+
+  $('jus-filtres').addEventListener('change', rendreJus);
 
   afficher(chemin);
 
@@ -427,7 +650,9 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     },
     detruire() {
       clearInterval(suivi);
+      clearInterval(signatures);
       clearTimeout(confirmation);
+      clearTimeout(relecturePhotos);
     },
   };
 }
