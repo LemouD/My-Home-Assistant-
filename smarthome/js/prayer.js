@@ -16,7 +16,7 @@ const PRIERES_DEF = [
 const METHODES = { 1: 'Karachi', 2: 'ISNA', 3: 'MWL', 4: 'Umm al-Qura', 5: 'Égypte', 12: 'UOIF', 15: 'Moonsighting' };
 
 // « dans 2 h 10 min » : délai avant la prochaine prière (passe minuit si besoin)
-const delai = (minutes) => {
+export const delai = (minutes) => {
   const total = (minutes + 1440) % 1440;
   const h = Math.floor(total / 60);
   const m = total % 60;
@@ -31,6 +31,49 @@ const enMinutes = (hhmm) => {
   return h * 60 + m;
 };
 
+// ---- DONNÉES (partagées entre les vues) ----
+
+// Un seul appel par jour et par position, quel que soit le nombre de vues qui affichent les prières
+const cache = new Map();
+
+export function horairesPriere({ latitude, longitude, methode }, jour = new Date()) {
+  const date = dateApi(jour);
+  const cle = `${date}|${latitude.toFixed(2)}|${longitude.toFixed(2)}|${methode}`;
+  if (!cache.has(cle)) {
+    const promesse = (async () => {
+      // Position arrondie à ~1 km : l'adresse exacte n'est pas envoyée à l'API
+      const params = new URLSearchParams({
+        latitude: latitude.toFixed(2),
+        longitude: longitude.toFixed(2),
+        method: methode,
+      });
+      const res = await fetch(`https://api.aladhan.com/v1/timings/${date}?${params}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.code !== 200) throw new Error('API Aladhan erreur');
+      return PRIERES_DEF.map((p) => {
+        const heure = data.data.timings[p.key].substring(0, 5); // HH:MM
+        return { ...p, heure, minutes: enMinutes(heure) };
+      });
+    })();
+    // En cas d'échec, on retire la promesse du cache pour réessayer au prochain appel
+    promesse.catch(() => cache.delete(cle));
+    cache.set(cle, promesse);
+  }
+  return cache.get(cle);
+}
+
+// Prochaine prière à `maintenant` ; après Isha, c'est Fajr du lendemain.
+export function prochainePriere(horaires, maintenant = new Date()) {
+  const minutes = maintenant.getHours() * 60 + maintenant.getMinutes();
+  const priere = horaires.find((p) => p.minutes > minutes) ?? horaires[0];
+  return { priere, dans: (priere.minutes - minutes + 1440) % 1440 };
+}
+
+export const NOM_METHODE = (methode) => METHODES[methode] ?? String(methode);
+
+// ---- AFFICHAGE (accueil) ----
+
 // Les horaires ne changent qu'une fois par jour : un seul appel à l'API par jour,
 // le calcul de la prochaine prière se fait localement chaque minute.
 // Renvoie une fonction qui arrête la mise à jour.
@@ -43,24 +86,6 @@ export function demarrerPrieres(racine, { latitude, longitude, methode, ville })
 
   let jour = null;      // date des horaires en cache (JJ-MM-AAAA)
   let horaires = null;  // [{ ...PRIERES_DEF, heure: 'HH:MM', minutes }]
-
-  const charger = async (date) => {
-    // Position arrondie à ~1 km : l'adresse exacte n'est pas envoyée à l'API
-    const params = new URLSearchParams({
-      latitude: latitude.toFixed(2),
-      longitude: longitude.toFixed(2),
-      method: methode,
-    });
-    const res = await fetch(`https://api.aladhan.com/v1/timings/${date}?${params}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (data.code !== 200) throw new Error('API Aladhan erreur');
-
-    return PRIERES_DEF.map((p) => {
-      const heure = data.data.timings[p.key].substring(0, 5); // HH:MM
-      return { ...p, heure, minutes: enMinutes(heure) };
-    });
-  };
 
   const afficher = (now) => {
     const minutes = now.getHours() * 60 + now.getMinutes();
@@ -87,7 +112,7 @@ export function demarrerPrieres(racine, { latitude, longitude, methode, ville })
     const date = dateApi(now);
     try {
       if (date !== jour) {
-        horaires = await charger(date);
+        horaires = await horairesPriere({ latitude, longitude, methode }, now);
         jour = date;
       }
       afficher(now);

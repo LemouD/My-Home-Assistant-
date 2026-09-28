@@ -79,3 +79,43 @@ export const valeurNumerique = (hass, id) => {
 export async function definirNombre(hass, entityId, valeur) {
   await hass.callService('input_number', 'set_value', { entity_id: entityId, value: valeur });
 }
+
+// ---- VIE : scénarios, lumières, appareils, caméras ----
+
+// Service appelé par un bouton « Activer / Lancer » selon le type d'entité
+const ACTIVATION = {
+  scene: 'turn_on',
+  script: 'turn_on',
+  automation: 'trigger',
+  vacuum: 'start',
+  button: 'press',
+  input_button: 'press',
+};
+
+export async function activer(hass, entityId) {
+  const domaine = entityId.split('.')[0];
+  const service = ACTIVATION[domaine];
+  if (!service) throw new Error(`Activation non prise en charge : ${domaine}`);
+  await hass.callService(domaine, service, { entity_id: entityId });
+}
+
+export const luminosite = (hass, id) => {
+  const brut = etat(hass, id)?.attributes.brightness;
+  return estActif(hass, id) && brut != null ? Math.round((brut / 255) * 100) : 0;
+};
+
+export async function reglerLuminosite(hass, entityId, pourcent) {
+  await hass.callService('light', 'turn_on', { entity_id: entityId, brightness_pct: pourcent });
+}
+
+// Image fixe d'une caméra (URL signée fournie par HA, renouvelée par HA)
+export const imageCamera = (hass, id) => etat(hass, id)?.attributes.entity_picture ?? null;
+
+// Ouvre la fiche native de Home Assistant (flux caméra en direct, thermostat, TV…)
+export function ouvrirFiche(element, entityId) {
+  element.dispatchEvent(new CustomEvent('hass-more-info', {
+    detail: { entityId },
+    bubbles: true,
+    composed: true,
+  }));
+}

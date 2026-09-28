@@ -92,6 +92,31 @@ template:
 Le bouton « Saisir nouvel index » modifie `input_number.index_eau` ; le capteur `sensor.index_eau`
 alimente les statistiques. Un futur capteur automatique remplacera simplement `sensor.index_eau`.
 
+## Vie
+
+Maison (scénarios, pièces, caméras, appareils) et bien-être & spiritualité, avec quatre
+sous-pages : détail d'une pièce, Bien-être (matin, après-midi, soir), Découvrir et Rituel du soir.
+Entités et images dans `config.js`, section `VIE` ; une entité absente est simplement ignorée.
+
+- **Images** (fonds et illustrations des pièces) : facultatives, déposées dans `/config/www/images/`.
+  Ce dossier est public (`/local/`) : uniquement des images libres de droits,
+  **jamais de photo de l'intérieur de la maison**.
+- **Caméras** : l'image vient de Home Assistant (`entity_picture`), avec la session de l'utilisateur.
+- **Lumière douce** (rituel du soir) : `sceneLumiereDouce` désigne une scène HA à créer.
+
+Sources externes, appelées depuis la tablette, sans clé :
+
+| Contenu | Source | Limite |
+|---|---|---|
+| Versets (arabe + traduction française) | [UmmahAPI](https://ummahapi.com) | 5000 requêtes / 15 min |
+| Audio des versets | everyayah.com (URL fournie par UmmahAPI, hôte vérifié) | — |
+| Citation du jour | [citation.lecog.fr](https://citation.lecog.fr) | 100 requêtes / h, mise en cache pour la journée |
+| Horaires de prière | [Aladhan](https://aladhan.com/prayer-times-api) | mis en cache pour la journée |
+
+Les invocations (arabe, translittération, traduction, source) sont dans
+`views/vie/contenus.js`. Le calendrier hégirien est calculé par le navigateur
+(Umm al-Qura) ; les dates peuvent différer d'un jour de l'observation locale.
+
 ## Sécurité
 
 - Tout ce qui est dans `/config/www` est servi en `/local/` **sans authentification** :
