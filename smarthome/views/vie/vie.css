@@ -1,0 +1,1214 @@
+/* =============================================
+   VIE.CSS — Onglet Vie (maquette Figma)
+   ============================================= */
+
+.vue-vie {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.vue-vie [hidden] { display: none !important; }
+
+.vie {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--vie-texte);
+}
+
+.vie-vide {
+  font-size: var(--fs-sm);
+  color: var(--vie-texte-doux);
+}
+
+.vie-texte-violet { color: var(--vie-violet-clair); }
+.vie-texte-ambre  { color: var(--vie-ambre); }
+
+/* === EN-TÊTE === */
+.vie-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.vie-titre {
+  font-size: var(--fs-xl);
+  font-weight: 400;
+  letter-spacing: -0.5px;
+}
+
+.vie-sous-titre {
+  font-size: var(--fs-sm);
+  color: var(--vie-texte-doux);
+}
+
+.vie-pastille {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 12px;
+  background: var(--vie-carte);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+/* === STRUCTURE === */
+.vie-bloc {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vie-repere {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--vie-texte-doux);
+}
+
+.vie-repere-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vie-ligne {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.vie-ligne-maison { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+
+.vie-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 16px;
+  background: var(--vie-carte);
+  box-shadow: var(--shadow-card);
+}
+
+.vie-sous-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 16px;
+  background: var(--vie-carte);
+}
+
+.vie-section-entete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vie-section-entete-action .vie-section-titre { flex: 1; }
+
+.vie-section-titre {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.vie-section-texte {
+  font-size: var(--fs-xs);
+  color: var(--vie-texte-doux);
+}
+
+/* === ICÔNES === */
+.vie-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--vie-violet-fond);
+}
+.vie-icone-grand { width: 44px; height: 44px; border-radius: 12px; }
+.vie-icone-rond  { border-radius: 50%; }
+.vie-icone-ambre { background: var(--vie-ambre-fond); }
+
+/* === BOUTONS === */
+.vie-bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: var(--touch-min);
+  padding: 0 18px;
+  border: 1px solid var(--vie-violet-bord);
+  border-radius: 12px;
+  background: var(--vie-violet-fond);
+  color: var(--vie-violet-clair);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.vie-bouton:active   { background: var(--vie-violet-bord); }
+.vie-bouton:disabled { opacity: 0.55; cursor: default; }
+.vie-bouton-petit    { min-height: var(--touch-min); padding: 0 14px; }
+
+.vie-bouton-plein {
+  border-color: transparent;
+  background: var(--vie-violet);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(109, 99, 255, 0.35);
+}
+.vie-bouton-plein:active { background: var(--vie-violet-clair); }
+
+.vie-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.vie-chevron:active { background: var(--vie-ligne); }
+.vie-chevron-ouvert img { transform: rotate(90deg); }
+
+/* === ACTIONS RAPIDES === */
+.vie-scenarios {
+  flex-direction: row;
+  gap: 0;
+  padding: 0;
+}
+
+.vie-scenario {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+}
+
+.vie-separateur {
+  width: 1px;
+  background: var(--vie-bord);
+}
+
+.vie-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.vie-details b    { font-size: var(--fs-sm); }
+.vie-details span { font-size: var(--fs-xs); color: var(--vie-texte-doux); }
+
+/* === PIÈCES === */
+.vie-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vie-piece,
+.vie-appareil,
+.vie-lien {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: var(--vie-ligne);
+  color: inherit;
+  text-decoration: none;
+}
+.vie-piece, .vie-lien { cursor: pointer; transition: var(--transition); }
+.vie-piece:active, .vie-lien:active { background: var(--vie-bord); }
+
+.vie-resume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vie-point {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--vie-texte-doux);
+}
+
+.vie-ouvrir {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--vie-violet-clair);
+}
+
+.vie-fonctions {
+  display: flex;
+  gap: 10px;
+}
+
+.vie-fonction {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--vie-ligne);
+  color: var(--vie-texte);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.vie-fonction span { flex: 1; }
+.vie-fonction:active { background: var(--vie-bord); }
+
+/* === CAMÉRAS === */
+.vie-cameras {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vie-camera {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: 156px;
+  padding: 14px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 16px;
+  background: var(--vie-ligne);
+}
+
+.vie-camera-image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vie-camera-absente {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-sm);
+  color: var(--vie-texte-doux);
+}
+
+.vie-camera-voile {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(8, 10, 14, 0.06), rgba(8, 10, 14, 0.86));
+}
+
+.vie-direct {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  background: rgba(10, 12, 17, 0.66);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+.vie-direct-point {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F27676;
+}
+
+.vie-camera-infos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: var(--fs-md);
+}
+
+.vie-camera-agrandir {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: none;
+  border-radius: 10px;
+  background: rgba(10, 12, 17, 0.72);
+  cursor: pointer;
+}
+
+/* === APPAREILS === */
+.vie-appareil { min-height: 64px; padding: 8px 12px; }
+
+.vie-sous-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 48px;
+}
+
+.vie-interrupteur-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 10px;
+  background: none;
+  color: var(--vie-texte);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+/* Interrupteur (maquette : piste violette, pastille blanche) */
+.vie-interrupteur {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--vie-bord);
+  transition: var(--transition);
+}
+.vie-interrupteur::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--vie-texte-doux);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.actif > .vie-interrupteur,
+.vie-interrupteur.actif { background: var(--vie-violet); }
+.actif > .vie-interrupteur::after,
+.vie-interrupteur.actif::after { transform: translateX(22px); background: #fff; }
+
+/* === BIEN-ÊTRE (résumé) === */
+.vie-encart {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--vie-ligne);
+}
+.vie-encart-ambre {
+  border: 1px solid var(--vie-ambre-bord);
+  background: var(--vie-ambre-fond);
+}
+.vie-encart > div { display: flex; flex-direction: column; gap: 3px; }
+
+.vie-encart-titre { font-size: var(--fs-xs); color: var(--vie-ambre); }
+.vie-encart-texte { font-size: var(--fs-sm); line-height: 1.4; }
+.vie-encart-auteur { font-size: var(--fs-xs); color: var(--vie-texte-doux); }
+
+.vie-lien { min-height: var(--touch-min); padding: 8px 12px; }
+.vie-lien span { flex: 1; font-size: var(--fs-sm); font-weight: 600; }
+.vie-lien-ambre { color: var(--vie-ambre); }
+
+/* === PAGE PIÈCE === */
+.vie-fil {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--vie-violet-clair);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.vie-controle-global {
+  flex-direction: row;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border-color: var(--vie-violet-bord);
+}
+
+.vie-apercu-piece {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 32%;
+  min-height: 142px;
+  padding: 18px;
+  background: var(--vie-ligne);
+  font-size: var(--fs-md);
+}
+.vie-apercu-image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vie-controle-tout {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 28px;
+}
+.vie-icone-xl { width: 56px; height: 56px; border-radius: 16px; }
+
+.vie-segments {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 12px;
+  background: #202632;
+}
+
+.vie-segment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 24px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--vie-texte-doux);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.vie-segment.actif { background: var(--vie-violet); color: #fff; }
+
+/* Ligne de réglage d'une lumière */
+.vie-lumiere {
+  display: grid;
+  grid-template-columns: auto minmax(150px, 0.8fr) 1px minmax(0, 1.6fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 116px;
+  padding: 0 20px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 16px;
+  background: var(--vie-ligne);
+}
+.vie-lumiere.actif { border-color: var(--vie-violet-bord); }
+
+.vie-lumiere-icone { background: #202632; color: var(--vie-texte-doux); }
+.actif > .vie-lumiere-icone { background: var(--vie-ambre-fond); color: var(--vie-ambre); }
+
+/* Icône teintée par currentColor (ambre si allumée, gris sinon) */
+.vie-masque {
+  width: 22px;
+  height: 22px;
+  background-color: currentColor;
+  -webkit-mask: var(--icone) center / contain no-repeat;
+  mask: var(--icone) center / contain no-repeat;
+}
+.vie-masque-plafonnier { --icone: url(../../assets/icons/vie/lumiere-plafonnier.svg); }
+.vie-masque-lampe      { --icone: url(../../assets/icons/vie/lumiere-lampe.svg); }
+.vie-masque-lampe-tv   { --icone: url(../../assets/icons/vie/lumiere-lampe-tv.svg); }
+.vie-masque-bandeau    { --icone: url(../../assets/icons/vie/lumiere-bandeau.svg); }
+
+.vie-lumiere-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: var(--fs-md);
+}
+
+.vie-lumiere-etat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vie-statut {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 999px;
+  background: #202632;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--vie-texte-doux);
+}
+.vie-statut-point {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #626A7A;
+}
+.actif .vie-statut {
+  border-color: #37D49B;
+  background: rgba(55, 212, 155, 0.1);
+  color: #37D49B;
+}
+.actif .vie-statut-point { background: #37D49B; }
+
+.vie-separateur-vertical {
+  width: 1px;
+  height: 52px;
+  background: var(--vie-bord);
+}
+
+.vie-intensite {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vie-echelle {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-xs);
+  color: #626A7A;
+}
+
+/* Curseur de luminosité : zone tactile de 48 px, piste fine remplie jusqu'à --valeur */
+.vie-curseur {
+  width: 100%;
+  height: var(--touch-min);
+  margin: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+.vie-curseur::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--vie-violet) var(--valeur), #202632 var(--valeur));
+}
+.vie-curseur::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  margin-top: -9px;
+  border: 4px solid var(--vie-violet);
+  border-radius: 50%;
+  background: #fff;
+}
+.vie-curseur::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--vie-violet) var(--valeur), #202632 var(--valeur));
+}
+.vie-curseur::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 4px solid var(--vie-violet);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.vie-alimentation {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: var(--touch-min);
+  padding: 0 4px 0 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.vie-alimentation:disabled { opacity: 0.55; cursor: wait; }
+
+/* === BIEN-ÊTRE & SPIRITUALITÉ === */
+.vie-bouton-discret {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--vie-texte-doux);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.vie-entete-bas { align-items: flex-end; }
+
+.vie-date {
+  font-size: var(--fs-sm);
+  color: #6F788A;
+  white-space: nowrap;
+}
+
+.vie-rituel-jour {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 26px 28px 24px;
+  border: 1px solid var(--vie-violet-bord);
+  border-radius: 24px;
+  background: #131720;
+  box-shadow: 0 24px 52px -16px rgba(0, 0, 0, 0.4);
+}
+
+.vie-rituel-fond {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.52;
+}
+
+.vie-rituel-voile {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(90deg, rgba(17, 21, 29, 0.88), rgba(17, 21, 29, 0.82) 58%, rgba(9, 12, 19, 0.9));
+}
+
+.vie-rituel-halo {
+  position: absolute;
+  top: -161px;
+  right: -131px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.vie-moment-accueil {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.vie-moment-salutation { font-size: var(--fs-sm); color: var(--vie-or); }
+
+.vie-ambiance {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--vie-texte-doux);
+}
+
+/* Prochaine prière */
+.vie-prochaine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+  gap: 34px;
+}
+
+.vie-priere-principale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 30px 20px 4px;
+}
+
+.vie-repere-priere { justify-content: flex-start; gap: 8px; }
+.vie-repere-priere .vie-repere { color: var(--vie-lavande); }
+
+.vie-priere-grande {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-weight: 400;
+  line-height: 1;
+}
+.vie-priere-nom   { font-size: var(--fs-2xl); letter-spacing: -1px; }
+.vie-priere-heure { font-size: var(--fs-display); letter-spacing: -2px; }
+
+.vie-priere-delai {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+}
+.vie-point-vert { background: var(--vie-vert); }
+
+.vie-prieres-a-venir {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 16px;
+  background: rgba(14, 18, 26, 0.95);
+}
+
+.vie-prieres-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+}
+
+.vie-prieres-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vie-priere-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: var(--fs-sm);
+}
+.vie-priere-ligne-nom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--vie-texte-doux);
+}
+.vie-priere-ligne b { font-weight: 400; }
+.vie-priere-ligne.actif {
+  border-color: rgba(145, 138, 255, 0.4);
+  background: var(--vie-violet-fond);
+}
+.vie-priere-ligne.actif .vie-priere-ligne-nom { color: var(--vie-texte); font-weight: 700; }
+.vie-priere-ligne.actif b { color: var(--vie-lavande); font-weight: 400; }
+.vie-priere-ligne.actif .vie-point { background: var(--vie-lavande); }
+
+/* Verset, invocation, bien-être */
+.vie-essentiels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--vie-bord);
+  border-radius: 16px;
+  background: rgba(14, 18, 26, 0.95);
+}
+
+.vie-essentiel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 22px;
+}
+.vie-essentiel + .vie-essentiel { border-left: 1px solid var(--vie-bord); }
+
+.vie-essentiel-entete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vie-essentiel-verset     .vie-essentiel-icone { background: rgba(163, 157, 255, 0.09); }
+.vie-essentiel-invocation .vie-essentiel-icone { background: rgba(116, 201, 165, 0.09); }
+.vie-essentiel-bien-etre  .vie-essentiel-icone { background: rgba(255, 209, 122, 0.09); }
+.vie-essentiel-verset     .vie-essentiel-titre { color: var(--vie-lavande); }
+.vie-essentiel-invocation .vie-essentiel-titre { color: var(--vie-menthe); }
+.vie-essentiel-bien-etre  .vie-essentiel-titre { color: var(--vie-or); }
+
+.vie-essentiel-contenu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vie-essentiel-valeur { font-size: var(--fs-md); line-height: 1.35; }
+.vie-essentiel-texte  { font-size: var(--fs-sm); line-height: 1.45; color: var(--vie-texte-doux); }
+
+/* Suggestions + Découvrir */
+.vie-suite {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 82px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.vie-activite {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.vie-activite-icone {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+}
+.vie-activite .vie-details b { font-weight: 400; }
+
+/* === DÉCOUVRIR === */
+
+.vie-point-or      { background: var(--vie-or); }
+.vie-point-lavande { background: var(--vie-lavande); }
+.vie-point-menthe  { background: var(--vie-menthe); }
+.vie-repere-or      { color: var(--vie-or); }
+.vie-repere-lavande { color: var(--vie-lavande); }
+.vie-repere-menthe  { color: var(--vie-menthe); }
+.vie-repere.vie-repere-or,
+.vie-repere.vie-repere-lavande,
+.vie-repere.vie-repere-menthe { display: inline-flex; align-items: center; gap: 8px; }
+.vie-icone-menthe { background: rgba(116, 201, 165, 0.09); }
+
+/* Pause respiration */
+.vie-respiration-carte {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 26px 30px;
+  border: 1px solid var(--vie-violet-bord);
+  border-radius: 24px;
+  background: #15141F;
+}
+.vie-halo-ambiant, .vie-lueur-chaude { position: absolute; z-index: -1; pointer-events: none; }
+.vie-halo-ambiant { top: -150px; right: -140px; }
+.vie-lueur-chaude { bottom: -120px; left: -90px; }
+
+.vie-respiration-intro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.vie-respiration-titre { font-size: var(--fs-xl); font-weight: 400; }
+.vie-respiration-texte { font-size: var(--fs-sm); line-height: 1.45; color: var(--vie-texte-doux); }
+
+/* Exercice (js/respiration.js) : les ondes grandissent avec le souffle */
+.respiration {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 220px;
+  height: 220px;
+}
+.respiration-ondes {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+}
+.respiration-onde { grid-area: 1 / 1; }
+.respiration-onde-1 { width: 220px; height: 220px; opacity: 0.6; }
+.respiration-onde-2 { width: 156px; height: 156px; opacity: 0.8; }
+.respiration-onde-3 { width: 96px;  height: 96px; }
+.respiration-centre {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.respiration-libelle { font-size: var(--fs-sm); font-weight: 700; }
+.respiration-detail  { font-size: var(--fs-xs); color: var(--vie-texte-doux); }
+.respiration.en-cours .respiration-libelle { color: var(--vie-or); }
+
+/* Spiritualité et repères du jour : fonds photo sous un voile */
+.vie-spiritualite, .vie-reperes-jour {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--vie-bord);
+  border-radius: 24px;
+  background: #131720;
+}
+.vie-spiritualite {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 22px 24px;
+}
+.vie-voile-spiritualite { background: linear-gradient(180deg, rgba(17, 21, 29, 0.72), rgba(17, 21, 29, 0.93)); }
+.vie-voile-motif        { background: linear-gradient(90deg, rgba(17, 21, 29, 0.93), rgba(17, 21, 29, 0.86)); }
+
+.vie-spirit-prochaine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--fs-display);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+}
+.vie-spirit-prochaine b { font-weight: 400; }
+
+.vie-trait { height: 1px; background: var(--vie-bord); }
+
+.vie-spirit-horaires {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+.vie-spirit-horaire {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: var(--fs-xs);
+  color: var(--vie-texte-doux);
+}
+.vie-spirit-horaire b { font-size: var(--fs-sm); font-weight: 400; color: var(--vie-texte); }
+.vie-spirit-horaire.actif { border-color: rgba(145, 138, 255, 0.4); background: var(--vie-violet-fond); color: var(--vie-lavande); font-weight: 700; }
+.vie-spirit-horaire.actif b { color: var(--vie-texte); }
+
+/* Verset et invocation */
+.vie-reperes-jour {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.vie-repere-jour {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 24px;
+}
+.vie-repere-invocation { border-left: 1px solid var(--vie-bord); }
+.vie-verset-texte { font-size: var(--fs-md); line-height: 1.5; }
+.vie-arabe {
+  font-size: var(--fs-lg);
+  line-height: 1.7;
+  text-align: right;
+}
+.vie-translitteration { font-size: var(--fs-sm); font-style: italic; color: var(--vie-menthe); }
+.vie-actions { display: flex; gap: 10px; margin-top: auto; }
+.vie-bouton-discret:disabled { opacity: 0.55; cursor: default; }
+
+/* Aperçu du rituel du soir */
+.vie-rituel-apercu {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 96px;
+  padding: 16px 20px;
+  border: 1px solid var(--vie-ambre-bord);
+  border-radius: 16px;
+  background: rgba(245, 166, 35, 0.05);
+}
+.vie-rituel-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.vie-rituel-intro .vie-section-titre { font-size: var(--fs-md); }
+
+/* === RITUEL DU SOIR === */
+.vie-duree { display: inline-flex; align-items: center; gap: 8px; }
+
+.vie-rituel-icone-or      { background: rgba(255, 209, 122, 0.09); }
+.vie-rituel-icone-lavande { background: rgba(163, 157, 255, 0.09); }
+.vie-rituel-icone-menthe  { background: rgba(116, 201, 165, 0.09); }
+
+/* Chemin : quatre étapes reliées par un trait */
+.vie-chemin {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--vie-bord);
+  border-radius: 16px;
+  background: var(--vie-carte);
+}
+.vie-chemin-titre { font-size: var(--fs-sm); }
+.vie-chemin-etapes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.vie-chemin-etape, .vie-rituel-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch-min);
+  padding: 4px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: var(--vie-texte-doux);
+  text-align: left;
+  cursor: pointer;
+}
+.vie-chemin-etape .vie-details b, .vie-rituel-item .vie-details b { font-weight: 400; }
+.vie-chemin-etape.actif, .vie-rituel-item.actif { color: var(--vie-texte); }
+.vie-chemin-etape.actif .vie-details b, .vie-rituel-item.actif .vie-details b { font-weight: 700; }
+.vie-chemin-etape.actif .vie-details span { color: var(--vie-lavande); }
+.vie-chemin-etape.actif .vie-icone, .vie-rituel-item.actif .vie-icone { background: var(--vie-violet); }
+.vie-chemin-etape.faite .vie-icone { box-shadow: inset 0 0 0 1px var(--vie-violet-bord); }
+.vie-chemin-etape {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 8px;
+}
+.vie-chemin-etape .vie-details { grid-column: 1 / -1; }
+.vie-chemin-etape::after {
+  content: '';
+  grid-row: 1;
+  grid-column: 2;
+  height: 1px;
+  background: var(--vie-bord);
+}
+.vie-chemin-etape.actif::after, .vie-chemin-etape.faite::after { background: var(--vie-violet); }
+.vie-chemin-etape:last-child::after { display: none; }
+
+/* Carte principale : colonne d'étapes + étape active + trois colonnes */
+.vie-rituel-carte {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  border: 1px solid var(--vie-bord);
+  border-radius: 24px;
+  background: #11141C;
+  overflow: hidden;
+}
+.vie-rituel-cote {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 20px;
+  border-right: 1px solid var(--vie-bord);
+}
+.vie-rituel-cote-titre { font-size: var(--fs-lg); font-weight: 700; line-height: 1.2; }
+.vie-rituel-liste { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+.vie-rituel-pause { margin-top: 8px; }
+
+.vie-rituel-principal {
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+}
+.vie-rituel-active {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 250px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--vie-bord);
+}
+.vie-rituel-active-texte {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.vie-rituel-badge { gap: 10px; }
+.vie-rituel-numero {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--vie-violet);
+  color: #fff;
+  font-size: var(--fs-xs);
+}
+.vie-rituel-active-titre { font-size: var(--fs-xl); font-weight: 400; }
+
+.vie-rituel-colonnes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.vie-rituel-colonne {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 20px;
+  opacity: 0.7;
+  transition: var(--transition);
+}
+.vie-rituel-colonne:first-child { padding-left: 0; }
+.vie-rituel-colonne:last-child { padding-right: 0; }
+.vie-rituel-colonne + .vie-rituel-colonne { border-left: 1px solid var(--vie-bord); }
+.vie-rituel-colonne.actif { opacity: 1; }
+.vie-rituel-colonne .vie-section-entete > div { display: flex; flex-direction: column; gap: 2px; }
+
+.vie-preparer { display: flex; flex-direction: column; gap: 6px; }
+.vie-preparer-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch-min);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--vie-texte);
+  text-align: left;
+}
+button.vie-preparer-item { cursor: pointer; }
+button.vie-preparer-item:disabled { opacity: 0.55; cursor: default; }
+.vie-preparer-item.actif .vie-lumiere-etat { color: var(--vie-or); }

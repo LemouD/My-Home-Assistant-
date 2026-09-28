@@ -36,6 +36,24 @@
   --accent-violet:    #A855F7;
   --bg-carte-sombre:  linear-gradient(90deg, #1D2429, #0F141C);
 
+  /* Vie (maquette Figma) */
+  --vie-violet:        #6D63FF;
+  --vie-violet-clair:  #8B84FF;
+  --vie-violet-fond:   rgba(109, 99, 255, 0.13);
+  --vie-violet-bord:   rgba(109, 99, 255, 0.33);
+  --vie-ambre:         #F5A623;
+  --vie-ambre-fond:    rgba(245, 166, 35, 0.11);
+  --vie-ambre-bord:    rgba(245, 166, 35, 0.27);
+  --vie-carte:         #141821;
+  --vie-ligne:         #191E28;
+  --vie-bord:          #292F3B;
+  --vie-texte:         #F7F7FB;
+  --vie-texte-doux:    #99A1B3;
+  --vie-vert:          #34D399;
+  --vie-or:            #FFD17A;
+  --vie-lavande:       #A39DFF;
+  --vie-menthe:        #74C9A5;
+
   --text-primary:   #FFFFFF;
   --text-secondary: #8B9AB0;
   --text-muted:     #7D8BA1;   /* contraste ≥ 4,5:1 sur les cartes */
@@ -94,6 +112,28 @@
   --violet-clair:     #A78BFA;
   --violet-pale:      #C4B5FD;
   --vert-pale:        #A7F3D0;
+
+  /* Calendrier (maquette Figma calendrier-familial) : une teinte par calendrier HA */
+  --cal-bleu:           #3B82F6;
+  --cal-vert:           #10B981;
+  --cal-rouge:          #EF4444;
+  --cal-ambre:          #F59E0B;
+  --cal-cyan:           #06B6D4;
+  --cal-sur-teinte:     #0A0F14;   /* texte posé sur une teinte pleine (badges de date) */
+  --cal-sarcelle:       linear-gradient(90deg, #0E3F3B, #072023);
+  --cal-nuit:           linear-gradient(90deg, #1A0D3B, #0D1230);
+  --cal-corail:         linear-gradient(90deg, #FF7A50, #FF4E64);
+  --cal-case-vide:      #151A1D;
+  --cal-case-vide-bord: #222A30;
+  --cal-segment-actif:  #1D2429;
+
+  /* Menu (maquettes Figma « Mon Menu ») : violet = générateur et actions */
+  --menu-violet:        #6D63FF;
+  --menu-violet-clair:  #827AFF;
+  --menu-carte:         #141821;
+  --menu-surface:       #202632;
+  --menu-bord:          #292F3B;
+  --menu-vedette-degrade: linear-gradient(115deg, #3A2710 0%, #1B1710 45%, #141821 100%);   /* remplace la photo en v1 */
 }
 
 /* Reset */

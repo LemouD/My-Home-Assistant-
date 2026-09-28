@@ -92,6 +92,62 @@ template:
 Le bouton « Saisir nouvel index » modifie `input_number.index_eau` ; le capteur `sensor.index_eau`
 alimente les statistiques. Un futur capteur automatique remplacera simplement `sensor.index_eau`.
 
+## Calendrier familial
+
+Une **catégorie** (Famille, Rendez-vous, Anniversaires…) = un calendrier HA, avec sa couleur.
+Dans Home Assistant : Paramètres → Appareils et services → Ajouter une intégration →
+**Calendrier local**, une fois par catégorie ; puis **Liste de tâches locale** pour les tâches.
+Déclarer les entités dans `config.js`, section `CALENDRIER`.
+
+- « + Ajouter un événement » : date fixe, ou répétition chaque semaine, mois ou année
+  (anniversaires : « Chaque année », journée entière). La règle de répétition est construite
+  uniquement à partir des choix du formulaire.
+- `discret: true` sur une catégorie : ses événements s'affichent « Occupé », sans titre.
+  « Rendez-vous » est discret par défaut (à reporter dans le vrai `config.js`).
+- Membres : seulement l'entité `person.*` dans `config.js` (fichier public) ; le nom affiché vient de HA.
+- La tablette (compte non-admin) peut lire et créer des événements, et cocher des tâches.
+- La carte « Calendrier famille — aujourd'hui » de l'accueil utilise les mêmes catégories.
+
+## Vie
+
+Maison (scénarios, pièces, caméras, appareils) et bien-être & spiritualité, avec quatre
+sous-pages : détail d'une pièce, Bien-être (matin, après-midi, soir), Découvrir et Rituel du soir.
+Entités et images dans `config.js`, section `VIE` ; une entité absente est simplement ignorée.
+
+- **Images** : fonds et illustration du salon libres de droits, fournis dans `smarthome/assets/images/`
+  (auteurs et licences : [CREDITS.md](smarthome/assets/images/CREDITS.md)). Pour en changer, les déposer
+  dans `/config/www/images/` et les déclarer dans `VIE.fonds`. Ce dossier est public (`/local/`) :
+  **jamais de photo de l'intérieur de la maison**.
+- **Actions rapides** : automatisations HA (`automation.*`) déclenchées depuis la tablette. Le déclenchement
+  manuel ignore leurs conditions.
+- **Caméras** : l'image vient de Home Assistant (`entity_picture`), avec la session de l'utilisateur.
+- **Lumière douce** (rituel du soir) : `sceneLumiereDouce` désigne une scène HA à créer.
+
+Sources externes, appelées depuis la tablette, sans clé :
+
+| Contenu | Source | Limite |
+|---|---|---|
+| Versets (arabe + traduction française) | [UmmahAPI](https://ummahapi.com) | 5000 requêtes / 15 min |
+| Audio des versets | everyayah.com (URL fournie par UmmahAPI, hôte vérifié) | — |
+| Citation du jour | [citation.lecog.fr](https://citation.lecog.fr) | 100 requêtes / h, mise en cache pour la journée |
+| Horaires de prière | [Aladhan](https://aladhan.com/prayer-times-api) | mis en cache pour la journée |
+
+Les invocations (arabe, translittération, traduction, source) sont dans
+`views/vie/contenus.js`. Le calendrier hégirien est calculé par le navigateur
+(Umm al-Qura) ; les dates peuvent différer d'un jour de l'observation locale.
+
+## Menu
+
+Menus de la semaine générés par un worker externe (IA), appelé **uniquement par l'intégration `maison`** :
+la tablette ne contacte jamais le générateur. Quota de générations par jour, filtre halal et allergies
+côté serveur, recettes validées avant d'être enregistrées.
+
+- Réglages (compte administrateur) : Maison → Configurer → **Générateur de menu** : URL https du worker,
+  secret (jamais réaffiché), repas proposés, quota par jour, liste de courses (`todo.*`).
+- « Ajouter aux courses » : les ingrédients sont écrits par le serveur dans la liste de courses,
+  avec les doublons additionnés. Format des articles : `qte=…;unite=…;rayon=…;source=menu|manuel`.
+- Les recettes sont générées automatiquement : la vue affiche toujours « à vérifier (cuisson, allergènes) ».
+
 ## Sécurité
 
 - Tout ce qui est dans `/config/www` est servi en `/local/` **sans authentification** :

@@ -1,0 +1,177 @@
+<div id="page-content" class="cal">
+
+  <!--
+    Maquette Figma « calendrier-familial » adaptée à la tablette.
+    Les listes sont remplies par calendrier.js à partir des entités calendar.* et todo.* de Home Assistant.
+
+    [Aperçu du mois                    ] [Membres            ]
+    [Aujourd'hui   ] [Cette semaine    ] [Rappels et tâches  ]
+  -->
+
+  <!-- EN-TÊTE : titre, navigation par mois, choix Mois / Semaine -->
+  <div class="cal-entete">
+    <div>
+      <h1 class="cal-titre">Calendrier familial</h1>
+      <p class="cal-sous-titre">Les événements et les tâches de toute la famille.</p>
+    </div>
+    <div class="cal-commandes">
+      <div class="cal-navigation">
+        <button class="cal-bouton-icone" data-action="mois-precedent" aria-label="Mois précédent">
+          <img src="../../assets/icons/calendrier/chevron-gauche.svg" width="14" height="14" alt="">
+        </button>
+        <span class="cal-periode" id="cal-periode"></span>
+        <button class="cal-bouton-icone" data-action="mois-suivant" aria-label="Mois suivant">
+          <img src="../../assets/icons/calendrier/chevron-droite.svg" width="14" height="14" alt="">
+        </button>
+      </div>
+      <div class="cal-segments" role="group" aria-label="Affichage">
+        <button class="cal-segment actif" data-action="vue-mois" aria-pressed="true">Mois</button>
+        <!-- Vue semaine prévue en v2 : bouton visible mais inactif -->
+        <button class="cal-segment" data-action="vue-semaine" aria-pressed="false" disabled>Semaine</button>
+      </div>
+      <button class="cal-bouton-principal" data-action="ouvrir-formulaire">+ Ajouter un événement</button>
+    </div>
+  </div>
+
+  <!-- FORMULAIRE D'AJOUT : date fixe ou événement répétitif (RRULE du calendrier local de HA) -->
+  <div class="cal-voile" id="cal-voile" hidden>
+    <form class="cal-formulaire" id="cal-formulaire" aria-labelledby="cal-formulaire-titre">
+      <h2 class="cal-formulaire-titre" id="cal-formulaire-titre">Nouvel événement</h2>
+
+      <label class="cal-champ">
+        <span>Titre</span>
+        <input type="text" name="titre" maxlength="80" required placeholder="Ex. : Rendez-vous dentiste">
+      </label>
+
+      <!-- La catégorie choisie donne la couleur de l'événement (une catégorie = un calendrier HA) -->
+      <fieldset class="cal-champ">
+        <legend>Catégorie</legend>
+        <div class="cal-choix-calendrier">
+          <!-- Une catégorie par calendrier de la config (couleur + nom) -->
+        </div>
+      </fieldset>
+
+      <div class="cal-champs-ligne">
+        <label class="cal-champ">
+          <span>Date</span>
+          <input type="date" name="date" required>
+        </label>
+        <label class="cal-champ cal-champ-heure">
+          <span>Début</span>
+          <input type="time" name="debut" value="09:00">
+        </label>
+        <label class="cal-champ cal-champ-heure">
+          <span>Fin</span>
+          <input type="time" name="fin" value="10:00">
+        </label>
+        <label class="cal-case-option">
+          <input type="checkbox" name="journee">
+          <span>Toute la journée</span>
+        </label>
+      </div>
+
+      <!-- Répétition : « Une seule fois » = date fixe -->
+      <fieldset class="cal-champ">
+        <legend>Répétition</legend>
+        <div class="cal-segments cal-repetition" role="radiogroup">
+          <label><input type="radio" name="repetition" value="aucune" checked><span>Une seule fois</span></label>
+          <label><input type="radio" name="repetition" value="semaine"><span>Chaque semaine</span></label>
+          <label><input type="radio" name="repetition" value="mois"><span>Chaque mois</span></label>
+          <label><input type="radio" name="repetition" value="annee"><span>Chaque année</span></label>
+        </div>
+      </fieldset>
+
+      <!-- Affiché seulement pour une répétition -->
+      <div class="cal-repetition-details" id="cal-repetition-details" hidden>
+        <fieldset class="cal-champ" id="cal-jours-repetition">
+          <legend>Les jours</legend>
+          <div class="cal-jours-choix">
+            <label><input type="checkbox" name="jour" value="MO"><span>L</span></label>
+            <label><input type="checkbox" name="jour" value="TU"><span>M</span></label>
+            <label><input type="checkbox" name="jour" value="WE"><span>M</span></label>
+            <label><input type="checkbox" name="jour" value="TH"><span>J</span></label>
+            <label><input type="checkbox" name="jour" value="FR"><span>V</span></label>
+            <label><input type="checkbox" name="jour" value="SA"><span>S</span></label>
+            <label><input type="checkbox" name="jour" value="SU"><span>D</span></label>
+          </div>
+        </fieldset>
+        <label class="cal-champ">
+          <span>Jusqu'au (facultatif)</span>
+          <input type="date" name="jusquau">
+        </label>
+      </div>
+
+      <p class="cal-message" id="cal-formulaire-message" role="status"></p>
+
+      <div class="cal-formulaire-actions">
+        <button type="button" class="cal-bouton" data-action="fermer-formulaire">Annuler</button>
+        <button type="submit" class="cal-bouton-principal">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- LIGNE 1 : aperçu du mois + membres -->
+  <div class="cal-ligne cal-ligne-haut">
+
+    <section class="cal-carte cal-carte-sarcelle cal-mois-carte">
+      <div class="cal-carte-entete">
+        <h2 class="cal-carte-titre">
+          <img src="../../assets/icons/calendrier/calendrier.svg" width="16" height="16" alt="">
+          Aperçu du mois
+        </h2>
+        <!-- Une couleur par calendrier Home Assistant -->
+        <ul class="cal-legende" id="cal-legende"></ul>
+      </div>
+
+      <div class="cal-jours-semaine">
+        <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+      </div>
+
+      <!-- Case : numéro, puis un événement en toutes lettres ou des points s'il y en a plusieurs -->
+      <div class="cal-grille" id="cal-grille"></div>
+    </section>
+
+    <section class="cal-carte cal-carte-sarcelle cal-membres-carte">
+      <h2 class="cal-carte-titre">
+        <img src="../../assets/icons/calendrier/membres.svg" width="16" height="16" alt="">
+        Membres de la famille
+      </h2>
+      <p class="cal-aide">Masquer les événements d'un membre</p>
+      <!-- Chaque ligne est un interrupteur : toute la ligne est la zone tactile -->
+      <div class="cal-membres" id="cal-membres"></div>
+    </section>
+
+  </div>
+
+  <!-- LIGNE 2 : aujourd'hui + cette semaine + tâches -->
+  <div class="cal-ligne cal-ligne-bas">
+
+    <section class="cal-carte cal-carte-nuit">
+      <h2 class="cal-carte-titre">
+        <img src="../../assets/icons/calendrier/horloge.svg" width="16" height="16" alt="">
+        Aujourd'hui <span class="cal-titre-detail" id="cal-jour"></span>
+      </h2>
+      <!-- Liseré de gauche = couleur du calendrier -->
+      <div class="cal-liste" id="cal-aujourdhui"></div>
+    </section>
+
+    <section class="cal-carte cal-carte-sarcelle">
+      <h2 class="cal-carte-titre">
+        <img src="../../assets/icons/calendrier/calendrier.svg" width="16" height="16" alt="">
+        Cette semaine
+      </h2>
+      <!-- Badge de date = couleur du calendrier -->
+      <div class="cal-liste" id="cal-a-venir"></div>
+    </section>
+
+    <section class="cal-carte cal-carte-corail">
+      <h2 class="cal-carte-titre">
+        <img src="../../assets/icons/calendrier/taches.svg" width="16" height="16" alt="">
+        Rappels et tâches
+      </h2>
+      <div class="cal-liste" id="cal-taches"></div>
+    </section>
+
+  </div>
+
+</div>

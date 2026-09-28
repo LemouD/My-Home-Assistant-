@@ -37,6 +37,8 @@ class Coffre:
     def __init__(self, hass: HomeAssistant, entree: ConfigEntry) -> None:
         self.hass = hass
         self.entree = entree
+        # Empreinte du code en vigueur : un changement ferme toutes les sessions (voir __init__)
+        self.empreinte_active = entree.data["code"]["empreinte"]
         self.sessions = Sessions()
         self.verrou = Verrou()
         # private=True : fichiers .storage lisibles par le seul utilisateur système de HA

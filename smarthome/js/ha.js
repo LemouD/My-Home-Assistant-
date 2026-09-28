@@ -79,3 +79,85 @@ export const valeurNumerique = (hass, id) => {
 export async function definirNombre(hass, entityId, valeur) {
   await hass.callService('input_number', 'set_value', { entity_id: entityId, value: valeur });
 }
+
+// ---- CALENDRIER ET TÂCHES ----
+// Lecture par l'API REST de HA (session du panneau, aucun token côté client).
+// Création par le WebSocket du calendrier local : c'est le seul qui accepte une règle
+// de répétition (le service calendar.create_event ne la prend pas).
+
+export const calendrierEvenements = (hass, entityId, debut, fin) =>
+  hass.callApi('GET', `calendars/${encodeURIComponent(entityId)}?start=${encodeURIComponent(debut.toISOString())}&end=${encodeURIComponent(fin.toISOString())}`);
+
+export const calendrierCreer = (hass, entityId, evenement) =>
+  hass.callWS({ type: 'calendar/event/create', entity_id: entityId, event: evenement });
+
+export const tachesLire = (hass, entityId) =>
+  hass.callWS({ type: 'todo/item/list', entity_id: entityId });
+
+export async function tacheStatut(hass, entityId, uid, terminee) {
+  await hass.callService('todo', 'update_item', {
+    entity_id: entityId,
+    item: uid,
+    status: terminee ? 'completed' : 'needs_action',
+  });
+}
+
+// ---- VIE : scénarios, lumières, appareils, caméras ----
+
+// Service appelé par un bouton « Activer / Lancer » selon le type d'entité
+const ACTIVATION = {
+  scene: 'turn_on',
+  script: 'turn_on',
+  automation: 'trigger',
+  vacuum: 'start',
+  button: 'press',
+  input_button: 'press',
+};
+
+export async function activer(hass, entityId) {
+  const domaine = entityId.split('.')[0];
+  const service = ACTIVATION[domaine];
+  if (!service) throw new Error(`Activation non prise en charge : ${domaine}`);
+  await hass.callService(domaine, service, { entity_id: entityId });
+}
+
+export const luminosite = (hass, id) => {
+  const brut = etat(hass, id)?.attributes.brightness;
+  return estActif(hass, id) && brut != null ? Math.round((brut / 255) * 100) : 0;
+};
+
+export async function reglerLuminosite(hass, entityId, pourcent) {
+  await hass.callService('light', 'turn_on', { entity_id: entityId, brightness_pct: pourcent });
+}
+
+// Image fixe d'une caméra (URL signée fournie par HA, renouvelée par HA)
+export const imageCamera = (hass, id) => etat(hass, id)?.attributes.entity_picture ?? null;
+
+// Ouvre la fiche native de Home Assistant (flux caméra en direct, thermostat, TV…)
+export function ouvrirFiche(element, entityId) {
+  element.dispatchEvent(new CustomEvent('hass-more-info', {
+    detail: { entityId },
+    bubbles: true,
+    composed: true,
+  }));
+}
+
+// ---- MENU ----
+// Génération et stockage côté serveur (intégration « maison ») : le panneau n'appelle
+// jamais le générateur lui-même. En cas d'erreur, la promesse est rejetée avec { code, message } :
+// non_configure, parametres_invalides, quota_atteint, generation_en_cours, generation_invalide,
+// generation_indisponible, menu_absent, courses_non_configure.
+
+export const menuEtat = (hass) => hass.callWS({ type: 'maison/menu/etat' });
+
+export const menuLire = (hass) => hass.callWS({ type: 'maison/menu/lire' });
+
+export const menuGenerer = (hass, parametres) =>
+  hass.callWS({ type: 'maison/menu/generer', parametres });
+
+export const menuRemplacer = (hass, date, repas) =>
+  hass.callWS({ type: 'maison/menu/remplacer', date, repas });
+
+// recettes absent : tout le menu
+export const menuVersCourses = (hass, recettes) =>
+  hass.callWS({ type: 'maison/menu/vers_courses', ...(recettes ? { recettes } : {}) });

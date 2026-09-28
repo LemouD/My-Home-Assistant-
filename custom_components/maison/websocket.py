@@ -15,13 +15,15 @@ from homeassistant.core import HomeAssistant
 
 from .coffre import Coffre, CodeRefuse
 from .const import DOMAIN
+from .resume import resume_courses
 from .schema import valider_budget
+from .websocket_menu import COMMANDES_MENU
 
 JETON = vol.All(str, vol.Length(max=128))
 
 
 def async_enregistrer_commandes(hass: HomeAssistant) -> None:
-    for commande in (ws_etat, ws_deverrouiller, ws_lire, ws_enregistrer, ws_verrouiller):
+    for commande in (ws_etat, ws_deverrouiller, ws_lire, ws_resume, ws_enregistrer, ws_verrouiller, *COMMANDES_MENU):
         websocket_api.async_register_command(hass, commande)
 
 
@@ -75,6 +77,18 @@ async def ws_lire(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
     if (coffre := _coffre(hass, connection, msg)) is None or not _session_valide(coffre, connection, msg):
         return
     connection.send_result(msg["id"], await coffre.lire())
+
+
+# Vue Courses : seulement le budget alimentation et le reste disponible, même session que le Budget
+@websocket_api.websocket_command({
+    vol.Required("type"): "maison/budget/resume",
+    vol.Required("jeton"): JETON,
+})
+@websocket_api.async_response
+async def ws_resume(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    if (coffre := _coffre(hass, connection, msg)) is None or not _session_valide(coffre, connection, msg):
+        return
+    connection.send_result(msg["id"], resume_courses(await coffre.lire()))
 
 
 @websocket_api.websocket_command({

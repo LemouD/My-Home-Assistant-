@@ -12,12 +12,15 @@ import { aChange, estPresent, nom } from './js/ha.js';
 import { demarrerHorloge } from './js/clock.js';
 
 // ---- VUES ----
-// La clé correspond au premier segment d'URL après le préfixe du panneau.
+// La clé correspond au premier segment d'URL après le préfixe du panneau ;
+// la suite (sous-page, ex. « piece/salon ») est transmise à la vue.
 const VUES = {
   '':         { titre: 'Tableau de bord', charger: () => import('./views/dashboard/dashboard.js') },
+  vie:        { titre: 'Vie', charger: () => import('./views/vie/vie.js') },
   budget:     { titre: 'Budget & Factures', charger: () => import('./views/budget/budget.js') },
   energie:    { titre: 'Énergie & Fluides', charger: () => import('./views/energie/energie.js') },
-  calendrier: { titre: 'Calendrier famille' },
+  calendrier: { titre: 'Calendrier famille', charger: () => import('./views/calendrier/calendrier.js') },
+  menu:       { titre: 'Menu', charger: () => import('./views/menu/menu.js') },
   courses:    { titre: 'Liste de courses' },
 };
 const VUE_A_VENIR = () => import('./views/a-venir/a-venir.js');
@@ -116,12 +119,17 @@ class SmarthomePanel extends HTMLElement {
     return (this.#route?.path ?? '').split('/')[1] ?? '';
   }
 
-  #naviguer(cle) {
+  #sousChemin() {
+    return (this.#route?.path ?? '').split('/').slice(2).join('/');
+  }
+
+  // `chemin` : clé de vue, suivie éventuellement d'une sous-page (« vie/piece/salon »)
+  #naviguer(chemin) {
     const prefixe = this.#route?.prefix ?? '';
-    history.pushState(null, '', cle ? `${prefixe}/${cle}` : prefixe);
+    history.pushState(null, '', chemin ? `${prefixe}/${chemin}` : prefixe);
     // Événement écouté par Home Assistant, qui renverra une nouvelle `route`
     window.dispatchEvent(new CustomEvent('location-changed', { detail: { replace: false } }));
-    this.#route = { prefix: prefixe, path: cle ? `/${cle}` : '' };
+    this.#route = { prefix: prefixe, path: chemin ? `/${chemin}` : '' };
     this.#afficherVue();
   }
 
@@ -140,7 +148,12 @@ class SmarthomePanel extends HTMLElement {
 
   async #afficherVue() {
     const cle = this.#cleCourante();
-    if (cle === this.#cleVue || !this.isConnected) return;
+    if (!this.isConnected) return;
+    // Même vue, autre sous-page : la vue se met à jour sans être recréée
+    if (cle === this.#cleVue) {
+      this.#vue?.changerSousPage?.(this.#sousChemin());
+      return;
+    }
     this.#cleVue = cle;
 
     this.#vue?.detruire?.();
@@ -157,7 +170,13 @@ class SmarthomePanel extends HTMLElement {
 
     try {
       const module = await (def.charger ?? VUE_A_VENIR)();
-      const vue = await module.monter({ config: this.#config, titre: def.titre });
+      const sousCheminInitial = this.#sousChemin();
+      const vue = await module.monter({
+        config: this.#config,
+        titre: def.titre,
+        sousChemin: sousCheminInitial,
+        naviguer: (chemin) => this.#naviguer(chemin),
+      });
 
       // L'utilisateur a pu changer de vue pendant le chargement
       if (this.#cleVue !== cle) {
@@ -167,6 +186,8 @@ class SmarthomePanel extends HTMLElement {
       this.#vue = vue;
       conteneur.replaceChildren(vue.racine);
       if (this.#hass) vue.maj?.(this.#hass);
+      // Sous-page changée pendant le chargement de la vue
+      if (this.#sousChemin() !== sousCheminInitial) vue.changerSousPage?.(this.#sousChemin());
     } catch (e) {
       console.error(`Vue "${cle}" :`, e);
       if (this.#cleVue === cle) conteneur.replaceChildren(el('p', { class: 'cal-empty' }, 'Vue indisponible.'));
