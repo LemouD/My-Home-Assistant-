@@ -9,11 +9,15 @@ import { audioVerset, verset } from '../../../js/spiritualite.js';
 import { choixDuJour, INVOCATIONS, momentDe, MOMENTS } from '../contenus.js';
 
 const icone = (fichier) => new URL(`../../../assets/icons/vie/${fichier}`, import.meta.url).href;
+const image = (fichier) => new URL(`../../../assets/images/vie/${fichier}`, import.meta.url).href;
+
+// Fonds fournis avec le panneau (voir assets/images/CREDITS.md) ; config.VIE.fonds peut les remplacer
+const FONDS = { decouvrirSpiritualite: image('spiritualite.webp'), decouvrirMotif: image('motif.webp') };
 const img = (fichier, taille) => el('img', { src: icone(`${fichier}.svg`), width: taille, height: taille, alt: '' });
 
 export async function monter({ config }) {
   const vie = config.VIE ?? {};
-  const fonds = vie.fonds ?? {};
+  const fonds = { ...FONDS, ...vie.fonds };
   const moment = MOMENTS[momentDe()];
   const referenceVerset = choixDuJour(moment.versets);
   const invocation = INVOCATIONS[choixDuJour(moment.invocations)];

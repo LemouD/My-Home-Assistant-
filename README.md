@@ -98,9 +98,12 @@ Maison (scénarios, pièces, caméras, appareils) et bien-être & spiritualité,
 sous-pages : détail d'une pièce, Bien-être (matin, après-midi, soir), Découvrir et Rituel du soir.
 Entités et images dans `config.js`, section `VIE` ; une entité absente est simplement ignorée.
 
-- **Images** (fonds et illustrations des pièces) : facultatives, déposées dans `/config/www/images/`.
-  Ce dossier est public (`/local/`) : uniquement des images libres de droits,
+- **Images** : fonds et illustration du salon libres de droits, fournis dans `smarthome/assets/images/`
+  (auteurs et licences : [CREDITS.md](smarthome/assets/images/CREDITS.md)). Pour en changer, les déposer
+  dans `/config/www/images/` et les déclarer dans `VIE.fonds`. Ce dossier est public (`/local/`) :
   **jamais de photo de l'intérieur de la maison**.
+- **Actions rapides** : automatisations HA (`automation.*`) déclenchées depuis la tablette. Le déclenchement
+  manuel ignore leurs conditions.
 - **Caméras** : l'image vient de Home Assistant (`entity_picture`), avec la session de l'utilisateur.
 - **Lumière douce** (rituel du soir) : `sceneLumiereDouce` désigne une scène HA à créer.
 

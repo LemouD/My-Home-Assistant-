@@ -10,6 +10,11 @@ import { verset } from '../../../js/spiritualite.js';
 import { choixDuJour, INVOCATIONS, momentDe, MOMENTS } from '../contenus.js';
 
 const icone = (fichier) => new URL(`../../../assets/icons/vie/${fichier}`, import.meta.url).href;
+const image = (fichier) => new URL(`../../../assets/images/vie/${fichier}`, import.meta.url).href;
+
+// Fonds libres de droits fournis avec le panneau (voir assets/images/CREDITS.md) ;
+// config.VIE.fonds peut les remplacer
+const FONDS = { matin: image('matin.webp'), apresMidi: image('apres-midi.webp'), soir: image('soir.webp') };
 const img = (fichier, taille) => el('img', { src: icone(`${fichier}.svg`), width: taille, height: taille, alt: '' });
 
 const AMBIANCES = { matin: 'ambiance-matin', apresMidi: 'ambiance-apres-midi', soir: 'ambiance-soir' };
@@ -25,7 +30,7 @@ const delaiLisible = (minutes) => {
 
 export async function monter({ config }) {
   const racine = el('div', { class: 'vie' });
-  const fonds = config.VIE?.fonds ?? {};
+  const fonds = { ...FONDS, ...config.VIE?.fonds };
 
   let hass = null;
   let momentAffiche = null;
