@@ -36,6 +36,24 @@
   --accent-violet:    #A855F7;
   --bg-carte-sombre:  linear-gradient(90deg, #1D2429, #0F141C);
 
+  /* Vie (maquette Figma) */
+  --vie-violet:        #6D63FF;
+  --vie-violet-clair:  #8B84FF;
+  --vie-violet-fond:   rgba(109, 99, 255, 0.13);
+  --vie-violet-bord:   rgba(109, 99, 255, 0.33);
+  --vie-ambre:         #F5A623;
+  --vie-ambre-fond:    rgba(245, 166, 35, 0.11);
+  --vie-ambre-bord:    rgba(245, 166, 35, 0.27);
+  --vie-carte:         #141821;
+  --vie-ligne:         #191E28;
+  --vie-bord:          #292F3B;
+  --vie-texte:         #F7F7FB;
+  --vie-texte-doux:    #99A1B3;
+  --vie-vert:          #34D399;
+  --vie-or:            #FFD17A;
+  --vie-lavande:       #A39DFF;
+  --vie-menthe:        #74C9A5;
+
   --text-primary:   #FFFFFF;
   --text-secondary: #8B9AB0;
   --text-muted:     #7D8BA1;   /* contraste ≥ 4,5:1 sur les cartes */

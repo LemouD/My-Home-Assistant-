@@ -22,3 +22,6 @@ BLOCAGE_MAX = 3600        # secondes
 DUREE_SESSION = 600       # secondes
 DUREE_SESSION_MAX = 3600  # secondes
 SESSIONS_MAX = 20
+
+# Catégorie du budget résumée pour la vue Courses (maison/budget/resume)
+CATEGORIE_COURSES = "Alimentation"

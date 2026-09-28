@@ -65,6 +65,65 @@ export default {
     consigne: 19,
   },
 
+  // Vie : scénarios, pièces, caméras, appareils. Entités Home Assistant.
+  VIE: {
+    // Actions rapides = automatisations HA (automation.*), déclenchées par « Activer / Lancer ».
+    // Attention : le déclenchement manuel ignore les conditions de l'automatisation.
+    // Autres types acceptés : scene, script, vacuum, button.
+    scenarios: [
+      { nom: 'Mode Cinéma', description: 'Ambiance du salon',   icone: 'cinema',      entite: 'automation.mode_cinema', action: 'Activer' },
+      { nom: 'Nettoyage',   description: 'Aspirateur du foyer', icone: 'etincelles',  entite: 'automation.nettoyage', action: 'Lancer' },
+      { nom: 'Mode Nuit',   description: 'Maison au calme',     icone: 'lune-etoile', entite: 'automation.mode_nuit', action: 'Activer' },
+    ],
+    // icone des lumières : plafonnier, lampe, lampe-tv, bandeau
+    pieces: [
+      {
+        id: 'salon', nom: 'Salon', sousTitre: 'Lumières et ambiance',
+        // Illustration facultative, libre de droits. /config/www/images/ est public (/local/,
+        // sans authentification) : jamais de vraie photo de l'intérieur de la maison.
+        image: '/local/smarthome/assets/images/vie/salon.webp',
+        lumieres: [
+          { id: 'light.salon_plafonnier', nom: 'Plafonnier',   icone: 'plafonnier' },
+          { id: 'light.salon_canape',     nom: 'Lampe canapé', icone: 'lampe' },
+          { id: 'light.salon_tv',         nom: 'Lampe TV',     icone: 'lampe-tv' },
+          { id: 'light.salon_led',        nom: 'Bandeau LED',  icone: 'bandeau' },
+        ],
+      },
+      {
+        id: 'cuisine', nom: 'Cuisine', sousTitre: 'Lumières',
+        lumieres: [
+          { id: 'light.cuisine_plafonnier', nom: 'Plafonnier', icone: 'plafonnier' },
+          { id: 'light.cuisine_ilot',       nom: 'Îlot',       icone: 'lampe' },
+          { id: 'light.cuisine_plan',       nom: 'Plan de travail', icone: 'bandeau' },
+        ],
+      },
+      {
+        id: 'chambre', nom: 'Chambre', sousTitre: 'Lumières',
+        lumieres: [
+          { id: 'light.chambre_plafonnier', nom: 'Plafonnier',  icone: 'plafonnier' },
+          { id: 'light.chambre_chevet',     nom: 'Lampe chevet', icone: 'lampe' },
+        ],
+      },
+    ],
+    cameras: [
+      { id: 'camera.salon',  nom: 'Salon' },
+      { id: 'camera.entree', nom: 'Entrée' },
+    ],
+    appareils: {
+      aspirateur: 'vacuum.aspirateur',
+      tv: 'media_player.tv',
+      thermostat: 'climate.salon',
+      prises: ['switch.prise_salon', 'switch.prise_bureau', 'switch.prise_cuisine', 'switch.prise_chambre'],
+    },
+    // Fonds de « Bien-être » et « Découvrir » : images libres fournies avec le panneau
+    // (assets/images/vie/, crédits dans assets/images/CREDITS.md). Pour en changer, décommenter :
+    // fonds: { matin: '/local/images/mon-fond.webp', apresMidi: '…', soir: '…', decouvrirSpiritualite: '…', decouvrirMotif: '…' },
+    // Récitateur des versets (UmmahAPI) : 1 = Mishary Alafasy, 2 = Al-Sudais, 3 = Abdul Basit
+    recitateur: 1,
+    // Scène déclenchée à l'étape « Lumière douce » du rituel du soir (facultatif)
+    sceneLumiereDouce: 'scene.lumiere_douce',
+  },
+
   // Une alerte s'affiche quand l'entité est à "on".
   // gravite : info (bleu, défaut), attention (ambre), danger (rouge)
   ALERTES: [

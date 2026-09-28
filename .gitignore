@@ -12,6 +12,9 @@ secrets.yaml
 # Récaps de session
 SESSION_SUMMARY.md
 
+# Images de maquette (licence inconnue) : uniquement en local, pour le mode dev
+smarthome/dev/images-locales/
+
 # Python
 __pycache__/
 *.pyc

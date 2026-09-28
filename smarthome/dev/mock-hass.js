@@ -113,6 +113,29 @@ async function callApi(methode, chemin) {
   return evenementsCalendrier.filter((e) => e.calendrier === id).flatMap((e) => occurrences(e, debut, fin));
 }
 
+// ---- Vie : lumières (avec luminosité), appareils, caméras ----
+const vie = config.VIE ?? {};
+const avecAttributs = (id, state, attributs) => {
+  definir(id, state, attributs.friendly_name ?? id);
+  Object.assign(states[id].attributes, attributs);
+};
+(vie.pieces ?? []).forEach((piece) => piece.lumieres.forEach((l, i) => {
+  const allumee = i !== 2;
+  avecAttributs(l.id, allumee ? 'on' : 'off', { friendly_name: l.nom, brightness: allumee ? Math.round(((65 - i * 15) / 100) * 255) : null });
+}));
+const appareilsVie = vie.appareils ?? {};
+if (appareilsVie.aspirateur) avecAttributs(appareilsVie.aspirateur, 'docked', { friendly_name: 'Aspirateur' });
+if (appareilsVie.tv) avecAttributs(appareilsVie.tv, 'off', { friendly_name: 'TV' });
+if (appareilsVie.thermostat) avecAttributs(appareilsVie.thermostat, 'heat', { friendly_name: 'Thermostat', current_temperature: 21.5 });
+(appareilsVie.prises ?? []).forEach((id, i) => avecAttributs(id, i < 3 ? 'on' : 'off', { friendly_name: `Prise ${id.split('_').pop()}` }));
+(vie.cameras ?? []).forEach((c, i) => avecAttributs(c.id, 'idle', {
+  friendly_name: c.nom,
+  entity_picture: `/dev/images-locales/camera-${i === 0 ? 'salon' : 'entree'}.png?token=demo`,
+}));
+if (vie.sceneLumiereDouce) avecAttributs(vie.sceneLumiereDouce, 'unknown', { friendly_name: 'Lumière douce' });
+// Dans HA, cet événement ouvre la fiche native de l'entité
+window.addEventListener('hass-more-info', (e) => console.info('[mock] fiche HA demandée :', e.detail.entityId));
+
 const panneau = document.querySelector('smarthome-panel');
 
 async function callService(domaine, service, donnees) {
@@ -133,12 +156,34 @@ async function callService(domaine, service, donnees) {
     publier();
     return;
   }
+  // Services de l'onglet Vie
+  if (['scene', 'script', 'automation', 'button', 'input_button'].includes(domaine)) {
+    console.info(`[mock] ${domaine}.${service} :`, cibles);
+    return;
+  }
+  if (domaine === 'vacuum') {
+    states[cibles] = { ...states[cibles], state: service === 'start' ? 'cleaning' : 'returning' };
+    publier();
+    return;
+  }
+  if (domaine === 'light' && service === 'turn_on' && donnees.brightness_pct != null) {
+    for (const id of [].concat(cibles)) {
+      states[id] = { ...states[id], state: donnees.brightness_pct > 0 ? 'on' : 'off',
+        attributes: { ...states[id].attributes, brightness: Math.round((donnees.brightness_pct / 100) * 255) } };
+    }
+    publier();
+    return;
+  }
   for (const id of [].concat(cibles)) {
     const actuel = states[id];
     if (!actuel) throw new Error(`Entité inconnue : ${id}`);
     const suivant = service === 'toggle' ? (actuel.state === 'on' ? 'off' : 'on')
       : service === 'turn_on' ? 'on' : 'off';
-    states[id] = { ...actuel, state: suivant };
+    // Comme HA : une lumière allumée a une luminosité (pleine si inconnue), éteinte n'en a pas
+    const attributes = id.startsWith('light.')
+      ? { ...actuel.attributes, brightness: suivant === 'on' ? (actuel.attributes.brightness ?? 255) : null }
+      : actuel.attributes;
+    states[id] = { ...actuel, state: suivant, attributes };
   }
   publier();
 }
@@ -277,6 +322,10 @@ function publier() {
 // Navigation par hash en développement : /dev/#/budget
 panneau.route = { prefix: `${location.pathname}#`, path: location.hash.slice(1) };
 panneau.narrow = matchMedia('(max-width: 870px)').matches;
+// Bouton « Retour » du navigateur : HA renverrait une nouvelle route, le mock fait pareil
+addEventListener('popstate', () => {
+  panneau.route = { prefix: `${location.pathname}#`, path: location.hash.slice(1) };
+});
 publier();
 
 // Accès depuis la console :
