@@ -8,6 +8,7 @@ import '../smarthome-panel.js';
 import config from '../js/config.js';
 import budgetExemple from './budget-exemple.js';
 import { creerMenuSimule } from './mock-menu.js';
+import { creerComparateurSimule } from './mock-comparateur.js';
 
 const LATENCE_MS = 300;
 
@@ -142,6 +143,26 @@ const panneau = document.querySelector('smarthome-panel');
 async function callService(domaine, service, donnees) {
   await new Promise((r) => setTimeout(r, LATENCE_MS));
   const { entity_id: cibles } = donnees;
+  // Liste de courses fictive (todo.courses) : mêmes services que l'intégration Liste de tâches locale
+  if (domaine === 'todo' && cibles === 'todo.courses') {
+    if (service === 'remove_item') {
+      const uids = [].concat(donnees.item);
+      for (let i = articlesCourses.length - 1; i >= 0; i -= 1) if (uids.includes(articlesCourses[i].uid)) articlesCourses.splice(i, 1);
+    } else if (service === 'add_item') {
+      articlesCourses.push({ uid: crypto.randomUUID(), summary: donnees.item, description: donnees.description ?? null, status: 'needs_action' });
+    } else if (service === 'update_item') {
+      const article = articlesCourses.find((x) => x.uid === donnees.item);
+      if (!article) throw new Error('Article inconnu');
+      if (donnees.status) article.status = donnees.status;
+      if (donnees.rename) article.summary = donnees.rename;
+      if ('description' in donnees) article.description = donnees.description;
+    } else if (service === 'remove_completed_items') {
+      for (let i = articlesCourses.length - 1; i >= 0; i -= 1) if (articlesCourses[i].status === 'completed') articlesCourses.splice(i, 1);
+    }
+    majEtatCourses();
+    publier();
+    return;
+  }
   if (domaine === 'todo' && service === 'update_item') {
     const tache = tachesDemo.find((t) => t.uid === donnees.item);
     if (!tache) throw new Error('Tâche inconnue');
@@ -202,8 +223,19 @@ const budget = {
 const erreurWS = (code, message) => Object.assign(new Error(message), { code });
 
 // ---- Menu simulé (dev/mock-menu.js) et liste de courses todo.courses fictive ----
-const articlesCourses = [];
+// Quelques articles de départ ; « Piles » a été ajouté depuis l'application HA (sans format commun)
+const articlesCourses = [
+  { uid: 'c-1', summary: 'Tomates — 500 g', description: 'qte=500;unite=g;rayon=fruits-legumes;source=manuel', status: 'needs_action', cle: 'tomate|g', nom: 'Tomates', qte: 500 },
+  { uid: 'c-2', summary: 'Yaourts nature — 12 pièce(s)', description: 'qte=12;unite=piece;rayon=cremerie;source=manuel', status: 'needs_action', cle: 'yaourt nature|piece', nom: 'Yaourts nature', qte: 12 },
+  { uid: 'c-3', summary: 'Baguette — 2 pièce(s)', description: 'qte=2;unite=piece;rayon=boulangerie;source=manuel', status: 'completed', cle: 'baguette|piece', nom: 'Baguette', qte: 2 },
+  { uid: 'c-4', summary: 'Liquide vaisselle — 1 pièce(s)', description: 'qte=1;unite=piece;rayon=entretien;source=manuel', status: 'needs_action', cle: 'liquide vaisselle|piece', nom: 'Liquide vaisselle', qte: 1 },
+  { uid: 'c-5', summary: 'Piles', description: null, status: 'needs_action' },
+];
+const majEtatCourses = () => definir('todo.courses', String(articlesCourses.filter((x) => x.status === 'needs_action').length), 'Courses');
+majEtatCourses();
 const menuSimule = creerMenuSimule({ erreur: erreurWS, courses: articlesCourses });
+// Dernières courses et comparateur (dev/mock-comparateur.js) ; total visible seulement avec un jeton Budget
+const comparateurSimule = creerComparateurSimule({ erreur: erreurWS, jetonValide: (jeton) => budget.jetons.has(jeton) });
 const attenteBudget = () => Math.max(0, Math.ceil((budget.bloqueJusqua - Date.now()) / 1000));
 const verifierJeton = (jeton) => {
   if (!budget.jetons.has(jeton)) throw erreurWS('session_invalide', 'Session invalide');
@@ -309,6 +341,7 @@ async function callWS(message) {
       return {};
     default:
       if (message.type.startsWith('maison/menu/') || message.type.startsWith('maison/jus/')) return menuSimule.commande(message);
+      if (message.type.startsWith('maison/courses/')) return comparateurSimule.commande(message);
       throw erreurWS('unknown_command', message.type);
   }
 }
@@ -352,6 +385,7 @@ window.mock = {
   expirerSessions: () => budget.jetons.clear(),      // simule l'expiration côté serveur
   menu: menuSimule,                                  // mock.menu.etat.indisponible = true, mock.menu.vider()
   courses: articlesCourses,
+  comparateur: comparateurSimule,                    // mock.comparateur.passages
 };
 
 // Taille d'écran en pixels CSS : ouvrir /dev/ sur la vraie tablette pour relever sa taille de référence

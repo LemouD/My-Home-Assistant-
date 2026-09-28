@@ -142,6 +142,11 @@
   --jus-antioxydant: #C026D3;
   --jus-digestif:    #84CC16;
   --jus-sur-teinte:  #0A0F14;   /* texte posé sur une teinte pleine (badges) */
+
+  /* Liste de courses (maquette Figma liste-de-courses) : une couleur = un rôle */
+  --crs-sarcelle: linear-gradient(90deg, #0E3F3B, #072023);   /* la liste */
+  --crs-corail:   linear-gradient(90deg, #FF7A50, #FF4E64);   /* l'action : ajout rapide */
+  --crs-nuit:     linear-gradient(90deg, #1A0D3B, #0D1230);   /* la planification : repas */
 }
 
 /* Reset */

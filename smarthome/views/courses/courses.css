@@ -1,0 +1,760 @@
+/* =============================================
+   COURSES.CSS — Vue Liste de courses
+   Maquette Figma « liste-de-courses » adaptée à la tablette :
+   textes à 14 px minimum, zones tactiles de 48 px, pas de flou, ombres ≤ 8 px.
+
+   Logique des couleurs (une couleur = un rôle, comme dans le Calendrier) :
+   - sarcelle   : la liste, contenu principal de la page ;
+   - corail     : la seule carte d'action (ajout rapide) ;
+   - violet nuit: la planification (repas de la semaine) ;
+   - neutre     : les informations secondaires (budget, dernières courses), montants en ambre ;
+   - vert       : uniquement « dans le panier » (case cochée) et « reste disponible » ;
+   - bleu       : uniquement les boutons principaux.
+   La maquette empilait quatre dégradés saturés à droite, qui détournaient l'œil de la liste.
+   ============================================= */
+
+.vue-courses {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#page-content.crs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* === EN-TÊTE === */
+.crs-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.crs-titre {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.crs-sous-titre {
+  margin-top: 4px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.crs-commandes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.crs-recherche {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 280px;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-verre);
+  transition: var(--transition);
+}
+.crs-recherche:focus-within { border-color: var(--border-active); }
+
+.crs-recherche input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  outline: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.crs-recherche input::placeholder { color: var(--text-muted); }
+
+/* === BOUTONS === */
+.crs-bouton-principal,
+.crs-bouton,
+.crs-bouton-violet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.crs-bouton-principal { background: var(--accent-bleu-vif); color: var(--text-primary); }
+.crs-bouton-principal:active { opacity: 0.85; }
+
+.crs-bouton {
+  border-color: var(--border);
+  background: var(--surface-verre);
+  color: var(--text-primary);
+}
+.crs-bouton:active { background: var(--surface-verre-on); }
+
+.crs-bouton-violet {
+  width: 100%;
+  border-color: rgba(167, 139, 250, 0.35);
+  background: rgba(124, 58, 237, 0.18);
+  color: var(--violet-clair);
+}
+.crs-bouton-violet:active { background: rgba(124, 58, 237, 0.3); }
+
+/* === GRILLE DE LA PAGE (paysage) ===
+   Ordre d'usage : liste → ajout rapide → repas → informations */
+.crs-grille {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  grid-template-areas:
+    "liste  repas"
+    "liste  comparateur"
+    "infos  comparateur";
+  grid-template-rows: auto 1fr auto;
+  gap: var(--gap);
+  align-items: stretch;
+}
+.crs-zone-liste  { grid-area: liste; }
+.crs-zone-rapide { grid-area: rapide; }
+.crs-zone-repas  { grid-area: repas; }
+.crs-zone-infos  {
+  grid-area: infos;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));   /* Budget + Dernières courses */
+  gap: var(--gap);
+}
+
+/* === CARTES === */
+.crs-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.crs-carte-sarcelle { background: var(--crs-sarcelle); box-shadow: 0 4px 8px rgba(14, 63, 59, 0.2); }
+.crs-carte-corail   { background: var(--crs-corail); border: none; box-shadow: 0 4px 8px rgba(255, 78, 100, 0.2); }
+.crs-carte-nuit     { background: var(--crs-nuit); border-color: rgba(124, 58, 237, 0.19); }
+.crs-carte-neutre   { background: var(--surface-verre); gap: 10px; padding: 16px 20px; }
+
+.crs-carte-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.crs-carte-titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.crs-titre-violet { color: var(--violet-clair); }
+
+.crs-compteur {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.crs-compteur b { color: var(--text-primary); font-size: var(--fs-sm); }
+
+/* === LISTE : rayons en colonnes (remplissage de haut en bas) === */
+.crs-rayons {
+  columns: 3 190px;
+  column-gap: 20px;
+}
+
+.crs-rayon {
+  display: flex;
+  flex-direction: column;
+  break-inside: avoid;
+  margin-bottom: 8px;
+}
+
+.crs-rayon-titre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 6px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+/* Nombre d'articles encore à acheter dans le rayon */
+.crs-rayon-nombre {
+  min-width: 26px;
+  padding: 1px 8px;
+  border-radius: 100px;
+  background: var(--surface-verre-on);
+  color: var(--text-doua);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Article : toute la ligne est la zone tactile */
+.crs-article {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: 0 6px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.crs-article:active { background: var(--surface-verre-on); }
+
+.crs-case {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--text-muted);
+  border-radius: 6px;
+  background: var(--surface-verre);
+  transition: var(--transition);
+}
+
+.crs-article-nom {
+  min-width: 0;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crs-quantite {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Dans le panier : case verte, texte barré et atténué (reste lisible : ≥ 4,5:1) */
+.crs-article[aria-checked="true"] .crs-case {
+  border-color: var(--accent-emeraude);
+  background: var(--accent-emeraude);
+}
+.crs-article[aria-checked="true"] .crs-article-nom,
+.crs-article[aria-checked="true"] .crs-quantite {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.crs-entete-liste {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* === AJOUT RAPIDE === */
+.crs-pastilles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.crs-pastille {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 10px 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.14);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.crs-pastille:active { background: rgba(0, 0, 0, 0.26); }
+
+.crs-plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-bleu-vif);
+}
+
+/* === REPAS DE LA SEMAINE === */
+.crs-repas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.crs-repas-jour {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-verre);
+}
+.crs-repas-jour span {
+  width: 36px;
+  flex-shrink: 0;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--violet-clair);
+}
+.crs-repas-jour b {
+  min-width: 0;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === INFORMATIONS : budget et dernières courses === */
+.crs-ligne-texte {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.crs-ligne-texte b { color: var(--text-primary); font-size: var(--fs-sm); }
+
+.crs-total { color: var(--accent-ambre) !important; font-size: var(--fs-lg) !important; }
+.crs-positif { color: var(--accent-emeraude) !important; }
+
+.crs-jauge {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--piste);
+  overflow: hidden;
+}
+.crs-jauge-remplie {
+  width: 0;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent-ambre);
+  transition: width 0.3s ease;
+}
+
+.crs-historique {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.crs-passage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-verre);
+}
+
+.crs-passage-texte {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+.crs-passage-texte b    { font-size: var(--fs-sm); font-weight: 600; }
+.crs-passage-texte span { font-size: var(--fs-xs); color: var(--text-secondary); white-space: nowrap; }
+
+.crs-montant { flex-shrink: 0; font-size: var(--fs-sm); color: var(--accent-ambre); }
+
+/* === BUDGET VERROUILLÉ : les chiffres du Budget restent derrière le code === */
+.crs-budget-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.crs-budget-verrou {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 8px 8px 14px;
+  border: 1px dashed var(--border-active);
+  border-radius: 12px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+/* Montant masqué : même place qu'un montant, en gris */
+.crs-montant-masque {
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+/* === FORMULAIRE D'AJOUT : fenêtre posée sur la vue === */
+.vue-courses { position: relative; }
+
+.crs-voile {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gap-lg);
+  background: rgba(7, 10, 14, 0.8);
+}
+
+.crs-formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(100%, 720px);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.crs-formulaire-titre { font-size: var(--fs-lg); font-weight: 700; }
+
+.crs-champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  border: none;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.crs-champ legend { margin-bottom: 6px; }
+
+.crs-champ input[type="text"],
+.crs-saisie-euros,
+.crs-quantite-saisie input {
+  min-height: var(--touch-min);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  -webkit-user-select: text;
+  user-select: text;
+}
+.crs-champ input[type="text"] { padding: 0 14px; }
+.crs-champ input:focus,
+.crs-saisie-euros:focus-within { outline: none; border-color: var(--border-active); }
+
+.crs-champs-ligne {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+}
+
+/* Quantité : − [ 1 ] + */
+.crs-quantite-saisie {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.crs-quantite-saisie input {
+  width: 72px;
+  padding: 0 8px;
+  text-align: center;
+  font-weight: 600;
+  -moz-appearance: textfield;
+}
+.crs-quantite-saisie input::-webkit-outer-spin-button,
+.crs-quantite-saisie input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.crs-bouton-pas {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-verre);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.crs-bouton-pas:active { background: var(--surface-verre-on); }
+
+/* Choix uniques (unité, rayon) : boutons à cocher, radio invisible mais accessible */
+.crs-choix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.crs-choix label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-verre);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.crs-choix input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.crs-choix label:has(input:checked) {
+  border-color: var(--accent-bleu-vif);
+  background: rgba(59, 130, 246, 0.18);
+  font-weight: 600;
+}
+.crs-choix label:has(input:focus-visible) { outline: 2px solid var(--border-active); }
+
+.crs-champ-prix { width: 220px; }
+.crs-saisie-euros {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+}
+.crs-saisie-euros input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  text-align: right;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.crs-saisie-euros input::-webkit-outer-spin-button,
+.crs-saisie-euros input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.crs-saisie-euros span { color: var(--text-secondary); }
+
+/* Article déjà présent : information, pas une erreur */
+.crs-doublon {
+  margin-top: -6px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--accent-ambre);
+  border-radius: 0;
+  background: rgba(245, 158, 11, 0.1);
+  font-size: var(--fs-xs);
+  color: var(--text-primary);
+}
+
+.crs-message {
+  min-height: 1.4em;
+  font-size: var(--fs-xs);
+  color: var(--accent-ambre);
+}
+
+.crs-formulaire-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* =============================================
+   TERMINER LES COURSES : saisie rapide, ticket en main
+   ============================================= */
+.crs-zone-comparateur { grid-area: comparateur; }
+
+.crs-terminer { width: min(100%, 760px); }
+
+.crs-terminer-ligne { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.crs-saisie-date {
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  color-scheme: dark;
+}
+
+/* Une ligne par article coché : nom et quantité à gauche, prix à droite */
+.crs-terminer-articles {
+  display: flex;
+  flex-direction: column;
+  max-height: 264px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.crs-ligne-prix {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  padding: 4px 8px 4px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: text;
+}
+.crs-ligne-prix:last-child { border-bottom: none; }
+
+.crs-ligne-prix-nom {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+.crs-ligne-prix-nom b    { font-size: var(--fs-sm); font-weight: 600; color: var(--text-primary); }
+.crs-ligne-prix-nom span { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+.crs-ligne-prix .crs-saisie-euros { flex: 0 0 150px; }
+
+/* Prix pré-rempli (dernier prix connu) : en gris tant qu'il n'est pas modifié ;
+   le JS retire la classe à la première saisie */
+.crs-prix-connu input { color: var(--text-secondary); }
+
+.crs-aide-prix { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+.crs-terminer-fin {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.1);
+  font-size: var(--fs-sm);
+}
+.crs-terminer-fin b { color: var(--accent-emeraude); }
+
+/* =============================================
+   COMPARATEUR : vert = le moins cher (économie)
+   ============================================= */
+.crs-comparateur { display: flex; flex-direction: column; gap: 14px; }
+
+.crs-gagnant {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 14px;
+  background: rgba(16, 185, 129, 0.1);
+}
+.crs-gagnant-libelle {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--accent-emeraude);
+}
+.crs-gagnant-nom   { font-size: var(--fs-lg); font-weight: 800; }
+.crs-gagnant-ecart { font-size: var(--fs-sm); color: var(--text-primary); }
+
+.crs-classement {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.crs-classement li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(60px, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-sm);
+}
+.crs-classement-nom { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crs-classement li b { min-width: 34px; text-align: right; }
+.crs-classement-nb { font-size: var(--fs-xs); color: var(--text-secondary); white-space: nowrap; }
+
+/* Barre d'indice : plus elle est longue, moins le magasin est cher */
+.crs-indice-barre {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--piste);
+  overflow: hidden;
+}
+.crs-indice-barre span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--text-muted);
+}
+.crs-premier .crs-classement-nom,
+.crs-premier b { color: var(--accent-emeraude); font-weight: 700; }
+.crs-premier .crs-indice-barre span { background: var(--accent-emeraude); }
+
+.crs-couverture { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+.crs-comparateur-vide {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.crs-comparateur-vide b { font-size: var(--fs-sm); color: var(--text-primary); }
+
+/* Dernières courses : nombre d'articles à droite, sans montant */
+.crs-passage-nb { flex-shrink: 0; font-size: var(--fs-xs); color: var(--text-secondary); white-space: nowrap; }
+
+.vue-courses [hidden] { display: none !important; }

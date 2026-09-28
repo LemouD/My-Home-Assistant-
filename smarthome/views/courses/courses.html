@@ -1,0 +1,240 @@
+<div id="page-content" class="crs">
+
+  <!--
+    Maquette Figma « liste-de-courses » adaptée à la tablette.
+    Contenu rempli par courses.js à partir de la liste todo.* et du menu (maison/menu/lire).
+
+    Ordre d'usage : ce qu'il faut acheter → ajouter vite → préparer depuis les repas → s'informer.
+    [Articles à acheter                 ] [Repas de la semaine ]
+    [                                   ] [                    ]
+    [Budget                              ] [                    ]
+  -->
+
+  <!-- EN-TÊTE : titre, recherche, ajout -->
+  <div class="crs-entete">
+    <div>
+      <h1 class="crs-titre">Liste de courses</h1>
+      <p class="crs-sous-titre">Ce qu'il faut racheter pour la maison, partagé en temps réel.</p>
+    </div>
+    <div class="crs-commandes">
+      <label class="crs-recherche">
+        <img src="../../assets/icons/courses/recherche.svg" width="14" height="14" alt="">
+        <input type="search" id="crs-recherche" placeholder="Rechercher un article" aria-label="Rechercher un article">
+      </label>
+      <button class="crs-bouton-principal" data-action="ouvrir-ajout">
+        <img src="../../assets/icons/courses/ajouter.svg" width="12" height="12" alt="">
+        Ajouter un article
+      </button>
+    </div>
+  </div>
+
+  <!-- FORMULAIRE D'AJOUT : fenêtre posée sur la vue -->
+  <div class="crs-voile" id="crs-voile" hidden>
+    <form class="crs-formulaire" id="crs-formulaire" aria-labelledby="crs-formulaire-titre" novalidate>
+      <h2 class="crs-formulaire-titre" id="crs-formulaire-titre">Ajouter un article</h2>
+
+      <label class="crs-champ">
+        <span>Article</span>
+        <input type="text" name="nom" maxlength="60" required placeholder="Ex. : Tomates" autocomplete="off">
+      </label>
+
+      <!-- Affiché si l'article est déjà sur la liste : on propose d'augmenter la quantité -->
+      <p class="crs-doublon" id="crs-doublon" hidden>Déjà sur la liste : <b>Tomates (x6)</b>. La quantité sera ajoutée.</p>
+
+      <div class="crs-champs-ligne">
+        <!-- Quantité : boutons − / + (1 à 99), unité au choix -->
+        <fieldset class="crs-champ">
+          <legend>Quantité</legend>
+          <div class="crs-quantite-saisie">
+            <button type="button" class="crs-bouton-pas" data-action="quantite-moins" aria-label="Diminuer la quantité">−</button>
+            <input type="number" name="quantite" inputmode="numeric" min="1" max="9999" step="1" value="1" aria-label="Quantité">
+            <button type="button" class="crs-bouton-pas" data-action="quantite-plus" aria-label="Augmenter la quantité">+</button>
+          </div>
+        </fieldset>
+        <fieldset class="crs-champ">
+          <legend>Unité</legend>
+          <div class="crs-choix crs-choix-unite">
+            <label><input type="radio" name="unite" value="piece" checked><span>pièce</span></label>
+            <label><input type="radio" name="unite" value="g"><span>g</span></label>
+            <label><input type="radio" name="unite" value="kg"><span>kg</span></label>
+            <label><input type="radio" name="unite" value="ml"><span>ml</span></label>
+            <label><input type="radio" name="unite" value="l"><span>L</span></label>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- Rayon : range l'article dans le bon bloc de la liste -->
+      <fieldset class="crs-champ">
+        <legend>Rayon</legend>
+        <div class="crs-choix crs-choix-rayon">
+          <label><input type="radio" name="rayon" value="fruits-legumes" checked><span>Fruits &amp; légumes</span></label>
+          <label><input type="radio" name="rayon" value="boucherie"><span>Boucherie</span></label>
+          <label><input type="radio" name="rayon" value="poissonnerie"><span>Poissonnerie</span></label>
+          <label><input type="radio" name="rayon" value="cremerie"><span>Crèmerie</span></label>
+          <label><input type="radio" name="rayon" value="boulangerie"><span>Boulangerie</span></label>
+          <label><input type="radio" name="rayon" value="epicerie"><span>Épicerie</span></label>
+          <label><input type="radio" name="rayon" value="surgeles"><span>Surgelés</span></label>
+          <label><input type="radio" name="rayon" value="boissons"><span>Boissons</span></label>
+          <label><input type="radio" name="rayon" value="entretien"><span>Entretien</span></label>
+          <label><input type="radio" name="rayon" value="hygiene"><span>Hygiène</span></label>
+          <label><input type="radio" name="rayon" value="autre"><span>Autre</span></label>
+        </div>
+      </fieldset>
+
+      <p class="crs-message" id="crs-formulaire-message" role="status"></p>
+
+      <div class="crs-formulaire-actions">
+        <button type="button" class="crs-bouton" data-action="fermer-ajout">Annuler</button>
+        <button type="submit" class="crs-bouton-principal">Ajouter à la liste</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- FORMULAIRE « TERMINER LES COURSES » : saisie rapide, ticket en main.
+       Exemples fictifs (magasins, articles, prix) : à retirer au branchement. -->
+  <div class="crs-voile" id="crs-terminer-voile" hidden>
+    <form class="crs-formulaire crs-terminer" id="crs-terminer" aria-labelledby="crs-terminer-titre" novalidate>
+      <h2 class="crs-formulaire-titre" id="crs-terminer-titre">Terminer les courses</h2>
+
+      <!-- Magasin : liste fermée venant de Home Assistant, plus « Autre » -->
+      <fieldset class="crs-champ">
+        <legend>Magasin</legend>
+        <div class="crs-choix" id="crs-terminer-magasins"></div>
+      </fieldset>
+
+      <div class="crs-champs-ligne crs-terminer-ligne">
+        <label class="crs-champ">
+          <span>Date</span>
+          <!-- max = aujourd'hui, posé par le JS -->
+          <input type="date" name="date" class="crs-saisie-date" required>
+        </label>
+        <label class="crs-champ">
+          <span>Total payé (facultatif)</span>
+          <span class="crs-saisie-euros">
+            <input type="number" name="total" inputmode="decimal" min="0" max="9999" step="0.01" placeholder="0,00">
+            <span>€</span>
+          </span>
+        </label>
+      </div>
+
+      <!-- Articles cochés : prix facultatif, pré-rempli par le dernier prix connu dans ce magasin -->
+      <fieldset class="crs-champ">
+        <legend>Prix des articles (facultatif) · <span id="crs-terminer-nombre"></span></legend>
+        <div class="crs-terminer-articles" id="crs-terminer-articles"></div>
+        <span class="crs-aide-prix">Les prix déjà connus dans ce magasin sont proposés : corrigez seulement ceux qui ont changé.</span>
+      </fieldset>
+
+      <p class="crs-message" id="crs-terminer-message" role="status"></p>
+
+      <div class="crs-formulaire-actions" id="crs-terminer-actions">
+        <button type="button" class="crs-bouton" data-action="fermer-terminer">Annuler</button>
+        <button type="submit" class="crs-bouton-principal">Enregistrer</button>
+      </div>
+
+      <!-- Après enregistrement : proposition de vider le panier (remplace #crs-terminer-actions) -->
+      <div class="crs-terminer-fin" id="crs-terminer-fin" hidden>
+        <p><b>Courses enregistrées.</b> Retirer les <span id="crs-terminer-fin-nombre"></span> articles cochés de la liste ?</p>
+        <div class="crs-formulaire-actions">
+          <button type="button" class="crs-bouton" data-action="fermer-terminer">Plus tard</button>
+          <button type="button" class="crs-bouton-principal" data-action="terminer-retirer">Retirer du panier</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="crs-grille">
+
+    <!-- ARTICLES À ACHETER : un bloc par rayon ; dans chaque rayon, les articles à acheter
+         d'abord, ceux déjà dans le panier ensuite (grisés). Toute la ligne coche l'article. -->
+    <section class="crs-carte crs-carte-sarcelle crs-zone-liste">
+      <div class="crs-carte-entete">
+        <h2 class="crs-carte-titre">
+          <img src="../../assets/icons/courses/panier.svg" width="14" height="14" alt="">
+          Articles à acheter
+        </h2>
+        <div class="crs-entete-liste">
+          <span class="crs-compteur" id="crs-compteur"></span>
+          <!-- Une fois les courses faites : retirer d'un coup ce qui est dans le panier -->
+          <!-- Liste imprimable (ou « Enregistrer en PDF » dans la fenêtre d'impression) -->
+          <button class="crs-bouton" data-action="imprimer">Imprimer / PDF</button>
+          <button class="crs-bouton" data-action="retirer-coches">Retirer du panier</button>
+          <!-- Visible seulement quand des articles sont cochés -->
+          <button class="crs-bouton-principal" data-action="ouvrir-terminer" id="crs-bouton-terminer" hidden>Terminer les courses</button>
+        </div>
+      </div>
+
+      <div class="crs-rayons" id="crs-rayons"></div>
+    </section>
+
+    <!-- REPAS DE LA SEMAINE : planification (violet nuit), source de la liste -->
+    <section class="crs-carte crs-carte-nuit crs-zone-repas">
+      <h2 class="crs-carte-titre crs-titre-violet">
+        <img src="../../assets/icons/courses/repas.svg" width="14" height="14" alt="">
+        Repas de la semaine
+      </h2>
+      <div class="crs-repas" id="crs-repas"></div>
+      <button class="crs-bouton-violet" data-action="generer-depuis-repas">Ajouter les ingrédients à la liste</button>
+    </section>
+
+    <!-- COMPARATEUR : magasin le moins cher sur notre panier (lisible sans code).
+         Masqué tant que l'intégration « maison » ne propose pas les commandes maison/courses/*. -->
+    <section class="crs-carte crs-carte-neutre crs-zone-comparateur" id="crs-carte-comparateur" hidden>
+      <div class="crs-carte-entete">
+        <h2 class="crs-carte-titre">
+          <img src="../../assets/icons/courses/budget.svg" width="14" height="14" alt="">
+          Comparateur
+        </h2>
+        <span class="crs-aide-prix">sur notre panier</span>
+      </div>
+
+      <div class="crs-comparateur" id="crs-comparateur">
+        <!-- Le moins cher : vert = économie -->
+        <div class="crs-gagnant">
+          <span class="crs-gagnant-libelle">Le moins cher</span>
+          <b class="crs-gagnant-nom" id="crs-gagnant-nom"></b>
+          <span class="crs-gagnant-ecart" id="crs-gagnant-ecart"></span>
+        </div>
+
+        <!-- Classement : indice 100 = le moins cher. La barre = 100 / indice (largeur posée par le JS) -->
+        <ol class="crs-classement" id="crs-classement"></ol>
+
+        <p class="crs-couverture" id="crs-couverture"></p>
+      </div>
+
+      <!-- Pas assez de prix : état vide -->
+      <div class="crs-comparateur-vide" id="crs-comparateur-vide" hidden>
+        <b>Pas encore assez de prix saisis</b>
+        <span>Saisissez les prix en terminant vos courses : le comparateur apparaît dès que deux magasins ont des articles en commun.</span>
+      </div>
+    </section>
+
+    <!-- INFORMATIONS : cartes neutres -->
+    <div class="crs-zone-infos">
+
+      <section class="crs-carte crs-carte-neutre">
+        <h2 class="crs-carte-titre">
+          <img src="../../assets/icons/courses/budget.svg" width="14" height="14" alt="">
+          Budget estimé
+        </h2>
+        <!-- Chiffres du Budget : jamais affichés ici sans code ; accès à la page Budget -->
+        <div class="crs-budget-verrou" id="crs-budget-verrou">
+          <span>Les chiffres du mois restent dans le Budget, protégés par le code.</span>
+          <button class="crs-bouton" data-action="deverrouiller-budget">Ouvrir le Budget</button>
+        </div>
+      </section>
+
+      <!-- DERNIÈRES COURSES : sans montant (les totaux sont dans le Budget, derrière le code). -->
+      <section class="crs-carte crs-carte-neutre" id="crs-carte-historique" hidden>
+        <h2 class="crs-carte-titre">
+          <img src="../../assets/icons/courses/historique.svg" width="14" height="14" alt="">
+          Dernières courses
+        </h2>
+        <div class="crs-historique" id="crs-historique"></div>
+        <p class="crs-aide-prix" id="crs-historique-vide" hidden>Aucune course enregistrée pour l'instant.</p>
+      </section>
+
+    </div>
+
+  </div>
+
+</div>
