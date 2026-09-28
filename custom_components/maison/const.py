@@ -65,3 +65,9 @@ PHOTO_COTE_MAX = 800                   # pixels
 PHOTO_POIDS_CIBLE = 200_000            # octets
 PHOTOS_DISQUE_MAX = 30_000_000         # octets, tout le dossier
 SIGNATURE_PHOTO_HEURES = 24
+
+# ---- DERNIÈRES COURSES ET COMPARATEUR ----
+
+STOCKAGE_COURSES_CLE = "maison.courses"
+STOCKAGE_COURSES_VERSION = 1
+CLE_CARNET = f"{DOMAIN}_carnet"   # hass.data : carnet des dernières courses

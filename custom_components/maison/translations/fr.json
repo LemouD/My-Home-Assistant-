@@ -25,7 +25,8 @@
         "title": "Réglages de Maison",
         "menu_options": {
           "code": "Changer le code du budget",
-          "menu": "Générateur de menu"
+          "menu": "Générateur de menu",
+          "courses": "Magasins"
         }
       },
       "code": {
@@ -49,6 +50,13 @@
         },
         "data_description": {
           "meteo": "Entité météo de Home Assistant : conseil de jus du jour, sans appel externe."
+        }
+      },
+      "courses": {
+        "title": "Magasins",
+        "description": "Noms des magasins où la famille fait ses courses, 12 au maximum. « Autre » est toujours proposé et n'entre pas dans le comparateur.",
+        "data": {
+          "magasins": "Magasins (un par ligne)"
         }
       }
     },
