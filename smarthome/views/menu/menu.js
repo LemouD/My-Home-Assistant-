@@ -3,11 +3,13 @@
 // =============================================
 // Tout passe par l'intégration « maison » (maison/menu/*) : le panneau ne contacte jamais
 // le générateur. Sous-pages : « menu » (semaine), « menu/generer », « menu/recette/<date>/<repas> »,
-// « menu/jus » (catalogue du jour) et « menu/jus/<id> ».
+// « menu/jus » (catalogue du jour), « menu/jus/<id> », « menu/plat » (un plat seul) et « menu/plat/<id> ».
 // Affichage en nœuds texte uniquement ; aucun stockage navigateur.
 
 import { ajouterStyle, chargerGabarit, el, remplacer } from '../../js/dom.js';
-import { jusCatalogue, jusRegenerer, menuEtat, menuGenerer, menuLire, menuRemplacer, menuVersCourses } from '../../js/ha.js';
+import {
+  jusCatalogue, jusRegenerer, menuEtat, menuGenerer, menuLire, menuPlat, menuPlats, menuRemplacer, menuVersCourses,
+} from '../../js/ha.js';
 
 const PERSONNES_MIN = 1;
 const PERSONNES_MAX = 12;
@@ -16,6 +18,10 @@ const PHOTOS_MS = 25_000;         // les photos arrivent en arrière-plan après
 const SIGNATURES_MS = 6 * 3600_000;   // les adresses signées des photos expirent après 24 h
 
 const REPAS = { petit_dej: 'Petit-déjeuner', jus: 'Jus', dejeuner: 'Déjeuner', diner: 'Dîner' };
+const REPAS_COURTS = { petit_dej: 'Matin', jus: 'Jus', dejeuner: 'Midi', diner: 'Soir' };
+// Plat principal d'une journée (jamais le jus), puis les autres repas
+const PRIORITE_PLATS = ['diner', 'dejeuner', 'petit_dej'];
+const REPAS_PLAT_SEUL = ['petit_dej', 'dejeuner', 'diner'];
 // Heure à partir de laquelle un repas du jour n'est plus « à venir » (recette mise en avant)
 const FIN_REPAS = { petit_dej: 10, jus: 17, dejeuner: 14, diner: 24 };
 const ALLERGIES = {
@@ -89,6 +95,15 @@ function poserPhoto(conteneur, credit, photo) {
   }
 }
 
+// Estimation facultative (calories_portion, 0-5000) : ajoutée à côté des portions, en texte
+function poserCalories(champPortions, recette) {
+  const liste = champPortions.closest('.menu-caracteristiques');
+  liste?.querySelector('.menu-calories')?.remove();
+  const kcal = recette.calories_portion;
+  if (!liste || !Number.isInteger(kcal) || kcal <= 0 || kcal > 5000) return;
+  liste.append(el('span', { class: 'menu-caracteristique menu-calories', title: 'Estimation, à vérifier' }, `≈ ${kcal} kcal / portion`));
+}
+
 const texteErreur = (e) => ERREURS[e?.code] ?? ['Erreur', 'L\'action n\'a pas abouti. Réessayez.'];
 
 const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
@@ -134,10 +149,15 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
   let erreurJus = null;
   let actionJus = false;
   let relecturePhotos = null;
+  let plats = [];           // derniers plats seuls (maison/menu/plats), lus à la visite de « menu/plat »
+  let chargePlats = false;
+  let erreurPlat = null;
+  let actionPlat = false;
   // Adresses signées des photos : relecture régulière avant leur expiration
   const signatures = setInterval(() => {
     actualiser();
     if (chargeJus) chargerCatalogue();
+    if (chargePlats) chargerPlats();
   }, SIGNATURES_MS);
 
   const restant = () => (etat ? Math.max(0, etat.quota.max - etat.quota.utilise) : 0);
@@ -155,13 +175,16 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
   function afficher(nouveauChemin = '') {
     chemin = nouveauChemin;
     const [page, date, repas] = chemin.split('/');
-    let sousPage = ['generer', 'recette', 'jus'].includes(page) ? page : 'semaine';
+    let sousPage = ['generer', 'recette', 'jus', 'plat'].includes(page) ? page : 'semaine';
     if (page === 'jus' && date) sousPage = 'jus-detail';
+    if (page === 'plat' && date) sousPage = 'recette';   // un plat seul s'affiche comme une recette
     racine.querySelectorAll('[data-sous-page]').forEach((section) => {
       section.hidden = section.dataset.sousPage !== sousPage;
     });
     if (sousPage === 'generer') preparerFormulaire();
+    else if (sousPage === 'recette' && page === 'plat') afficherPlat(decoder(date));
     else if (sousPage === 'recette') rendreRecette(date, repas);
+    else if (sousPage === 'plat') afficherPagePlat();
     else if (sousPage === 'jus') afficherJus();
     else if (sousPage === 'jus-detail') {
       const id = decoder(date);
@@ -184,7 +207,9 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
       for (const r of ordre) if (jour.date > jourJ || heure < FIN_REPAS[r]) candidats.push([jour, r]);
     }
     for (const jour of menu.jours) for (const r of ordre) candidats.push([jour, r]);
-    return candidats.find(([j, r]) => recetteDe(j.repas[r]));
+    // Le plat du jour est un repas : un jus n'est mis en avant que s'il n'y a rien d'autre
+    const trouve = (plat) => candidats.find(([j, r]) => (r !== 'jus') === plat && recetteDe(j.repas[r]));
+    return trouve(true) ?? trouve(false);
   }
 
   function libelleMoment(date, repas) {
@@ -233,7 +258,8 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
       $('menu-vedette-nom').textContent = recette.nom;
       $('menu-vedette-duree').textContent = `${recette.duree_min} min`;
       $('menu-vedette-portions').textContent = pluriel(recette.portions, 'personne');
-      Object.assign($('menu-vedette-ouvrir').dataset, { jour: jour.date, repas });
+      poserCalories($('menu-vedette-portions'), recette);
+      Object.assign($('menu-vedette-ouvrir').dataset, { date: jour.date, repas });
       poserPhoto($('menu-vedette-photo'), $('menu-vedette-credit'), recette.photo);
     }
 
@@ -241,35 +267,74 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     $('menu-resume-repas').textContent = String(recettes.length);
     $('menu-resume-ingredients').textContent = String(recettes.reduce((n, r) => n + r.ingredients.length, 0));
 
-    // Grille : une ligne par jour, une colonne par repas du menu (1 à 4)
-    remplacer($('menu-entetes-repas'), el('span'), ...parametres.repas.map((r) => el('span', {}, REPAS[r] ?? r)));
-    remplacer($('menu-grille'), ...jours.map((jour) => {
-      const d = dateLocale(jour.date);
-      const estAujourdhui = jour.date === aujourdhui();
-      return el('div', { class: estAujourdhui ? 'menu-jour menu-jour-aujourdhui' : 'menu-jour', 'aria-current': estAujourdhui ? 'date' : null },
-        el('span', { class: 'menu-jour-nom' },
-          `${majuscule(d.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', ''))} `, el('b', {}, String(d.getDate()))),
-        ...parametres.repas.map((repas) => creneau(jour, repas)));
-    }));
+    // Une carte par jour : le plat principal en grand, les autres repas dessous (le jus est en bas de page)
+    const repasDuMenu = parametres.repas.filter((r) => r !== 'jus');
+    remplacer($('menu-jours'), ...jours.map((jour) => carteJour(jour, repasDuMenu)));
+
+    rendreBandeJus();
   }
 
-  function creneau(jour, repas) {
-    const valeur = jour.repas[repas];
+  const boutonRemplacer = (date, repas) => el('button', {
+    class: 'menu-bouton-rose', 'data-action': 'remplacer', 'data-date': date, 'data-repas': repas,
+    disabled: restant() === 0 || action || Boolean(etat?.enCours),
+  }, 'Remplacer ', el('span', { class: 'menu-quota-mini' }, texteRestant()));
+
+  function carteJour(jour, repasDuMenu) {
+    const d = dateLocale(jour.date);
+    const estAujourdhui = jour.date === aujourdhui();
+    const principal = PRIORITE_PLATS.find((r) => repasDuMenu.includes(r) && jour.repas[r]) ?? repasDuMenu[0];
+    const nomJour = d.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '').toUpperCase();
+    const valeur = jour.repas[principal];
     const recette = recetteDe(valeur);
+
+    let blocPrincipal;
     if (recette) {
-      return el('button', { class: 'menu-creneau', 'data-action': 'ouvrir-recette', 'data-jour': jour.date, 'data-repas': repas },
-        el('b', {}, recette.nom),
-        el('span', {}, [`${recette.duree_min} min`, recette.tags[0]].filter(Boolean).join(' · ')));
-    }
-    // Plat retiré par le serveur (halal, allergie, recette incomplète)
-    return el('div', { class: 'menu-creneau menu-creneau-rejete' },
-      el('span', { class: 'menu-rejete-texte' },
+      const photo = el('span', { class: 'menu-jour-photo' });
+      poserPhoto(photo, null, recette.photo);
+      blocPrincipal = el('button', { class: 'menu-jour-principal', 'data-action': 'ouvrir-recette', 'data-date': jour.date, 'data-repas': principal },
+        photo,
+        el('span', { class: 'menu-jour-legende' }, el('span', { class: 'menu-jour-nom' }, `${nomJour} ${d.getDate()}`), el('b', {}, recette.nom)));
+    } else {
+      blocPrincipal = el('div', { class: 'menu-jour-principal menu-jour-principal-rejete' },
+        el('span', { class: 'menu-jour-nom' }, `${nomJour} ${d.getDate()}`),
         el('b', {}, valeur?.rejete ? 'Plat non conforme retiré' : 'Pas de plat'),
-        el('span', {}, MOTIFS[valeur?.motif] ?? '')),
-      el('button', {
-        class: 'menu-bouton-rose', 'data-action': 'remplacer', 'data-jour': jour.date, 'data-repas': repas,
-        disabled: restant() === 0 || action || Boolean(etat?.enCours),
-      }, 'Remplacer ', el('span', { class: 'menu-quota-mini' }, texteRestant())));
+        el('span', {}, MOTIFS[valeur?.motif] ?? ''),
+        boutonRemplacer(jour.date, principal));
+    }
+
+    const autres = repasDuMenu.filter((r) => r !== principal && jour.repas[r]).map((r) => {
+      const autre = recetteDe(jour.repas[r]);
+      if (autre) {
+        return el('li', {}, el('button', { class: 'menu-jour-repas', 'data-action': 'ouvrir-recette', 'data-date': jour.date, 'data-repas': r },
+          el('span', {}, REPAS_COURTS[r]), el('b', {}, autre.nom)));
+      }
+      return el('li', { class: 'menu-jour-rejete' }, el('span', {}, `${REPAS_COURTS[r]} · Plat retiré`), boutonRemplacer(jour.date, r));
+    });
+
+    return el('div', {
+      class: estAujourdhui ? 'menu-jour-carte menu-jour-aujourdhui' : 'menu-jour-carte',
+      'aria-current': estAujourdhui ? 'date' : null,
+    },
+    blocPrincipal,
+    autres.length ? el('ul', { class: 'menu-jour-autres' }, ...autres) : null);
+  }
+
+  // Jus du jour : en bas de page, secondaires (catalogue généré au premier affichage de la journée)
+  function rendreBandeJus() {
+    if (!chargeJus && !actionJus && hass) chargerCatalogue();
+    const jus = catalogue?.jus ?? [];
+    $('menu-bloc-jus').hidden = chargeJus && !catalogue;
+    $('menu-jus-vide').hidden = jus.length > 0 || !chargeJus;
+    $('menu-jus-conseil').textContent = typeof catalogue?.conseil?.texte === 'string'
+      ? catalogue.conseil.texte : 'Des suggestions fraîches pour accompagner vos repas';
+    remplacer($('menu-jus-bande'), ...jus.slice(0, 6).map((r) => {
+      const objectif = objectifDe(r);
+      const photo = el('span', { class: 'menu-jus-photo' });
+      poserPhoto(photo, null, r.photo);
+      return el('button', { class: `menu-jus-mini jus-objectif-${objectif}`, 'data-action': 'ouvrir-jus', 'data-id': r.id },
+        photo,
+        el('span', { class: 'menu-jus-legende' }, el('span', { class: 'menu-jus-objectif' }, OBJECTIFS[objectif]), el('b', {}, r.nom)));
+    }));
   }
 
   // ---- RECETTE ----
@@ -281,12 +346,18 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
       if (charge) aller('');   // lien périmé (menu régénéré) : retour à la semaine
       return;
     }
-    $('recette-contexte').textContent = libelleMoment(date, repas);
+    remplirRecette(recette, libelleMoment(date, repas), { date, repas });
+  }
+
+  // Détail d'une recette, du menu (remplaçable) ou d'un plat seul (non remplaçable)
+  function remplirRecette(recette, contexte, creneauMenu = null) {
+    $('recette-contexte').textContent = contexte;
     $('recette-tags').textContent = recette.tags.slice(0, 3).map(majuscule).join(' · ');
     $('recette-nom').textContent = recette.nom;
     poserPhoto($('recette-photo'), $('recette-credit'), recette.photo);
     $('recette-duree').textContent = `${recette.duree_min} min`;
     $('recette-portions').textContent = pluriel(recette.portions, 'personne');
+    poserCalories($('recette-portions'), recette);
     $('recette-nb-ingredients').textContent = String(recette.ingredients.length);
     remplacer($('recette-ingredients'), ...recette.ingredients.map((i) =>
       el('li', {},
@@ -296,12 +367,13 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     $('recette-nb-etapes').textContent = pluriel(recette.etapes.length, 'étape');
     remplacer($('recette-etapes'), ...recette.etapes.map((e) => el('li', {}, e)));
     $('recette-resume-courses').textContent = `Ajoutez les ${pluriel(recette.ingredients.length, 'ingrédient')} à la liste de courses.`;
-    Object.assign($('recette-remplacer').dataset, { jour: date, repas });
+    $('recette-remplacer').hidden = !creneauMenu;
+    if (creneauMenu) Object.assign($('recette-remplacer').dataset, creneauMenu);
     $('recette-remplacer').disabled = restant() === 0 || action || Boolean(etat?.enCours);
     $('recette-quota').textContent = texteRestant();
     // Lien construit ici (jamais fourni par le générateur) : recherche YouTube en https
     $('recette-youtube').href = `https://www.youtube.com/results?search_query=${encodeURIComponent(`recette ${recette.nom}`)}`;
-    racine.querySelector('[data-action="recette-vers-courses"]').dataset.recette = jour.repas[repas].recette;
+    racine.querySelector('[data-action="recette-vers-courses"]').dataset.recette = recette.id;
   }
 
   // ---- FORMULAIRE ----
@@ -408,8 +480,8 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
   }
 
   function remplacerPlat(bouton) {
-    const { jour, repas } = bouton.dataset;
-    executer(() => menuRemplacer(hass, jour, repas));
+    const { date, repas } = bouton.dataset;
+    executer(() => menuRemplacer(hass, date, repas));
   }
 
   async function versCourses(bouton, recettes, zone = recettes ? $('recette-resume-courses') : bilanSemaine) {
@@ -433,14 +505,125 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
   // Photos cherchées en arrière-plan : une relecture quelques secondes après la génération
   function programmerPhotos() {
     const sansPhoto = (liste) => liste.some((r) => !r.photo);
-    const attente = (menu && sansPhoto(Object.values(menu.recettes))) || (catalogue && sansPhoto(catalogue.jus));
+    const attente = (menu && sansPhoto(Object.values(menu.recettes))) || (catalogue && sansPhoto(catalogue.jus))
+      || sansPhoto(plats);
     if (!attente || relecturePhotos) return;
     relecturePhotos = setTimeout(() => {
       relecturePhotos = null;
       actualiser();
       if (chargeJus) chargerCatalogue();
+      if (chargePlats) chargerPlats();
     }, PHOTOS_MS);
   }
+
+  // ---- UN PLAT SEUL (sans toucher au menu de la semaine) ----
+
+  const formPlat = $('plat-formulaire');
+
+  function afficherPagePlat() {
+    if (!chargePlats && !actionPlat && hass) chargerPlats();
+    rendrePagePlat();
+  }
+
+  async function chargerPlats() {
+    try {
+      const reponse = await menuPlats(hass);
+      plats = Array.isArray(reponse) ? reponse : [];
+      erreurPlat = null;
+    } catch (e) {
+      erreurPlat = e?.code ? e : { code: 'generation_indisponible' };
+      console.warn('Plats :', erreurPlat.code);
+    }
+    chargePlats = true;
+    programmerPhotos();
+    afficher(chemin);
+  }
+
+  function rendrePagePlat() {
+    // Choix du repas : proposé une seule fois, puis la sélection de l'utilisateur est gardée
+    if (!$('plat-choix-repas').querySelector('input')) {
+      remplacer($('plat-choix-repas'), ...REPAS_PLAT_SEUL.map((r) =>
+        el('label', {}, el('input', { type: 'radio', name: 'repas', value: r, checked: r === 'diner' }), el('span', {}, REPAS[r]))));
+      if (menu) formPlat.elements.personnes.value = menu.parametres.personnes;
+    }
+    const enCours = actionPlat || Boolean(etat?.enCours);
+    $('plat-etat-encours').hidden = !enCours;
+    $('plat-etat-erreur').hidden = enCours || !erreurPlat;
+    if (erreurPlat) {
+      const [titre, texte] = texteErreur(erreurPlat);
+      $('plat-erreur-titre').textContent = titre;
+      $('plat-erreur-texte').textContent = texte;
+    }
+    $('plat-quota').textContent = etat ? `${restant()} sur ${etat.quota.max}` : '—';
+    $('plat-note-compteur').textContent = `${formPlat.elements.note.value.length} / 200`;
+    formPlat.querySelector('button[type="submit"]').disabled = !etat?.configure || restant() === 0 || enCours;
+
+    $('plat-derniers-vide').hidden = plats.length > 0 || !chargePlats;
+    remplacer($('plat-derniers'), ...plats.map((r) => {
+      const photo = el('span', { class: 'menu-plat-photo' });
+      poserPhoto(photo, null, r.photo);
+      const detail = [REPAS[r.repas] ?? '', `${r.duree_min} min`].filter(Boolean).join(' · ');
+      return el('div', { class: 'menu-plat-carte' },
+        el('button', { class: 'menu-plat-ouvrir', 'data-action': 'ouvrir-plat', 'data-id': r.id },
+          photo, el('span', { class: 'menu-plat-texte' }, el('b', {}, r.nom), el('span', {}, detail))),
+        el('button', { class: 'menu-bouton', 'data-action': 'plat-vers-courses', 'data-id': r.id }, '+ Courses'));
+    }));
+  }
+
+  function afficherPlat(id) {
+    const plat = plats.find((r) => r.id === id);
+    if (!plat) {
+      if (chargePlats) aller('plat');
+      else if (hass && !actionPlat) chargerPlats();
+      return;
+    }
+    remplirRecette(plat, `Plat seul${REPAS[plat.repas] ? ` · ${REPAS[plat.repas]}` : ''}`);
+  }
+
+  function lireParametresPlat() {
+    const personnes = Number.parseInt(formPlat.elements.personnes.value, 10);
+    const choisis = (nom) => [...formPlat.querySelectorAll(`input[name="${nom}"]:checked`)].map((c) => c.value);
+    const repas = formPlat.querySelector('input[name="repas"]:checked')?.value;
+    return {
+      repas: REPAS_PLAT_SEUL.includes(repas) ? repas : 'diner',
+      personnes: Math.min(PERSONNES_MAX, Math.max(PERSONNES_MIN, Number.isFinite(personnes) ? personnes : PERSONNES_MIN)),
+      preferences: choisis('preference'),
+      allergies: choisis('allergie'),
+      note: formPlat.elements.note.value.trim().slice(0, 200),
+    };
+  }
+
+  async function genererPlat() {
+    actionPlat = true;
+    erreurPlat = null;
+    $('plat-message').textContent = '';
+    rendrePagePlat();
+    try {
+      const plat = await menuPlat(hass, lireParametresPlat());
+      plats = [plat, ...plats.filter((r) => r.id !== plat.id)].slice(0, 5);
+      $('plat-message').textContent = `« ${plat.nom} » est prêt.`;
+      programmerPhotos();
+    } catch (e) {
+      erreurPlat = e?.code ? e : { code: 'generation_indisponible' };
+      console.warn('Plat seul refusé :', erreurPlat.code);
+    }
+    actionPlat = false;
+    await actualiser();
+  }
+
+  function changerPersonnesPlat(pas) {
+    const champ = formPlat.elements.personnes;
+    const valeur = Number.parseInt(champ.value, 10) || PERSONNES_MIN;
+    champ.value = Math.min(PERSONNES_MAX, Math.max(PERSONNES_MIN, valeur + pas));
+  }
+
+  formPlat.addEventListener('input', () => {
+    $('plat-note-compteur').textContent = `${formPlat.elements.note.value.length} / 200`;
+  });
+  formPlat.addEventListener('submit', (e) => {
+    e.preventDefault();
+    genererPlat();
+  });
 
   // ---- JUS DU JOUR ----
 
@@ -571,6 +754,7 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     }
     $('jus-detail-duree').textContent = `${recette.duree_min} min`;
     $('jus-detail-portions').textContent = pluriel(recette.portions, 'verre');
+    poserCalories($('jus-detail-portions'), recette);
     remplacer($('jus-detail-ingredients'), ...recette.ingredients.map((i) =>
       el('li', {},
         el('b', {}, quantite(i)),
@@ -615,7 +799,12 @@ export async function monter({ sousChemin = '', naviguer } = {}) {
     switch (cible.dataset.action) {
       case 'aller-generer': aller('generer'); break;
       case 'retour-semaine': aller(''); break;
-      case 'ouvrir-recette': aller(`recette/${cible.dataset.jour}/${cible.dataset.repas}`); break;
+      case 'ouvrir-recette': aller(`recette/${cible.dataset.date}/${cible.dataset.repas}`); break;
+      case 'aller-plat': aller('plat'); break;
+      case 'ouvrir-plat': aller(`plat/${encodeURIComponent(cible.dataset.id)}`); break;
+      case 'plat-personnes-moins': changerPersonnesPlat(-1); break;
+      case 'plat-personnes-plus': changerPersonnesPlat(1); break;
+      case 'plat-vers-courses': versCourses(cible, [cible.dataset.id], $('plat-message')); break;
       case 'personnes-moins': changerPersonnes(-1); break;
       case 'personnes-plus': changerPersonnes(1); break;
       case 'remplacer': remplacerPlat(cible); break;

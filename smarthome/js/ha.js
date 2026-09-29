@@ -202,3 +202,8 @@ export const coursesComparer = (hass) => hass.callWS({ type: 'maison/courses/com
 export async function coursesRetirerArticles(hass, entityId, uids) {
   await hass.callService('todo', 'remove_item', { entity_id: entityId, item: uids });
 }
+
+// Plat seul, sans toucher au menu de la semaine (compte dans le quota) ; les 5 derniers sont gardés à part
+export const menuPlat = (hass, parametres) => hass.callWS({ type: 'maison/menu/plat', parametres });
+
+export const menuPlats = (hass) => hass.callWS({ type: 'maison/menu/plats' });
