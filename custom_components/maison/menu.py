@@ -133,6 +133,8 @@ RECETTE = _objet({
     vol.Required("etapes"): _liste(_texte(500), 1, 30),
     vol.Optional("tags", default=list): _liste(_texte(30), 0, 10),
     vol.Optional("photo_requete", default=""): _requete_photo,
+    # Estimation fournie par le générateur, affichée à titre indicatif
+    vol.Optional("calories_portion"): _nombre(0, 5_000, entier=True),
     vol.Optional("jus"): INFOS_JUS,
 })
 
@@ -146,6 +148,23 @@ PARAMETRES = _objet({
         _liste(_dans(ALLERGIES), 0, len(ALLERGIES)), lambda l: sorted(set(l))),
     vol.Optional("note", default=""): vol.All(vol.Any(str, None), nettoyer_note),
 })
+
+
+PARAMETRES_PLAT = _objet({
+    vol.Required("repas"): _dans(REPAS),
+    vol.Required("personnes"): _nombre(1, 12, entier=True),
+    vol.Optional("preferences", default=list): vol.All(
+        _liste(_dans(PREFERENCES), 0, len(PREFERENCES)), lambda l: sorted(set(l))),
+    vol.Optional("allergies", default=list): vol.All(
+        _liste(_dans(ALLERGIES), 0, len(ALLERGIES)), lambda l: sorted(set(l))),
+    vol.Optional("note", default=""): vol.All(vol.Any(str, None), nettoyer_note),
+})
+
+
+def valider_parametres_plat(parametres: object) -> dict:
+    if not isinstance(parametres, dict):
+        raise vol.Invalid("objet attendu")
+    return PARAMETRES_PLAT(parametres)
 
 
 def valider_parametres(parametres: object) -> dict:

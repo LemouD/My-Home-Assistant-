@@ -20,8 +20,11 @@ from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    APPELS_SIMULTANES,
     DELAI_WORKER,
     EXPIRATION_GENERATION,
+    JOURS_PAR_APPEL,
+    PLATS_GARDES,
     PERSONNES_CATALOGUE_DEFAUT,
     QUOTA_MENU_DEFAUT,
     STOCKAGE_MENU_CLE,
@@ -68,6 +71,7 @@ class Cuisine:
             "catalogue": None,               # jus du jour
             "catalogue_tentative": "",       # date de la dernière génération automatique
             "quota": {"jour": "", "utilise": 0},
+            "plats": [],                     # derniers plats générés seuls, hors menu
         }
         self._courses = asyncio.Lock()
         self._verrou_photos = asyncio.Lock()
@@ -76,6 +80,7 @@ class Cuisine:
     async def charger(self) -> None:
         if stockees := await self._stockage.async_load():
             self._donnees.update(stockees)
+        self._donnees.setdefault("plats", [])
 
     async def _sauver(self) -> None:
         await self._stockage.async_save(self._donnees)
@@ -192,6 +197,23 @@ class Cuisine:
             raise MenuErreur("generation_invalide", "Réponse du générateur inutilisable")
         return [j if isinstance(j, dict) else {} for j in jours_recus]
 
+    async def _appeler_par_blocs(self, parametres: dict, jours: int, repas: list[str]) -> list[dict]:
+        """Plusieurs appels courts plutôt qu'un long : moins d'attente et pas de réponse géante."""
+        tailles = [min(JOURS_PAR_APPEL, jours - debut) for debut in range(0, jours, JOURS_PAR_APPEL)]
+        limite = asyncio.Semaphore(APPELS_SIMULTANES)
+
+        async def bloc(taille: int) -> list[dict]:
+            async with limite:
+                return await self._appeler_worker(parametres, taille, repas)
+
+        resultats = await asyncio.gather(*(bloc(t) for t in tailles), return_exceptions=True)
+        erreurs = [r for r in resultats if isinstance(r, BaseException)]
+        if erreurs:
+            # Tous les blocs ont échoué pour la même raison la plupart du temps : la première suffit
+            raise erreurs[0] if isinstance(erreurs[0], MenuErreur) else MenuErreur(
+                "generation_indisponible", "Générateur indisponible, réessayer plus tard")
+        return [jour for r in resultats for jour in r]
+
     async def _plat_conforme(self, parametres: dict, repas: str) -> tuple[dict | None, str]:
         """Nouvel essai pour un seul créneau : (recette, "") ou (None, motif)."""
         try:
@@ -212,7 +234,7 @@ class Cuisine:
             raise MenuErreur("parametres_invalides", "Aucun des repas demandés n'est activé")
         self._demarrer()
         try:
-            jours_bruts = await self._appeler_worker(parametres, parametres["jours"], repas)
+            jours_bruts = await self._appeler_par_blocs(parametres, parametres["jours"], repas)
             debut = dt_util.now().date()
             recettes: dict[str, dict] = {}
             jours: list[dict] = []
@@ -252,6 +274,27 @@ class Cuisine:
             await self._sauver()
         self._chercher_photos()
         return self.lire()
+
+    async def plat(self, parametres: dict) -> dict:
+        """Un plat seul, sans toucher au menu de la semaine (compte dans le quota)."""
+        self._demarrer()
+        try:
+            recette, motif = await self._plat_conforme(parametres, parametres["repas"])
+            if recette is None:
+                recette, motif = await self._plat_conforme(parametres, parametres["repas"])
+            if recette is None:
+                raise MenuErreur("generation_invalide", f"Plat non conforme ({motif}), réessayer")
+            rangees: dict[str, dict] = {}
+            identifiant = self._ranger(rangees, recette)
+            self._donnees["plats"] = [rangees[identifiant], *self._donnees["plats"]][:PLATS_GARDES]
+        finally:
+            self._en_cours_depuis = None
+            await self._sauver()
+        self._chercher_photos()
+        return self._exporter_recette(rangees[identifiant])
+
+    def plats(self) -> list[dict]:
+        return [self._exporter_recette(r) for r in self._donnees["plats"]]
 
     async def remplacer(self, date: str, repas: str) -> dict:
         menu = self._donnees["menu"]
@@ -333,7 +376,7 @@ class Cuisine:
         entite = self._options.get("todo")
         if not entite or self.hass.states.get(entite) is None:
             raise MenuErreur("courses_non_configure", "Liste de courses non configurée")
-        connues = {**catalogue, **menu["recettes"]}
+        connues = {**catalogue, **{r["id"]: r for r in self._donnees["plats"]}, **menu["recettes"]}
         choisies = [connues[i] for i in (ids if ids is not None else menu["recettes"]) if i in connues]
         lignes, ignores = lignes_courses(choisies)
 
@@ -366,7 +409,8 @@ class Cuisine:
 
     def _toutes_recettes(self) -> list[dict]:
         return [*((self._donnees["menu"] or {}).get("recettes", {}).values()),
-                *((self._donnees["catalogue"] or {}).get("jus", {}).values())]
+                *((self._donnees["catalogue"] or {}).get("jus", {}).values()),
+                *self._donnees["plats"]]
 
     async def _completer_photos(self) -> None:
         async with self._verrou_photos:
@@ -377,7 +421,9 @@ class Cuisine:
                 if not recette.get("photo_requete"):
                     continue
                 try:
-                    reponse = await self._post_worker({"type": "ha_photo", "requete": recette["photo_requete"]}, delai=30)
+                    # Le nom du plat permet au générateur de vérifier que la photo lui correspond
+                    reponse = await self._post_worker(
+                        {"type": "ha_photo", "requete": recette["photo_requete"], "nom": recette["nom"]}, delai=60)
                     trouvee = reponse.get("photo")
                     if isinstance(trouvee, dict) and (identifiant := await self.photos.telecharger(trouvee.get("url"))):
                         recette["photo"] = {"id": identifiant, **credit_photo(trouvee.get("auteur"), trouvee.get("lien"))}

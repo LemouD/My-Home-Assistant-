@@ -45,8 +45,11 @@ ALLERGIES = ("gluten", "lactose", "arachide", "fruits-a-coque", "oeuf", "poisson
 REPAS_DEFAUT = ("jus", "diner")
 QUOTA_MENU_DEFAUT = 10        # générations (ou remplacements) par jour
 NOTE_MAX = 200                # texte libre envoyé au générateur
-EXPIRATION_GENERATION = 300   # secondes : au-delà, une génération bloquée est oubliée
-DELAI_WORKER = 240            # secondes : le worker réessaie lui-même jusqu'à 3 fois
+EXPIRATION_GENERATION = 480   # secondes : au-delà, une génération bloquée est oubliée
+DELAI_WORKER = 420            # secondes : un appel au générateur (quelques jours au plus, voir JOURS_PAR_APPEL)
+JOURS_PAR_APPEL = 2           # une semaine est générée en plusieurs appels parallèles, plus courts
+APPELS_SIMULTANES = 4
+PLATS_GARDES = 5              # derniers plats seuls conservés
 CLE_CUISINE = f"{DOMAIN}_cuisine"   # hass.data : état du menu
 
 # ---- JUS ET PHOTOS ----

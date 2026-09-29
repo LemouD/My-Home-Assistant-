@@ -88,12 +88,37 @@ class TestParametres(unittest.TestCase):
             menu.valider_parametres([])
 
 
+class TestParametresPlat(unittest.TestCase):
+    def test_valides(self):
+        p = menu.valider_parametres_plat({"repas": "dejeuner", "personnes": 3, "allergies": ["oeuf", "oeuf"],
+                                          "note": "sans\nfour", "jours": 7})
+        self.assertEqual(p, {"repas": "dejeuner", "personnes": 3, "preferences": [], "allergies": ["oeuf"],
+                             "note": "sans four"})
+
+    def test_refus(self):
+        for modif in ({"repas": "gouter"}, {"repas": ["diner"]}, {"personnes": 0}, {"personnes": 13},
+                      {"allergies": ["tout"]}, {"preferences": ["halal"]}):
+            with self.subTest(modif=modif):
+                with self.assertRaises(vol.Invalid):
+                    menu.valider_parametres_plat({"repas": "diner", "personnes": 2, **modif})
+        with self.assertRaises(vol.Invalid):
+            menu.valider_parametres_plat("diner")
+
+
 class TestRecette(unittest.TestCase):
     def test_valide(self):
         r = menu.valider_recette({**recette(), "url": "https://exemple.invalid", "video": "x"})
         self.assertNotIn("url", r)
         self.assertNotIn("video", r)
         self.assertEqual(r["portions"], 4)
+
+    def test_calories(self):
+        self.assertEqual(menu.valider_recette(recette(calories_portion=512.4))["calories_portion"], 512)
+        self.assertNotIn("calories_portion", menu.valider_recette(recette()))
+        for valeur in (-1, 5_001, True, "500", float("nan")):
+            with self.subTest(valeur=valeur):
+                with self.assertRaises(vol.Invalid):
+                    menu.valider_recette(recette(calories_portion=valeur))
 
     def test_unite_et_rayon_inconnus(self):
         r = menu.valider_recette(recette(ingredients=[
