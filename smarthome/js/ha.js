@@ -207,3 +207,23 @@ export async function coursesRetirerArticles(hass, entityId, uids) {
 export const menuPlat = (hass, parametres) => hass.callWS({ type: 'maison/menu/plat', parametres });
 
 export const menuPlats = (hass) => hass.callWS({ type: 'maison/menu/plats' });
+
+// ---- Réglages du foyer (intégration maison) ----
+// Affichage et notifications sans code ; nom et membres avec le jeton Budget
+export const foyerLire = (hass) => hass.callWS({ type: 'maison/foyer/lire' });
+
+export const foyerAffichage = (hass, affichage) => hass.callWS({ type: 'maison/foyer/affichage', affichage });
+
+export const foyerNotifications = (hass, notifications) =>
+  hass.callWS({ type: 'maison/foyer/notifications', notifications });
+
+export const foyerNom = (hass, jeton, nom) => hass.callWS({ type: 'maison/foyer/nom', jeton, nom });
+
+export const foyerAjouterMembre = (hass, jeton, membre) =>
+  hass.callWS({ type: 'maison/foyer/membre/ajouter', jeton, membre });
+
+export const foyerModifierMembre = (hass, jeton, membreId, modification) =>
+  hass.callWS({ type: 'maison/foyer/membre/modifier', jeton, membre_id: membreId, modification });
+
+export const foyerRetirerMembre = (hass, jeton, membreId) =>
+  hass.callWS({ type: 'maison/foyer/membre/retirer', jeton, membre_id: membreId });

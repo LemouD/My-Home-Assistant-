@@ -177,6 +177,19 @@ apparaît aussi dans l'application HA du téléphone, pratique au magasin.
   en 90 jours), comparé au prix au kilo, au litre ou à la pièce. **Dernières courses** : sans montant ;
   les totaux ne se lisent qu'avec le code du Budget.
 
+## Réglages
+
+Page Réglages de la tablette (compte non administrateur) :
+
+- **Foyer** : nom et membres (prénom, couleur, parent ou enfant, personne HA liée). Modifier demande le
+  code du Budget ; la session se referme en quittant la page ou après 10 minutes sans action.
+  Le rôle n'est qu'une étiquette : il ne donne aucun droit dans Home Assistant.
+- **Affichage** et **Notifications** : sans code, enregistrés par l'intégration `maison`.
+- **Appareils** : lus dans Home Assistant (en ligne / hors ligne). **Abonnements** : capteurs déclarés
+  dans `config.js`, section `CONFIGURATIONS` (date de renouvellement ou montant).
+- Mot de passe, double authentification, appairage Zigbee, générateur de menu et code du Budget :
+  uniquement depuis Home Assistant sur un ordinateur.
+
 ## Sécurité
 
 - Tout ce qui est dans `/config/www` est servi en `/local/` **sans authentification** :

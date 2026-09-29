@@ -158,4 +158,10 @@ export default {
   COURSES: {
     liste: 'todo.courses',
   },
+
+  // Réglages : abonnements affichés en lecture seule (capteurs HA : date de renouvellement ou montant).
+  // Appareils : lus directement dans Home Assistant, rien à déclarer.
+  CONFIGURATIONS: {
+    abonnements: [],
+  },
 };

@@ -9,6 +9,7 @@ import config from '../js/config.js';
 import budgetExemple from './budget-exemple.js';
 import { creerMenuSimule } from './mock-menu.js';
 import { creerComparateurSimule } from './mock-comparateur.js';
+import { creerFoyerSimule } from './mock-foyer.js';
 
 const LATENCE_MS = 300;
 
@@ -21,6 +22,25 @@ const definir = (id, state, friendlyName) => {
 config.LUMIERES.forEach((l, i) => definir(l.id, i % 2 === 0 ? 'on' : 'off', l.nom));
 config.PRESENCES.forEach((p, i) => definir(p.id, i === 0 ? 'home' : 'not_home', p.nom));
 config.ALERTES.forEach((a, i) => definir(a.id, i === 0 ? 'on' : 'off', a.libelle));
+
+// ---- Réglages : registres d'appareils fictifs (hass.devices / entities / areas) et abonnements ----
+const pieces = { salon: { area_id: 'salon', name: 'Salon' }, cuisine: { area_id: 'cuisine', name: 'Cuisine' } };
+const appareils = {};
+const entitesRegistre = {};
+[['d1', 'Thermostat', 'salon', 'climate.thermostat', 'heat'], ['d2', 'Prise lave-linge', 'cuisine', 'switch.prise_lave_linge', 'on'],
+  ['d3', 'Capteur porte', 'salon', 'binary_sensor.porte_entree', 'unavailable'], ['d4', 'Météo', null, 'weather.maison', 'sunny', 'service']]
+  .forEach(([id, nomAppareil, piece, entite, etatEntite, type]) => {
+    appareils[id] = { id, name: nomAppareil, name_by_user: null, area_id: piece, entry_type: type ?? null, disabled_by: null };
+    entitesRegistre[entite] = { entity_id: entite, device_id: id };
+    definir(entite, etatEntite, nomAppareil);
+  });
+(config.CONFIGURATIONS?.abonnements ?? []).forEach((id, i) => {
+  definir(id, i % 2 ? '4.99' : new Date(Date.now() + 12 * 86_400_000).toISOString(), `Abonnement ${i + 1}`);
+  Object.assign(states[id].attributes, i % 2 ? { device_class: 'monetary', unit_of_measurement: '€' } : { device_class: 'timestamp' });
+});
+['person.membre_1', 'person.membre_2'].forEach((id, i) => {
+  if (!states[id]) definir(id, 'home', `Membre ${i + 1}`);
+});
 
 const { niveau: batterieNiveau, charge: batterieCharge } = config.BATTERIE_TABLETTE ?? {};
 if (batterieNiveau) definir(batterieNiveau, '78', 'Tablette Niveau de batterie');
@@ -236,6 +256,8 @@ majEtatCourses();
 const menuSimule = creerMenuSimule({ erreur: erreurWS, courses: articlesCourses });
 // Dernières courses et comparateur (dev/mock-comparateur.js) ; total visible seulement avec un jeton Budget
 const comparateurSimule = creerComparateurSimule({ erreur: erreurWS, jetonValide: (jeton) => budget.jetons.has(jeton) });
+// Réglages du foyer (dev/mock-foyer.js) ; nom et membres demandent un jeton Budget
+const foyerSimule = creerFoyerSimule({ erreur: erreurWS, jetonValide: (jeton) => budget.jetons.has(jeton) });
 const attenteBudget = () => Math.max(0, Math.ceil((budget.bloqueJusqua - Date.now()) / 1000));
 const verifierJeton = (jeton) => {
   if (!budget.jetons.has(jeton)) throw erreurWS('session_invalide', 'Session invalide');
@@ -342,6 +364,7 @@ async function callWS(message) {
     default:
       if (message.type.startsWith('maison/menu/') || message.type.startsWith('maison/jus/')) return menuSimule.commande(message);
       if (message.type.startsWith('maison/courses/')) return comparateurSimule.commande(message);
+      if (message.type.startsWith('maison/foyer/')) return foyerSimule.commande(message);
       throw erreurWS('unknown_command', message.type);
   }
 }
@@ -356,6 +379,9 @@ function publier() {
       longitude: 2.3522,
       time_zone: 'Europe/Paris',
     },
+    devices: appareils,
+    entities: entitesRegistre,
+    areas: pieces,
     callService,
     callWS,
     callApi,
@@ -386,6 +412,7 @@ window.mock = {
   menu: menuSimule,                                  // mock.menu.etat.indisponible = true, mock.menu.vider()
   courses: articlesCourses,
   comparateur: comparateurSimule,                    // mock.comparateur.passages
+  foyer: foyerSimule,                                // mock.foyer.etat.membres
 };
 
 // Taille d'écran en pixels CSS : ouvrir /dev/ sur la vraie tablette pour relever sa taille de référence

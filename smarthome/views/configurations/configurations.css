@@ -1,0 +1,578 @@
+/* =============================================
+   CONFIGURATIONS.CSS — Vue Réglages
+   Maquette Figma « Configurations » (34:6) adaptée à la tablette :
+   textes à 14 px minimum, zones tactiles de 48 px, pas de flou, ombres ≤ 8 px.
+
+   Logique des couleurs (une couleur = un rôle) :
+   - bleu nuit : le foyer ;               - violet sombre : les notifications ;
+   - sarcelle  : les appareils ;          - neutre : affichage, abonnements ;
+   - bleu vif  : choix actif, bouton principal ;
+   - vert      : activé / connecté ;      - rose : retirer / hors ligne / erreur.
+   La maquette donnait un dégradé saturé à chaque carte : ici ils sont assombris
+   pour que les réglages actifs (bleu vif, vert) restent ce qui se voit en premier.
+   ============================================= */
+
+.vue-configurations {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  /* Fonds de cartes (propres à la vue) */
+  --cfg-foyer:         linear-gradient(135deg, #172554, #0F1733);
+  --cfg-notifications: linear-gradient(135deg, #2A1245, #16112B);
+  --cfg-appareils:     linear-gradient(135deg, #0E3F3B, #072023);
+  --cfg-neutre:        var(--bg-carte-sombre);
+  --cfg-actif:         var(--accent-bleu-vif);
+  --cfg-actif-fond:    rgba(59, 130, 246, 0.18);
+  --cfg-on:            var(--accent-emeraude);
+  --cfg-off:           #3A4452;
+  --cfg-rose:          #F472B6;
+  --cfg-rose-fond:     rgba(225, 29, 72, 0.16);
+}
+
+#page-content.cfg {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* === EN-TÊTE === */
+.cfg-titre {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.2;
+}
+.cfg-sous-titre {
+  margin-top: 4px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+/* === MESSAGES === */
+.cfg-message {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--surface-verre);
+  font-size: var(--fs-sm);
+}
+.cfg-message-erreur { border-color: rgba(244, 114, 182, 0.4); background: var(--cfg-rose-fond); color: #FBCFE8; }
+.cfg-message-ok     { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.14); color: #A7F3D0; }
+
+/* === GRILLE : deux colonnes indépendantes (hauteurs libres) === */
+.cfg-grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: var(--gap);
+  align-items: start;
+}
+.cfg-colonne {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* === CARTES === */
+.cfg-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--cfg-neutre);
+}
+.cfg-foyer         { background: var(--cfg-foyer); }
+.cfg-notifications { background: var(--cfg-notifications); }
+.cfg-appareils     { background: var(--cfg-appareils); }
+
+.cfg-carte-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Titre de carte : petite barre de couleur au lieu d'une icône */
+.cfg-carte-titre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+.cfg-carte-titre::before {
+  content: "";
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--text-secondary);
+}
+.cfg-foyer .cfg-carte-titre::before         { background: #60A5FA; }
+.cfg-notifications .cfg-carte-titre::before { background: #C084FC; }
+.cfg-appareils .cfg-carte-titre::before     { background: #2DD4BF; }
+
+.cfg-aide,
+.cfg-vide {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+/* === BOUTONS === */
+.cfg-bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--touch-min);
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-btn);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cfg-bouton:active { background: rgba(255, 255, 255, 0.14); }
+.cfg-bouton:focus-visible { outline: 2px solid var(--border-active); outline-offset: 2px; }
+
+.cfg-bouton-principal {
+  border-color: transparent;
+  background: var(--cfg-actif);
+}
+.cfg-bouton-principal:active { background: var(--accent-bleu-fonce); }
+
+.cfg-bouton-discret {
+  border-color: var(--border);
+  background: none;
+  color: var(--text-clair);
+}
+
+.cfg-bouton-retirer {
+  border-color: rgba(244, 114, 182, 0.35);
+  background: none;
+  color: var(--cfg-rose);
+}
+/* Second appui : « Confirmer ? » */
+.cfg-bouton-retirer.cfg-confirmer {
+  border-color: transparent;
+  background: var(--accent-rose);
+  color: var(--text-primary);
+}
+
+/* === FOYER : verrouillé / ouvert === */
+.cfg-foyer[data-etat="verrouille"] .cfg-si-ouvert,
+.cfg-foyer[data-etat="verrouille"] .cfg-membre-actions,
+.cfg-foyer[data-etat="ouvert"] .cfg-si-verrouille { display: none !important; }
+
+.cfg-foyer-nom {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+.cfg-foyer-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+.cfg-foyer-form .cfg-champ { flex: 1; }
+
+.cfg-foyer-compte {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-xs);
+  color: #BFDBFE;
+}
+
+.cfg-foyer > .cfg-bouton-principal { align-self: flex-start; }
+
+/* Membres */
+.cfg-membres {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+}
+.cfg-membre {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 56px;
+}
+
+.cfg-pastille {
+  flex: 0 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--cfg-couleur, var(--accent-bleu-vif));
+  color: #0A0F14;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+}
+
+.cfg-membre-texte {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cfg-membre-texte b {
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cfg-membre-infos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.cfg-membre-lien {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+.cfg-etiquette {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.cfg-etiquette-parent { background: rgba(96, 165, 250, 0.18); color: #BFDBFE; }
+.cfg-etiquette-enfant { background: rgba(252, 211, 77, 0.16); color: var(--accent-jaune); }
+
+.cfg-membre-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Palette des membres : même classe pour la pastille et le choix de couleur */
+.cfg-couleur-bleu    { --cfg-couleur: #60A5FA; }
+.cfg-couleur-rose    { --cfg-couleur: #F472B6; }
+.cfg-couleur-ambre   { --cfg-couleur: #FBBF24; }
+.cfg-couleur-vert    { --cfg-couleur: #34D399; }
+.cfg-couleur-violet  { --cfg-couleur: #A78BFA; }
+.cfg-couleur-cyan    { --cfg-couleur: #22D3EE; }
+.cfg-couleur-corail  { --cfg-couleur: #FB7185; }
+.cfg-couleur-lavande { --cfg-couleur: #C7B8F2; }
+
+/* === LISTES EN LECTURE SEULE (appareils, abonnements) === */
+.cfg-liste {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+.cfg-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+.cfg-ligne:first-child { border-top: none; }
+
+.cfg-ligne-texte {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cfg-ligne-texte b {
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cfg-ligne-texte span {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.cfg-appareils .cfg-ligne-texte span { color: #99F6E4; }
+
+.cfg-etat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.cfg-etat::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cfg-etat-ok { color: #6EE7B7; }
+.cfg-etat-ko { color: var(--cfg-rose); }
+
+.cfg-valeur {
+  flex-shrink: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-clair);
+}
+
+/* === AFFICHAGE : contrôles segmentés === */
+.cfg-reglage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+}
+.cfg-reglage + .cfg-reglage { border-top: 1px solid var(--border); padding-top: 8px; }
+
+.cfg-reglage-nom { font-size: var(--fs-sm); }
+
+.cfg-segments {
+  display: flex;
+  flex-shrink: 0;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.3);
+}
+.cfg-segments button {
+  min-width: 56px;
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cfg-segments button[aria-pressed="true"] {
+  background: var(--cfg-actif);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.cfg-segments button:focus-visible { outline: 2px solid var(--border-active); }
+
+/* === NOTIFICATIONS : interrupteurs === */
+.cfg-interrupteur {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--touch-min);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.cfg-interrupteur > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cfg-interrupteur small {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+/* Interrupteur dessiné sur la case elle-même : 52 × 30, zone tactile = toute la ligne */
+.cfg-interrupteur input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 30px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--cfg-off);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cfg-interrupteur input::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #E5E7EB;
+  transition: transform 0.2s ease;
+}
+.cfg-interrupteur input:checked { background: var(--cfg-on); }
+.cfg-interrupteur input:checked::after { transform: translateX(22px); }
+.cfg-interrupteur input:focus-visible { outline: 2px solid var(--border-active); outline-offset: 2px; }
+
+.cfg-silencieux {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+/* Mode silencieux actif : les autres interrupteurs s'estompent (restent modifiables) */
+.cfg-notifications:has(.cfg-silencieux input:checked) .cfg-interrupteur:not(.cfg-silencieux) { opacity: 0.45; }
+
+/* === NOTE DE BAS DE PAGE === */
+.cfg-note {
+  padding: 4px 4px 8px;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+/* === FORMULAIRE MEMBRE (fenêtre) === */
+/* Fixe : la page défile, la fenêtre doit rester visible où qu'on soit */
+.cfg-voile {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--gap-lg);
+  background: rgba(7, 10, 14, 0.8);
+}
+.cfg-formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(520px, 100%);
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: #141A22;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+.cfg-formulaire-titre {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.cfg-champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.cfg-champ legend { margin-bottom: 6px; padding: 0; }
+.cfg-champ small { font-size: var(--fs-xs); color: var(--text-muted); }
+
+.cfg-champ input[type="text"],
+.cfg-champ input[type="password"],
+.cfg-champ select {
+  min-height: var(--touch-min);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  -webkit-user-select: text;
+  user-select: text;
+}
+.cfg-champ input[type="text"]:focus,
+.cfg-champ input[type="password"]:focus,
+.cfg-champ select:focus { outline: none; border-color: var(--border-active); }
+
+/* Choix de couleur : pastilles de 48 px */
+.cfg-couleurs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cfg-couleurs label {
+  position: relative;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 3px solid transparent;
+  border-radius: 50%;
+  background: var(--cfg-couleur) content-box;
+  padding: 3px;
+  cursor: pointer;
+}
+.cfg-couleurs label:has(input:checked) { border-color: var(--text-primary); }
+.cfg-couleurs label:has(input:focus-visible) { outline: 2px solid var(--border-active); }
+
+/* Choix du rôle */
+.cfg-choix {
+  display: flex;
+  gap: 8px;
+}
+.cfg-choix label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  min-height: var(--touch-min);
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--surface-verre);
+  color: var(--text-primary);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cfg-choix label:has(input:checked) {
+  border-color: var(--cfg-actif);
+  background: var(--cfg-actif-fond);
+  font-weight: 600;
+}
+.cfg-choix label:has(input:focus-visible) { outline: 2px solid var(--border-active); }
+
+/* Radios masquées mais accessibles */
+.cfg-couleurs input,
+.cfg-choix input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.cfg-hors-ecran {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.cfg-formulaire-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* === ÉCRAN ÉTROIT : une colonne === */
+@media (max-width: 1000px) {
+  .cfg-grille { grid-template-columns: minmax(0, 1fr); }
+}
+
+.vue-configurations [hidden] { display: none !important; }
+
+/* Fenêtre du code du Budget : étroite, 6 chiffres centrés */
+#cfg-code-formulaire { width: min(360px, 100%); }
+#cfg-code-formulaire input {
+  letter-spacing: 0.4em;
+  font-size: var(--fs-lg);
+  text-align: center;
+}
