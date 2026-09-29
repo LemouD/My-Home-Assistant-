@@ -147,6 +147,12 @@ côté serveur, recettes validées avant d'être enregistrées.
 - « Ajouter aux courses » : les ingrédients sont écrits par le serveur dans la liste de courses,
   avec les doublons additionnés. Format des articles : `qte=…;unite=…;rayon=…;source=menu|manuel`.
 - Les recettes sont générées automatiquement : la vue affiche toujours « à vérifier (cuisson, allergènes) ».
+- Page Menu : le plat du jour en avant, la semaine (un plat principal par jour, les autres repas dessous),
+  les courses, puis les jus en bas de page. Repas proposés (petit-déjeuner, déjeuner, dîner, jus) :
+  Maison → Configurer → Générateur de menu.
+- **Un plat simple** : génère un seul plat sans toucher au menu de la semaine (compte dans le quota) ;
+  les 5 derniers restent disponibles et peuvent être ajoutés aux courses.
+- Calories : estimation par portion, affichée seulement si le générateur la fournit.
 - **Jus du jour** : 6 jus préparés au premier affichage de la journée (hors quota), avec un conseil selon
   la météo. Choisir l'entité `weather.*` dans les options du générateur de menu (facultatif).
 - **Photos** (plats et jus) : trouvées par le worker sur Pexels, téléchargées et réencodées par l'intégration

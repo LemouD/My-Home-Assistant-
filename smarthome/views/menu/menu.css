@@ -304,93 +304,6 @@
 .menu-resume-liste dt { font-size: var(--fs-xs); color: var(--text-secondary); }
 .menu-resume-liste dd { font-size: var(--fs-sm); font-weight: 700; text-align: right; }
 
-/* === SEMAINE : grille jours × repas (1 à 4 repas) === */
-.menu-semaine { gap: 8px; padding: 16px 20px; }
-
-.menu-grille-entete,
-.menu-jour {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-}
-
-.menu-grille-entete span {
-  flex: 1;
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--accent-ambre);
-}
-.menu-grille-entete span:first-child,
-.menu-jour-nom { flex: 0 0 76px; }
-
-.menu-grille { display: flex; flex-direction: column; gap: 6px; }
-
-.menu-jour-nom {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  font-size: var(--fs-xs);
-  color: var(--text-secondary);
-  line-height: 1.2;
-}
-.menu-jour-nom b { font-size: var(--fs-md); color: var(--text-primary); }
-
-/* Aujourd'hui : jour en violet, créneaux encadrés */
-.menu-jour-aujourdhui .menu-jour-nom,
-.menu-jour-aujourdhui .menu-jour-nom b { color: var(--menu-violet-clair); }
-.menu-jour-aujourdhui .menu-creneau { border-color: rgba(130, 122, 255, 0.55); }
-
-.menu-creneau {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex: 1;
-  min-width: 0;
-  min-height: 52px;
-  padding: 6px 14px;
-  border: 1px solid var(--menu-bord);
-  border-radius: 12px;
-  background: var(--menu-surface);
-  color: var(--text-primary);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.menu-creneau:active { background: var(--menu-bord); }
-
-.menu-creneau b,
-.menu-creneau > span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.menu-creneau b      { font-size: var(--fs-sm); font-weight: 600; }
-.menu-creneau > span { font-size: var(--fs-xs); color: var(--text-secondary); }
-
-/* Plat retiré par le serveur (halal, allergie, invalide) */
-.menu-creneau-rejete {
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  padding: 4px 6px 4px 14px;
-  border-style: dashed;
-  border-color: rgba(225, 29, 72, 0.5);
-  background: rgba(225, 29, 72, 0.06);
-  cursor: default;
-}
-.menu-rejete-texte {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  font-size: var(--fs-xs);
-  color: var(--text-secondary);
-}
-.menu-rejete-texte b { font-size: var(--fs-sm); color: var(--text-primary); }
-
 /* === GÉNÉRER : formulaire en listes fermées === */
 .menu-generer {
   display: grid;
@@ -898,6 +811,298 @@
   margin-top: 6px;
   font-size: var(--fs-xs);
   color: var(--accent-ambre);
+}
+
+/* =============================================
+   MENU v2 (maquette 116:67) : vedette, semaine en bande, courses, jus en bas
+   ============================================= */
+.menu-vedette-grande {
+  min-height: 300px;
+  justify-content: space-between;
+}
+.menu-vedette-grande .menu-vedette-nom { font-size: var(--fs-hero); }
+.menu-vedette-grande .menu-vedette-texte { gap: 12px; max-width: 55%; }
+
+.menu-bouton-violet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+  padding: 0 18px;
+  border: 1px solid rgba(130, 122, 255, 0.45);
+  border-radius: 12px;
+  background: rgba(109, 99, 255, 0.14);
+  color: var(--menu-violet-clair);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.menu-bouton-violet:active { background: rgba(109, 99, 255, 0.28); }
+
+.menu-bloc-semaine { display: flex; flex-direction: column; gap: 12px; }
+.menu-bloc-entete {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+.menu-bloc-titre-page { font-size: var(--fs-lg); font-weight: 700; }
+.menu-bloc-entete .menu-aide b { color: var(--menu-violet-clair); }
+
+/* Bande des jours : 7 colonnes égales, sans défilement horizontal */
+.menu-jours {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 16px;
+  background: var(--menu-carte);
+}
+
+.menu-jour-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+}
+.menu-jour-aujourdhui {
+  border-color: rgba(130, 122, 255, 0.55);
+  background: rgba(109, 99, 255, 0.1);
+}
+
+.menu-jour-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Photo du plat principal ; sans photo : dégradé chaud (celui de la vedette) */
+.menu-jour-photo {
+  position: relative;
+  display: block;
+  height: 88px;
+  border-radius: 10px;
+  background: var(--menu-vedette-degrade);
+  overflow: hidden;
+}
+.menu-jour-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.menu-jour-legende {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0 2px;
+}
+.menu-jour-nom {
+  flex-shrink: 0;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.menu-jour-aujourdhui .menu-jour-nom { color: var(--menu-violet-clair); }
+.menu-jour-legende b {
+  min-width: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Autres repas du jour (petit-déjeuner, déjeuner…) : une ligne tactile chacun */
+.menu-jour-autres { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.menu-jour-repas {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: 4px 8px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 8px;
+  background: var(--menu-surface);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.menu-jour-repas span { font-size: var(--fs-xs); color: var(--accent-ambre); line-height: 1.2; }
+.menu-jour-repas b {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Plat retiré (principal ou autre repas) */
+.menu-jour-principal-rejete,
+.menu-jour-rejete {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px dashed rgba(225, 29, 72, 0.5);
+  border-radius: 10px;
+  background: rgba(225, 29, 72, 0.06);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+.menu-jour-principal-rejete b { font-size: var(--fs-sm); color: var(--text-primary); }
+.menu-jour-principal-rejete .menu-bouton-rose,
+.menu-jour-rejete .menu-bouton-rose { padding: 0 10px; font-size: var(--fs-xs); }
+
+/* Barre des courses */
+.menu-barre-courses {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+}
+
+/* Jus en bas de page : bande de 6 vignettes, couleur = objectif */
+.menu-jus-bande {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 16px;
+  background: var(--menu-carte);
+}
+.menu-jus-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.menu-jus-mini:active { border-color: var(--jus-teinte); }
+.menu-jus-photo {
+  display: block;
+  height: 72px;
+  border-radius: 10px;
+  background: linear-gradient(140deg, var(--jus-fond), var(--menu-carte) 85%);
+  overflow: hidden;
+}
+.menu-jus-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.menu-jus-legende { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.menu-jus-objectif {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--jus-teinte);
+}
+.menu-jus-legende b {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === UN PLAT SEUL === */
+.menu-plat {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+  gap: var(--gap);
+  align-items: start;
+}
+.menu-plat-formulaire { gap: 14px; }
+.menu-bloc-simple { display: flex; flex-direction: column; gap: 8px; border: none; min-width: 0; }
+.menu-bloc-simple .menu-bloc-titre { margin-bottom: 0; }
+
+.menu-plat-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--menu-bord);
+}
+.menu-plat-action .menu-quota { flex: 1; }
+
+.menu-plat-liste { display: flex; flex-direction: column; gap: 8px; }
+.menu-plat-carte {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--menu-bord);
+  border-radius: 12px;
+  background: var(--menu-surface);
+}
+.menu-plat-ouvrir {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  min-height: 56px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.menu-plat-photo {
+  flex-shrink: 0;
+  width: 72px;
+  height: 56px;
+  border-radius: 8px;
+  background: var(--menu-vedette-degrade);
+  overflow: hidden;
+}
+.menu-plat-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.menu-plat-texte { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.menu-plat-texte b    { font-size: var(--fs-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu-plat-texte span { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+/* Calories par portion (estimation, facultative) : même pastille, texte ambre */
+.menu-calories { color: var(--accent-ambre); }
+
+/* Carte du jour : abréviation et nom côte à côte, calés à gauche */
+.menu-jour-legende { justify-content: flex-start; }
+
+/* Écrans bas (tablette 1280 × 800) : vedette plus compacte, textes inchangés au-delà de 14 px */
+@media (max-height: 860px) {
+  .menu-vedette-grande { min-height: 220px; padding: 20px 24px; }
+  .menu-vedette-grande .menu-vedette-nom { font-size: var(--fs-2xl); }
+  .menu-jour-photo { height: 64px; }
+  .menu-jus-photo { height: 56px; }
 }
 
 .vue-menu [hidden] { display: none !important; }
