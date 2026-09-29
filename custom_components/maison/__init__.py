@@ -13,9 +13,10 @@ from homeassistant.helpers.typing import ConfigType
 
 from .carnet import Carnet
 from .coffre import Coffre
-from .const import CLE_CARNET, CLE_CUISINE, DOMAIN
+from .const import CLE_CARNET, CLE_CUISINE, CLE_FOYER, DOMAIN
 from .cuisine import Cuisine
 from .photos import VuePhoto, dossier_photos
+from .reglages import Reglages
 from .websocket import async_enregistrer_commandes
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
@@ -38,6 +39,9 @@ async def async_setup_entry(hass: HomeAssistant, entree: ConfigEntry) -> bool:
     carnet = Carnet(hass, entree)
     await carnet.charger()
     hass.data[CLE_CARNET] = carnet
+    reglages = Reglages(hass, entree)
+    await reglages.charger()
+    hass.data[CLE_FOYER] = reglages
     entree.async_on_unload(entree.add_update_listener(_configuration_modifiee))
     return True
 
@@ -46,6 +50,7 @@ async def async_unload_entry(hass: HomeAssistant, entree: ConfigEntry) -> bool:
     coffre: Coffre | None = hass.data.pop(DOMAIN, None)
     hass.data.pop(CLE_CUISINE, None)
     hass.data.pop(CLE_CARNET, None)
+    hass.data.pop(CLE_FOYER, None)
     if coffre is not None:
         coffre.sessions.fermer_tout()
     return True

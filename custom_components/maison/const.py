@@ -74,3 +74,9 @@ SIGNATURE_PHOTO_HEURES = 24
 STOCKAGE_COURSES_CLE = "maison.courses"
 STOCKAGE_COURSES_VERSION = 1
 CLE_CARNET = f"{DOMAIN}_carnet"   # hass.data : carnet des dernières courses
+
+# ---- FOYER (page Configurations de la tablette) ----
+
+STOCKAGE_FOYER_CLE = "maison.foyer"
+STOCKAGE_FOYER_VERSION = 1
+CLE_FOYER = f"{DOMAIN}_foyer"   # hass.data : membres et réglages d'affichage
