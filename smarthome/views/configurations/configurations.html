@@ -1,0 +1,257 @@
+<div id="page-content" class="cfg">
+
+  <!--
+    Maquette Figma « Configurations » (34:6) adaptée à la tablette.
+    Contenu rempli par configurations.js avec el() : aucun prénom ni appareil en dur.
+    Les exemples ne vivent que dans les <template> en bas de page (modèles pour le JS).
+
+    [Foyer (membres)          ] [Affichage     ]
+    [                         ] [Notifications ]
+    [Appareils (lecture seule)] [Abonnements   ]
+    Ligne discrète : ce qui se règle depuis Home Assistant sur un ordinateur.
+
+    Logique des couleurs (une couleur = un rôle) :
+    - bleu nuit : le foyer (qui vit ici) ;  - violet : ce qui prévient (notifications) ;
+    - sarcelle  : les appareils ;           - neutre : affichage et abonnements ;
+    - bleu vif  : choix actif et bouton principal ; vert : activé / connecté ; rose : retirer / hors ligne.
+  -->
+
+  <!-- EN-TÊTE -->
+  <div class="cfg-entete">
+    <h1 class="cfg-titre">Réglages</h1>
+    <p class="cfg-sous-titre">Le foyer, l'affichage de la tablette et les notifications.</p>
+  </div>
+
+  <!-- MESSAGES : prénom déjà pris, 12 membres max, session expirée…
+       Classes possibles : .cfg-message-erreur (rose), .cfg-message-ok (vert). -->
+  <p class="cfg-message" id="cfg-message" role="status" hidden></p>
+
+  <div class="cfg-grille">
+
+    <!-- ===== COLONNE GAUCHE ===== -->
+    <div class="cfg-colonne">
+
+      <!-- FOYER — data-etat="verrouille" (défaut) ou "ouvert" après le code du Budget.
+           En "verrouille", tout ce qui porte .cfg-si-ouvert est masqué par le CSS,
+           et .cfg-si-verrouille est affiché (et inversement). -->
+      <section class="cfg-carte cfg-foyer" id="cfg-foyer" data-etat="verrouille" aria-labelledby="cfg-foyer-titre">
+        <div class="cfg-carte-entete">
+          <h2 class="cfg-carte-titre" id="cfg-foyer-titre">
+            Foyer
+          </h2>
+          <button type="button" class="cfg-bouton cfg-si-verrouille" data-action="deverrouiller">Déverrouiller</button>
+          <button type="button" class="cfg-bouton cfg-bouton-discret cfg-si-ouvert" data-action="verrouiller">Verrouiller</button>
+        </div>
+
+        <!-- Nom du foyer : lecture en mode verrouillé, champ en mode ouvert -->
+        <p class="cfg-foyer-nom cfg-si-verrouille" id="cfg-foyer-nom"></p>
+        <form class="cfg-foyer-form cfg-si-ouvert" id="cfg-foyer-form" novalidate>
+          <label class="cfg-champ">
+            <span>Nom du foyer</span>
+            <input type="text" name="nom_foyer" maxlength="40" autocomplete="off" required>
+          </label>
+          <button type="submit" class="cfg-bouton">Enregistrer</button>
+        </form>
+
+        <p class="cfg-foyer-compte"><span id="cfg-membres-nombre">0</span> / 12 membres</p>
+
+        <!-- Membres : li.cfg-membre (voir le modèle #cfg-modele-membre) -->
+        <ul class="cfg-membres" id="cfg-membres"></ul>
+        <p class="cfg-vide" id="cfg-membres-vide" hidden>Aucun membre pour l'instant.</p>
+
+        <button type="button" class="cfg-bouton cfg-bouton-principal cfg-si-ouvert" data-action="ajouter-membre">+ Ajouter un membre</button>
+        <p class="cfg-aide cfg-si-verrouille">Modifier le foyer demande le code du Budget.</p>
+      </section>
+
+      <!-- APPAREILS : lecture seule -->
+      <section class="cfg-carte cfg-appareils" aria-labelledby="cfg-appareils-titre">
+        <h2 class="cfg-carte-titre" id="cfg-appareils-titre">
+          Appareils connectés
+        </h2>
+        <!-- li.cfg-ligne (voir le modèle #cfg-modele-appareil) -->
+        <ul class="cfg-liste" id="cfg-appareils"></ul>
+        <p class="cfg-vide" id="cfg-appareils-vide" hidden>Aucun appareil pour l'instant.</p>
+      </section>
+
+    </div>
+
+    <!-- ===== COLONNE DROITE ===== -->
+    <div class="cfg-colonne">
+
+      <!-- AFFICHAGE : sans code. Chaque choix = bouton[data-cle][data-valeur][aria-pressed]. -->
+      <section class="cfg-carte cfg-affichage" aria-labelledby="cfg-affichage-titre">
+        <h2 class="cfg-carte-titre" id="cfg-affichage-titre">Affichage</h2>
+
+        <div class="cfg-reglage">
+          <span class="cfg-reglage-nom" id="cfg-lib-theme">Thème</span>
+          <div class="cfg-segments" role="group" aria-labelledby="cfg-lib-theme">
+            <button type="button" data-cle="theme" data-valeur="sombre" aria-pressed="true">Sombre</button>
+            <button type="button" data-cle="theme" data-valeur="clair" aria-pressed="false">Clair</button>
+          </div>
+        </div>
+
+        <div class="cfg-reglage">
+          <span class="cfg-reglage-nom" id="cfg-lib-date">Format de date</span>
+          <div class="cfg-segments" role="group" aria-labelledby="cfg-lib-date">
+            <button type="button" data-cle="format_date" data-valeur="JJ/MM/AAAA" aria-pressed="true">JJ/MM/AAAA</button>
+            <button type="button" data-cle="format_date" data-valeur="AAAA-MM-JJ" aria-pressed="false">AAAA-MM-JJ</button>
+          </div>
+        </div>
+
+        <div class="cfg-reglage">
+          <span class="cfg-reglage-nom" id="cfg-lib-temperature">Température</span>
+          <div class="cfg-segments" role="group" aria-labelledby="cfg-lib-temperature">
+            <button type="button" data-cle="temperature" data-valeur="celsius" aria-pressed="true">°C</button>
+            <button type="button" data-cle="temperature" data-valeur="fahrenheit" aria-pressed="false">°F</button>
+          </div>
+        </div>
+
+        <div class="cfg-reglage">
+          <span class="cfg-reglage-nom" id="cfg-lib-rafraichissement">Rafraîchissement</span>
+          <div class="cfg-segments" role="group" aria-labelledby="cfg-lib-rafraichissement">
+            <button type="button" data-cle="rafraichissement" data-valeur="5" aria-pressed="false">5 s</button>
+            <button type="button" data-cle="rafraichissement" data-valeur="30" aria-pressed="true">30 s</button>
+            <button type="button" data-cle="rafraichissement" data-valeur="60" aria-pressed="false">60 s</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- NOTIFICATIONS : sans code. input[type=checkbox][role=switch][data-notif] -->
+      <section class="cfg-carte cfg-notifications" aria-labelledby="cfg-notifications-titre">
+        <h2 class="cfg-carte-titre" id="cfg-notifications-titre">Notifications</h2>
+
+        <label class="cfg-interrupteur"><span>Énergie et fluides</span><input type="checkbox" role="switch" data-notif="energie"></label>
+        <label class="cfg-interrupteur"><span>Rappels de factures</span><input type="checkbox" role="switch" data-notif="factures"></label>
+        <label class="cfg-interrupteur"><span>Dépassement du budget</span><input type="checkbox" role="switch" data-notif="budget"></label>
+        <label class="cfg-interrupteur"><span>Calendrier du foyer</span><input type="checkbox" role="switch" data-notif="calendrier"></label>
+        <label class="cfg-interrupteur"><span>Liste de courses</span><input type="checkbox" role="switch" data-notif="courses"></label>
+        <label class="cfg-interrupteur"><span>Sécurité</span><input type="checkbox" role="switch" data-notif="securite"></label>
+
+        <label class="cfg-interrupteur cfg-silencieux">
+          <span>Mode silencieux<small>Coupe toutes les notifications ci-dessus</small></span>
+          <input type="checkbox" role="switch" data-notif="silencieux">
+        </label>
+      </section>
+
+      <!-- ABONNEMENTS : lecture seule -->
+      <section class="cfg-carte cfg-abonnements" aria-labelledby="cfg-abonnements-titre">
+        <h2 class="cfg-carte-titre" id="cfg-abonnements-titre">Abonnements</h2>
+        <!-- li.cfg-ligne (voir le modèle #cfg-modele-abonnement) -->
+        <ul class="cfg-liste" id="cfg-abonnements"></ul>
+        <p class="cfg-vide" id="cfg-abonnements-vide" hidden>Aucun abonnement pour l'instant.</p>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Réglages sensibles : jamais depuis la tablette -->
+  <p class="cfg-note">
+    Mot de passe, double authentification, appairage Zigbee, générateur de menus et code du Budget :
+    ces réglages se font depuis Home Assistant sur un ordinateur.
+  </p>
+
+  <!-- ===== FORMULAIRE MEMBRE : fenêtre posée sur la vue (ajout ou modification) ===== -->
+  <div class="cfg-voile" id="cfg-voile" hidden>
+    <form class="cfg-formulaire" id="cfg-membre-formulaire" aria-labelledby="cfg-membre-titre" novalidate>
+      <h2 class="cfg-formulaire-titre" id="cfg-membre-titre">Ajouter un membre</h2>
+
+      <label class="cfg-champ">
+        <span>Prénom</span>
+        <input type="text" name="prenom" maxlength="30" required autocomplete="off">
+      </label>
+
+      <!-- Couleur de la pastille : 8 teintes, classes .cfg-couleur-<valeur> -->
+      <fieldset class="cfg-champ">
+        <legend>Couleur</legend>
+        <div class="cfg-couleurs">
+          <label class="cfg-couleur-bleu"><input type="radio" name="couleur" value="bleu" checked><span class="cfg-hors-ecran">Bleu</span></label>
+          <label class="cfg-couleur-rose"><input type="radio" name="couleur" value="rose"><span class="cfg-hors-ecran">Rose</span></label>
+          <label class="cfg-couleur-ambre"><input type="radio" name="couleur" value="ambre"><span class="cfg-hors-ecran">Ambre</span></label>
+          <label class="cfg-couleur-vert"><input type="radio" name="couleur" value="vert"><span class="cfg-hors-ecran">Vert</span></label>
+          <label class="cfg-couleur-violet"><input type="radio" name="couleur" value="violet"><span class="cfg-hors-ecran">Violet</span></label>
+          <label class="cfg-couleur-cyan"><input type="radio" name="couleur" value="cyan"><span class="cfg-hors-ecran">Cyan</span></label>
+          <label class="cfg-couleur-corail"><input type="radio" name="couleur" value="corail"><span class="cfg-hors-ecran">Corail</span></label>
+          <label class="cfg-couleur-lavande"><input type="radio" name="couleur" value="lavande"><span class="cfg-hors-ecran">Lavande</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="cfg-champ">
+        <legend>Rôle</legend>
+        <div class="cfg-choix">
+          <label><input type="radio" name="role" value="parent" checked><span>Parent</span></label>
+          <label><input type="radio" name="role" value="enfant"><span>Enfant</span></label>
+        </div>
+      </fieldset>
+
+      <!-- Personne Home Assistant liée (facultatif) : options ajoutées par le JS -->
+      <label class="cfg-champ">
+        <span>Personne Home Assistant <small>(facultatif)</small></span>
+        <select name="personne" id="cfg-personne">
+          <option value="">Aucune</option>
+        </select>
+      </label>
+
+      <p class="cfg-message cfg-message-erreur" id="cfg-membre-message" role="status" hidden></p>
+
+      <div class="cfg-formulaire-actions">
+        <button type="button" class="cfg-bouton cfg-bouton-discret" data-action="fermer-membre">Annuler</button>
+        <button type="submit" class="cfg-bouton cfg-bouton-principal">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== CODE DU BUDGET : même code et même session que la page Budget ===== -->
+  <div class="cfg-voile" id="cfg-voile-code" hidden>
+    <form class="cfg-formulaire" id="cfg-code-formulaire" aria-labelledby="cfg-code-titre" novalidate>
+      <h2 class="cfg-formulaire-titre" id="cfg-code-titre">Code du Budget</h2>
+
+      <label class="cfg-champ">
+        <span>Code à 6 chiffres</span>
+        <input type="password" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" required>
+      </label>
+
+      <p class="cfg-message cfg-message-erreur" id="cfg-code-message" role="status" hidden></p>
+
+      <div class="cfg-formulaire-actions">
+        <button type="button" class="cfg-bouton cfg-bouton-discret" data-action="fermer-code">Annuler</button>
+        <button type="submit" class="cfg-bouton cfg-bouton-principal">Déverrouiller</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== MODÈLES (jamais affichés) : structure attendue pour le JS ===== -->
+  <template id="cfg-modele-membre">
+    <!-- En mode verrouillé, .cfg-membre-actions est masqué par le CSS.
+         « Retirer » se confirme par un second appui : ajouter .cfg-confirmer + texte « Confirmer ? ». -->
+    <li class="cfg-membre">
+      <span class="cfg-pastille cfg-couleur-vert" aria-hidden="true">L</span>
+      <span class="cfg-membre-texte">
+        <b>Lina</b>
+        <span class="cfg-membre-infos">
+          <span class="cfg-etiquette cfg-etiquette-parent">Parent</span>
+          <span class="cfg-membre-lien">Lié à Lina (Home Assistant)</span>
+        </span>
+      </span>
+      <span class="cfg-membre-actions">
+        <button type="button" class="cfg-bouton cfg-bouton-discret" data-action="modifier-membre" data-id="m1">Modifier</button>
+        <button type="button" class="cfg-bouton cfg-bouton-retirer" data-action="retirer-membre" data-id="m1">Retirer</button>
+      </span>
+    </li>
+  </template>
+
+  <template id="cfg-modele-appareil">
+    <!-- État : .cfg-etat-ok « Connecté » ou .cfg-etat-ko « Hors ligne » -->
+    <li class="cfg-ligne">
+      <span class="cfg-ligne-texte"><b>Thermostat</b><span>Salon</span></span>
+      <span class="cfg-etat cfg-etat-ok">Connecté</span>
+    </li>
+  </template>
+
+  <template id="cfg-modele-abonnement">
+    <li class="cfg-ligne">
+      <span class="cfg-ligne-texte"><b>Stockage caméra</b><span>Renouvellement le 12/10</span></span>
+      <span class="cfg-valeur">4,99 € / mois</span>
+    </li>
+  </template>
+
+</div>
