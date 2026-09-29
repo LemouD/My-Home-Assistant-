@@ -10,6 +10,11 @@ const DELAI_GENERATION_MS = 1500;
 const DELAI_PHOTOS_MS = 4000;
 
 const RECETTES = {
+  petit_dej: [
+    { nom: 'Porridge banane et cannelle', duree_min: 10, tags: ['rapide'], etapes: ["Chauffer le lait avec les flocons d'avoine 5 min.", 'Ajouter la banane écrasée et la cannelle.'], ingredients: [["Flocons d'avoine", 200, 'g', 'epicerie'], ['Lait', 60, 'cl', 'cremerie'], ['Bananes', 2, 'piece', 'fruits-legumes']] },
+    { nom: 'Msemen au miel', duree_min: 25, tags: ['marocain'], etapes: ['Préparer la pâte et la laisser reposer 10 min.', 'Étaler, plier et cuire à la poêle.', 'Servir avec du miel.'], ingredients: [['Farine', 300, 'g', 'epicerie'], ['Semoule fine', 100, 'g', 'epicerie'], ['Miel', 4, 'cas', 'epicerie']] },
+    { nom: 'Omelette aux herbes', duree_min: 10, tags: ['protéiné'], etapes: ['Battre les œufs avec les herbes.', 'Cuire à feu moyen 4 min.'], ingredients: [['Œufs', 6, 'piece', 'cremerie'], ['Ciboulette', 1, 'botte', 'fruits-legumes']] },
+  ],
   jus: [
     { nom: 'Orange et carotte', duree_min: 10, tags: ['vitaminé'], ingredients: [['Oranges', 4, 'piece', 'fruits-legumes'], ['Carottes', 3, 'piece', 'fruits-legumes']] },
     { nom: 'Pomme et gingembre', duree_min: 10, tags: ['tonique'], ingredients: [['Pommes', 4, 'piece', 'fruits-legumes'], ['Gingembre frais', 20, 'g', 'fruits-legumes']] },
@@ -19,11 +24,11 @@ const RECETTES = {
     { nom: 'Fraise et banane', duree_min: 10, tags: ['enfants'], ingredients: [['Fraises', 250, 'g', 'fruits-legumes'], ['Bananes', 2, 'piece', 'fruits-legumes'], ['Lait', 20, 'cl', 'cremerie']] },
   ],
   diner: [
-    { nom: 'Poulet yassa', duree_min: 45, tags: ['familial', 'sénégalais'], ingredients: [['Cuisses de poulet halal', 4, 'piece', 'boucherie'], ['Oignons', 4, 'piece', 'fruits-legumes'], ['Citrons', 3, 'piece', 'fruits-legumes'], ['Moutarde', 45, 'g', 'epicerie'], ['Riz', 280, 'g', 'epicerie']] },
-    { nom: 'Soupe de lentilles corail', duree_min: 35, tags: ['végétarien'], ingredients: [['Lentilles corail', 250, 'g', 'epicerie'], ['Carottes', 2, 'piece', 'fruits-legumes'], ['Lait de coco', 20, 'cl', 'epicerie'], ['Oignons', 1, 'piece', 'fruits-legumes']] },
-    { nom: 'Tajine de légumes', duree_min: 50, tags: ['économique'], ingredients: [['Courgettes', 2, 'piece', 'fruits-legumes'], ['Pois chiches', 1, 'boite', 'epicerie'], ['Tomates', 500, 'g', 'fruits-legumes'], ['Ras el hanout', 1, 'cas', 'epicerie']] },
-    { nom: 'Saumon au four et riz', duree_min: 30, tags: ['poisson'], ingredients: [['Pavés de saumon', 4, 'piece', 'poissonnerie'], ['Riz', 300, 'g', 'epicerie'], ['Citron', 1, 'piece', 'fruits-legumes'], ['Crème fraîche', 20, 'cl', 'cremerie']] },
-    { nom: 'Pâtes à la tomate', duree_min: 25, tags: ['rapide', 'enfants'], ingredients: [['Pâtes', 500, 'g', 'epicerie'], ['Tomates', 800, 'g', 'fruits-legumes'], ['Ail', 2, 'piece', 'fruits-legumes'], ['Parmesan', 60, 'g', 'cremerie']] },
+    { nom: 'Poulet yassa', etapes: ["Mariner le poulet avec le jus des citrons, la moutarde, sel et poivre pendant 1 h.", "Émincer les oignons et les faire fondre 15 min à feu doux.", "Saisir le poulet, ajouter les oignons et la marinade, cuire 25 min à couvert.", "Servir avec le riz cuit à part."],  duree_min: 45, tags: ['familial', 'sénégalais'], ingredients: [['Cuisses de poulet halal', 4, 'piece', 'boucherie'], ['Oignons', 4, 'piece', 'fruits-legumes'], ['Citrons', 3, 'piece', 'fruits-legumes'], ['Moutarde', 45, 'g', 'epicerie'], ['Riz', 280, 'g', 'epicerie']] },
+    { nom: 'Soupe de lentilles corail', etapes: ["Faire revenir l'oignon et les carottes coupés en dés.", "Ajouter les lentilles rincées et 1 l d'eau, cuire 20 min.", "Verser le lait de coco et mixer finement."],  duree_min: 35, tags: ['végétarien'], ingredients: [['Lentilles corail', 250, 'g', 'epicerie'], ['Carottes', 2, 'piece', 'fruits-legumes'], ['Lait de coco', 20, 'cl', 'epicerie'], ['Oignons', 1, 'piece', 'fruits-legumes']] },
+    { nom: 'Tajine de légumes', etapes: ["Couper les courgettes et les tomates en morceaux.", "Faire revenir avec le ras el hanout 5 min.", "Ajouter les pois chiches égouttés et un verre d'eau, mijoter 35 min."],  duree_min: 50, tags: ['économique'], ingredients: [['Courgettes', 2, 'piece', 'fruits-legumes'], ['Pois chiches', 1, 'boite', 'epicerie'], ['Tomates', 500, 'g', 'fruits-legumes'], ['Ras el hanout', 1, 'cas', 'epicerie']] },
+    { nom: 'Saumon au four et riz', etapes: ["Préchauffer le four à 200 °C et cuire le riz.", "Déposer les pavés dans un plat, arroser de citron, enfourner 15 min.", "Napper de crème chaude au moment de servir."],  duree_min: 30, tags: ['poisson'], ingredients: [['Pavés de saumon', 4, 'piece', 'poissonnerie'], ['Riz', 300, 'g', 'epicerie'], ['Citron', 1, 'piece', 'fruits-legumes'], ['Crème fraîche', 20, 'cl', 'cremerie']] },
+    { nom: 'Pâtes à la tomate', etapes: ["Faire revenir l'ail émincé, ajouter les tomates concassées, mijoter 15 min.", "Cuire les pâtes al dente.", "Mélanger, parsemer de parmesan."],  duree_min: 25, tags: ['rapide', 'enfants'], ingredients: [['Pâtes', 500, 'g', 'epicerie'], ['Tomates', 800, 'g', 'fruits-legumes'], ['Ail', 2, 'piece', 'fruits-legumes'], ['Parmesan', 60, 'g', 'cremerie']] },
   ],
 };
 // Sous-objet « jus » du contrat, pour les jus du menu et du catalogue
@@ -36,7 +41,8 @@ const INFOS_JUS = {
   'Fraise et banane': { objectif: 'vitalite', moment: 'gouter', description: 'Onctueux, apprécié des enfants.', service: 'Bien frais' },
 };
 
-const ETAPES = [
+// Jus : mêmes gestes pour tous, seuls les fruits changent
+const ETAPES_JUS = [
   'Préparer et laver les ingrédients.',
   'Cuire à feu moyen en remuant régulièrement.',
   'Rectifier l\'assaisonnement et servir chaud.',
@@ -81,9 +87,10 @@ export function creerMenuSimule({ erreur, courses }) {
       id: `r${compteur}`,
       nom: modele.nom,
       portions: personnes,
+      calories_portion: RECETTES.jus.includes(modele) ? 120 + (compteur % 5) * 15 : 420 + (compteur % 7) * 35,
       duree_min: modele.duree_min,
       tags: modele.tags,
-      etapes: ETAPES,
+      etapes: modele.etapes ?? ETAPES_JUS,
       photo: null,   // cherchée en arrière-plan après la génération, comme le serveur
       ...(INFOS_JUS[modele.nom] ? { jus: INFOS_JUS[modele.nom] } : {}),
       ingredients: modele.ingredients.map(([nom, quantite, unite, rayon]) => ({ nom, quantite, unite, rayon })),
@@ -158,6 +165,25 @@ export function creerMenuSimule({ erreur, courses }) {
     }
   }
 
+  // Plat seul : hors du menu de la semaine, les 5 derniers gardés à part
+  const platsSeuls = [];
+  async function genererPlat(parametres) {
+    if (!['petit_dej', 'jus', 'dejeuner', 'diner'].includes(parametres?.repas)) throw erreur('parametres_invalides', 'Repas inconnu');
+    consommerQuota();
+    etat.enCours = true;
+    try {
+      await new Promise((r) => setTimeout(r, DELAI_GENERATION_MS));
+      if (etat.indisponible) throw erreur('generation_indisponible', 'Générateur injoignable');
+      const plat = recette(parametres.repas, parametres.personnes ?? 2);
+      platsSeuls.unshift(plat);
+      platsSeuls.splice(5);
+      ajouterPhotosPlusTard([plat]);
+      return structuredClone(plat);
+    } finally {
+      etat.enCours = false;
+    }
+  }
+
   async function remplacerPlat(date, repas) {
     const jour = etat.menu?.jours.find((j) => j.date === date);
     if (!etat.menu) throw erreur('menu_absent', 'Aucun menu');
@@ -175,7 +201,7 @@ export function creerMenuSimule({ erreur, courses }) {
   // Ingrédients → articles todo au format commun ; quantités additionnées sur un article non coché
   function versCourses(ids) {
     if (!etat.menu && !ids) throw erreur('menu_absent', 'Aucun menu');
-    const toutes = [...Object.values(etat.menu?.recettes ?? {}), ...(ids ? etat.catalogue?.jus ?? [] : [])];
+    const toutes = [...Object.values(etat.menu?.recettes ?? {}), ...(ids ? [...(etat.catalogue?.jus ?? []), ...platsSeuls] : [])];
     const choisies = toutes.filter((r) => !ids || ids.includes(r.id));
     let ajoutes = 0;
     let fusionnes = 0;
@@ -226,6 +252,10 @@ export function creerMenuSimule({ erreur, courses }) {
         return etat.menu ? structuredClone(etat.menu) : null;
       case 'maison/menu/generer':
         return generer(message.parametres);
+      case 'maison/menu/plat':
+        return genererPlat(message.parametres);
+      case 'maison/menu/plats':
+        return structuredClone(platsSeuls);
       case 'maison/menu/remplacer':
         return remplacerPlat(message.date, message.repas);
       case 'maison/menu/vers_courses':
