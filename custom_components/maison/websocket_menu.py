@@ -16,7 +16,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import CLE_CUISINE, REPAS
 from .cuisine import Cuisine, MenuErreur
-from .menu import valider_parametres
+from .menu import valider_parametres, valider_parametres_plat
 
 DATE = vol.All(str, vol.Match(r"^\d{4}-\d{2}-\d{2}$"))
 IDENTIFIANT = vol.All(str, vol.Length(max=32))
@@ -101,7 +101,30 @@ async def ws_jus_regenerer(hass: HomeAssistant, connection, msg: dict[str, Any])
         await _executer(connection, msg, cuisine.regenerer_catalogue)
 
 
+@websocket_api.websocket_command({
+    vol.Required("type"): "maison/menu/plat",
+    vol.Required("parametres"): dict,
+})
+@websocket_api.async_response
+async def ws_menu_plat(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    if (cuisine := _cuisine(hass, connection, msg)) is None:
+        return
+    try:
+        parametres = valider_parametres_plat(msg["parametres"])
+    except vol.Invalid as err:
+        connection.send_error(msg["id"], "parametres_invalides", str(err))
+        return
+    await _executer(connection, msg, lambda: cuisine.plat(parametres))
+
+
+@websocket_api.websocket_command({vol.Required("type"): "maison/menu/plats"})
+@websocket_api.async_response
+async def ws_menu_plats(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    if (cuisine := _cuisine(hass, connection, msg)) is not None:
+        connection.send_result(msg["id"], cuisine.plats())
+
+
 COMMANDES_MENU = (
     ws_menu_etat, ws_menu_generer, ws_menu_lire, ws_menu_remplacer, ws_menu_vers_courses,
-    ws_jus_catalogue, ws_jus_regenerer,
+    ws_jus_catalogue, ws_jus_regenerer, ws_menu_plat, ws_menu_plats,
 )
