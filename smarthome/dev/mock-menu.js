@@ -121,7 +121,7 @@ export function creerMenuSimule({ erreur, courses }) {
   }
 
   let photos = 0;
-  function ajouterPhotosPlusTard(recettes) {
+  function ajouterPhotosPlusTard(recettes, delai = DELAI_PHOTOS_MS) {
     setTimeout(() => {
       for (const r of recettes) {
         if (r.photo) continue;
@@ -131,7 +131,7 @@ export function creerMenuSimule({ erreur, courses }) {
           credit: { auteur: 'Photographe démo', lien: 'https://www.pexels.com' },
         };
       }
-    }, DELAI_PHOTOS_MS);
+    }, delai);
   }
 
   // Catalogue de jus du jour : généré au premier appel du jour, hors quota
@@ -231,6 +231,7 @@ export function creerMenuSimule({ erreur, courses }) {
 
   // Menu de départ pour que la vue ne soit pas vide en dev
   etat.menu = construire({ jours: 5, repas: ['jus', 'diner'], personnes: 4, preferences: [], allergies: ['arachide'], note: '' });
+  ajouterPhotosPlusTard(Object.values(etat.menu.recettes), 0);   // menu de départ : photos déjà prêtes
 
   async function commande(message) {
     switch (message.type) {
